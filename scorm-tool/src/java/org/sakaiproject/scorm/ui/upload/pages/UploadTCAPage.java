@@ -61,6 +61,7 @@ public class UploadTCAPage extends ConsoleBasePage implements ScormConstants {
     private static final long serialVersionUID = 1L;
     private static final ResourceReference PAGE_ICON = new ResourceReference(ConsoleBasePage.class, "res/table_add.png");
     private static final Log LOG = LogFactory.getLog(FileUploadForm.class);
+    private static final boolean IS_TINCANAPI_PACKAGE = true;
 
     // SCO-97 sakai.property to enable/disable (show/hide) email sending (drop down)
     private static final String SAK_PROP_SCORM_ENABLE_EMAIL = "scorm.enable.email";
@@ -214,21 +215,22 @@ public class UploadTCAPage extends ConsoleBasePage implements ScormConstants {
                 protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
                     if(fileUploadField != null) {
                         final FileUpload upload = fileUploadField.getFileUpload();
+
                         if(upload != null) {
                             try {
                                 String resourceId = resourceService.putArchive(upload.getInputStream(), upload.getClientFileName(), upload.getContentType(), isFileHidden(), getPriority());
-                                int status = contentService.storeAndValidate(resourceId, isFileValidated(), serverConfigurationService.getString( "scorm.zip.encoding", "UTF-8" ));
+                                int status = contentService.storeAndValidate(resourceId, isFileValidated(), serverConfigurationService.getString( "scorm.zip.encoding", "UTF-8"), IS_TINCANAPI_PACKAGE);
 
                                 if(status == VALIDATION_SUCCESS) {
-                                    setResponsePage( PackageListPage.class );
+                                    setResponsePage(PackageListPage.class);
                                 } else {
                                     PageParameters params = new PageParameters();
-                                    params.add( "resourceId", resourceId );
-                                    params.put( "status", status );
-                                    setResponsePage( ConfirmPage.class, params );
+                                    params.add("resourceId", resourceId);
+                                    params.put("status", status);
+                                    setResponsePage( ConfirmPage.class, params);
                                 }
                             } catch(Exception e) {
-                                UploadTCAPage.this.warn(getLocalizer().getString( "upload.failed", UploadTCAPage.this, new Model(e)));
+                                UploadTCAPage.this.warn(getLocalizer().getString("upload.failed", UploadTCAPage.this, new Model(e)));
                                 LOG.error("Failed to upload file", e);
                             }
                         }

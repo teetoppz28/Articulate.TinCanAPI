@@ -47,20 +47,19 @@ import org.sakaiproject.scorm.exceptions.ResourceNotDeletedException;
 import org.sakaiproject.scorm.exceptions.ResourceStorageException;
 import org.sakaiproject.scorm.model.api.ContentPackage;
 import org.sakaiproject.scorm.model.api.ContentPackageManifest;
+import org.sakaiproject.scorm.model.api.TinCanAPIManifest;
 import org.sakaiproject.scorm.service.api.LearningManagementSystem;
 import org.sakaiproject.scorm.service.api.ScormContentService;
 import org.sakaiproject.scorm.service.api.ScormResourceService;
+import org.sakaiproject.scorm.service.api.TinCanAPIContentService;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public abstract class ScormContentServiceImpl implements ScormContentService, ScormConstants {
+public abstract class ScormContentServiceImpl extends BaseContentServiceImpl implements ScormContentService, ScormConstants {
 	private static Log log = LogFactory.getLog(ScormContentServiceImpl.class);
 
-	// Data access objects (also dependency injected by lookup method)
-	protected abstract ContentPackageDao contentPackageDao();
-
-	protected abstract ContentPackageManifestDao contentPackageManifestDao();
+    protected TinCanAPIContentService tinCanAPIContentService;
 
 	/**
 	 * Takes the identifier for a content package that's been stored in the
@@ -261,10 +260,6 @@ public abstract class ScormContentServiceImpl implements ScormContentService, Sc
 		return title;
 	}
 
-	protected abstract LearnerDao learnerDao();
-
-	protected abstract LearningManagementSystem lms();
-
 	public void removeContentPackage(long contentPackageId) throws ResourceNotDeletedException {
 		LearningManagementSystem lms = lms();
 		if (lms.canDelete(lms.currentContext())) {
@@ -276,9 +271,6 @@ public abstract class ScormContentServiceImpl implements ScormContentService, Sc
 		}
 
 	}
-
-	// Dependency injected lookup methods
-	protected abstract ScormResourceService resourceService();
 
 	// Helper methods
 
@@ -313,21 +305,39 @@ public abstract class ScormContentServiceImpl implements ScormContentService, Sc
 	    return validate(resourceId, false, true, encoding, false);
 	}
 	
-	public int storeAndValidate(String resourceId, boolean isValidateToSchema, String encoding) throws ResourceStorageException {
-		return validate(resourceId, false, isValidateToSchema, encoding, true);
-	}
+    public int storeAndValidate(String resourceId, boolean isValidateToSchema, String encoding, boolean isTinCanApi) throws ResourceStorageException {
+        return validate(resourceId, false, isValidateToSchema, encoding, true, isTinCanApi);
+    }
 
-	
+    public int storeAndValidate(String resourceId, boolean isValidateToSchema, String encoding) throws ResourceStorageException {
+        return validate(resourceId, false, isValidateToSchema, encoding, true);
+    }
+
+    public int validate(String resourceId, boolean isManifestOnly, boolean isValidateToSchema, String encoding, boolean createContentPackage) throws ResourceStorageException {
+        return validate(resourceId, isManifestOnly, isValidateToSchema, encoding, createContentPackage, false);
+    }
+
 	/* (non-Javadoc)
 	 * @see org.sakaiproject.scorm.service.api.ScormContentService#validate(java.lang.String, boolean, boolean, java.lang.String)
 	 */
-	public int validate(String resourceId, boolean isManifestOnly, boolean isValidateToSchema, String encoding, boolean createContentPackage) throws ResourceStorageException {
+    public int validate(String resourceId, boolean isManifestOnly, boolean isValidateToSchema, String encoding, boolean createContentPackage, boolean isTinCanApi) throws ResourceStorageException {
 		File file = createFile(resourceService().getArchiveStream(resourceId));
 
 		int result = VALIDATION_SUCCESS;
 
-		if (!file.exists())
-			return VALIDATION_NOFILE;
+        if (!file.exists()) {
+            return VALIDATION_NOFILE;
+        }
+
+        // if this is a TinCanAPI package, skip the normal validation
+        if (isTinCanApi) {
+            TinCanAPIManifest tinCanAPIManifest = tinCanAPIContentService.createManifest(file);
+            if (!tinCanAPIManifest.isValid()) {
+                return VALIDATION_NOTWELLFORMED;
+            }
+
+            return VALIDATION_SUCCESS;
+        }
 
 		IValidator validator = validate(file, isManifestOnly, isValidateToSchema, encoding);
 		IValidatorOutcome validatorOutcome = validator.getADLValidatorOutcome();
