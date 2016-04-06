@@ -50,8 +50,8 @@ import org.apache.wicket.util.lang.Bytes;
 import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.event.api.NotificationService;
 import org.sakaiproject.scorm.api.ScormConstants;
-import org.sakaiproject.scorm.service.api.ScormContentService;
 import org.sakaiproject.scorm.service.api.ScormResourceService;
+import org.sakaiproject.scorm.service.tincanapi.api.TinCanAPIContentService;
 import org.sakaiproject.scorm.ui.console.pages.ConsoleBasePage;
 import org.sakaiproject.scorm.ui.console.pages.PackageListPage;
 import org.sakaiproject.wicket.markup.html.form.CancelButton;
@@ -61,15 +61,15 @@ public class UploadTCAPage extends ConsoleBasePage implements ScormConstants {
     private static final long serialVersionUID = 1L;
     private static final ResourceReference PAGE_ICON = new ResourceReference(ConsoleBasePage.class, "res/table_add.png");
     private static final Log LOG = LogFactory.getLog(FileUploadForm.class);
-    private static final boolean IS_TINCANAPI_PACKAGE = true;
 
     // SCO-97 sakai.property to enable/disable (show/hide) email sending (drop down)
     private static final String SAK_PROP_SCORM_ENABLE_EMAIL = "scorm.enable.email";
     @SpringBean(name = "org.sakaiproject.component.api.ServerConfigurationService")
     ServerConfigurationService serverConfigurationService;
 
-    @SpringBean(name="org.sakaiproject.scorm.service.api.ScormContentService")
-    ScormContentService contentService;
+    @SpringBean(name="tinCanAPIContentService")
+    TinCanAPIContentService tinCanAPIContentService;
+
     @SpringBean(name="org.sakaiproject.scorm.service.api.ScormResourceService")
     ScormResourceService resourceService;
 
@@ -218,16 +218,16 @@ public class UploadTCAPage extends ConsoleBasePage implements ScormConstants {
 
                         if(upload != null) {
                             try {
-                                String resourceId = resourceService.putArchive(upload.getInputStream(), upload.getClientFileName(), upload.getContentType(), isFileHidden(), getPriority());
-                                int status = contentService.storeAndValidate(resourceId, isFileValidated(), serverConfigurationService.getString( "scorm.zip.encoding", "UTF-8"), IS_TINCANAPI_PACKAGE);
-
+                                //String resourceId = resourceService.putArchive(upload.getInputStream(), upload.getClientFileName(), upload.getContentType(), isFileHidden(), getPriority());
+                                //int status = contentService.storeAndValidate(resourceId, isFileValidated(), serverConfigurationService.getString( "scorm.zip.encoding", "UTF-8"), IS_TINCANAPI_PACKAGE);
+                                int status = tinCanAPIContentService.validateAndStore(upload.getInputStream(), upload.getClientFileName(), upload.getContentType());
                                 if(status == VALIDATION_SUCCESS) {
                                     setResponsePage(PackageListPage.class);
                                 } else {
                                     PageParameters params = new PageParameters();
-                                    params.add("resourceId", resourceId);
+                                    params.add("resourceId", "WHAT IS THIS???");
                                     params.put("status", status);
-                                    setResponsePage( ConfirmPage.class, params);
+                                    setResponsePage(ConfirmPage.class, params);
                                 }
                             } catch(Exception e) {
                                 UploadTCAPage.this.warn(getLocalizer().getString("upload.failed", UploadTCAPage.this, new Model(e)));
