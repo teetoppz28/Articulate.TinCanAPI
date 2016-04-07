@@ -12,7 +12,7 @@ public interface TinCanAPIContentService {
      * @param inputStream the uploaded content stream
      * @param packageName the name of the file uploaded
      * @param contentType the mimetype of the content
-     * @return
+     * @return the status
      */
     public int validateAndProcess(InputStream inputStream, String packageName, String contentType);
 

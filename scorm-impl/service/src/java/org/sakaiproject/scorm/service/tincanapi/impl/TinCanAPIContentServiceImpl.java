@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.sakaiproject.antivirus.api.VirusFoundException;
 import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.content.api.ContentCollectionEdit;
 import org.sakaiproject.content.api.ContentHostingService;
@@ -21,6 +22,7 @@ import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.exception.IdUsedException;
 import org.sakaiproject.exception.InUseException;
 import org.sakaiproject.exception.InconsistentException;
+import org.sakaiproject.exception.OverQuotaException;
 import org.sakaiproject.exception.PermissionException;
 import org.sakaiproject.exception.ServerOverloadException;
 import org.sakaiproject.exception.TypeException;
@@ -48,6 +50,12 @@ public abstract class TinCanAPIContentServiceImpl extends ZipContentUtil impleme
     private String launchPage;
     private boolean removeExistingContentPackage;
     private boolean hideContentPackageRoot;
+    private String currentContext;
+    private String siteRootCollection;
+    private String rootPackageCollectionPath;
+    private String contentPackageCollectionId;
+    private String contentPackageCollectionPath;
+    private String contentPackageZipFilePath;
 
     public void init() {
         collectionPackageRoot = serverConfigurationService.getString("tincanapi.package.root.dir", "TinCanAPI_Packages");
@@ -59,17 +67,19 @@ public abstract class TinCanAPIContentServiceImpl extends ZipContentUtil impleme
     @Override
     public int validateAndProcess(InputStream inputStream, String packageName, String contentType) {
         if (inputStream == null) {
-            throw new IllegalArgumentException("InputStream cannot be null.");
+            return VALIDATION_NOFILE;
+            //throw new IllegalArgumentException("InputStream cannot be null.");
         }
         if (StringUtils.isBlank(packageName)) {
-            throw new IllegalArgumentException("Package name cannot be empty.");
+            return VALIDATION_NOTWELLFORMED;
+            //throw new IllegalArgumentException("Package name cannot be empty.");
         }
-        if (StringUtils.isBlank(contentType)) {
-            throw new IllegalArgumentException("Content type cannot be empty.");
-        }
-        if (StringUtils.equals(ZIP_MIMETYPE, contentType)) {
+        if (!StringUtils.equals(ZIP_MIMETYPE, contentType)) {
             return VALIDATION_WRONGMIMETYPE;
         }
+
+        setPathVariables(packageName);
+
         String launchUrl = processPackage(inputStream, packageName, contentType);
 
         return VALIDATION_SUCCESS;
@@ -85,49 +95,19 @@ public abstract class TinCanAPIContentServiceImpl extends ZipContentUtil impleme
 
     @Override
     public String processPackage(InputStream inputStream, String packageName, String contentType) {
-        String currentContext = lms().currentContext();
-        String siteRootCollection = ContentHostingService.COLLECTION_SITE + currentContext + "/";
-        String rootPackageCollectionPath =  siteRootCollection + collectionPackageRoot + "/";
-        String contentPackageCollectionId = packageName.substring(0, packageName.lastIndexOf("."));
-        String contentPackageCollectionPath = rootPackageCollectionPath + contentPackageCollectionId + "/";
-        String contentPackageZipFilePath = rootPackageCollectionPath + packageName;
-        ContentCollectionEdit rootPackageCollectionEdit = null;
-        ContentCollectionEdit contentPackageCollectionEdit = null;
-
         try {
-            // check if root package dir exists, if not, create it
-            List<String> siteRootChildren = contentHostingService.getCollection(siteRootCollection).getMembers();
-            if (!siteRootChildren.contains(rootPackageCollectionPath)) {
-                // root collection not found, create it
-                rootPackageCollectionEdit = addOrEditCollection(rootPackageCollectionPath);
-                rootPackageCollectionEdit.setHidden();
-                addProperty(rootPackageCollectionEdit, ResourceProperties.PROP_DISPLAY_NAME, collectionPackageRoot);
-                addProperty(rootPackageCollectionEdit, ResourceProperties.PROP_HIDDEN_WITH_ACCESSIBLE_CONTENT, Boolean.toString(hideContentPackageRoot));
-                contentHostingService.commitCollection(rootPackageCollectionEdit);
-            }
+            String zipFileId = storeZipFile(inputStream);
+            // TODO add validation to ensure this is a TinCanAPI archive (if a tincan.xml file exists)
 
-            // check if content package dir exists, if so, remove it (if configured)
-            if (removeExistingContentPackage) {
-                List<String> packageRootChildren = contentHostingService.getCollection(rootPackageCollectionPath).getMembers();
-                if (packageRootChildren.contains(contentPackageCollectionPath)) {
-                    // delete existing package collection
-                    contentPackageCollectionEdit = contentHostingService.editCollection(contentPackageCollectionPath);
-                    contentHostingService.removeCollection(contentPackageCollectionEdit);
-                }
-            }
+            processRootDirectory();
 
-            // add the zip file to the root content package dir
-            ContentResourceEdit zipFile = addOrEditResource(contentPackageZipFilePath);
-            zipFile.setContent(inputStream);
-            zipFile.setContentType(ZIP_MIMETYPE);
-            contentHostingService.commitResource(zipFile);
+            processContentPackageDirectory();
 
             // extract the files to the current directory
-            contentHostingService.expandZippedResource(zipFile.getId());
+            contentHostingService.expandZippedResource(zipFileId);
 
             // remove the content package zip file after it's extracted
-            zipFile = editResource(contentPackageZipFilePath);
-            contentHostingService.removeResource(zipFile);
+            contentHostingService.removeResource(contentPackageZipFilePath);
         } catch (Exception e) {
             log.error("An error occurred extracting the TinCanAPI zip file into resources.", e);
             return null;
@@ -137,6 +117,74 @@ public abstract class TinCanAPIContentServiceImpl extends ZipContentUtil impleme
         String relativeUrl = contentPackageCollectionId + launchPage;
 
         return relativeUrl;
+    }
+
+    /**
+     * Set the necessary file path variables
+     * 
+     * @param packageName the uploaded file name
+     */
+    private void setPathVariables(String packageName) {
+        currentContext = lms().currentContext();
+        siteRootCollection = ContentHostingService.COLLECTION_SITE + currentContext + "/";
+        rootPackageCollectionPath =  siteRootCollection + collectionPackageRoot + "/";
+        contentPackageCollectionId = packageName.substring(0, packageName.lastIndexOf("."));
+        contentPackageCollectionPath = rootPackageCollectionPath + contentPackageCollectionId + "/";
+        contentPackageZipFilePath = rootPackageCollectionPath + packageName;
+    }
+
+    /**
+     * Check if root package directory exists, if not, create it
+     *
+     * @throws IdUnusedException
+     * @throws TypeException
+     * @throws PermissionException
+     */
+    private void processRootDirectory() throws IdUnusedException, TypeException, PermissionException {
+        List<String> siteRootChildren = contentHostingService.getCollection(siteRootCollection).getMembers();
+        if (!siteRootChildren.contains(rootPackageCollectionPath)) {
+            // root collection not found, create it
+            ContentCollectionEdit rootPackageCollectionEdit = addOrEditCollection(rootPackageCollectionPath);
+            rootPackageCollectionEdit.setHidden();
+            addProperty(rootPackageCollectionEdit, ResourceProperties.PROP_DISPLAY_NAME, collectionPackageRoot);
+            addProperty(rootPackageCollectionEdit, ResourceProperties.PROP_HIDDEN_WITH_ACCESSIBLE_CONTENT, Boolean.toString(hideContentPackageRoot));
+            contentHostingService.commitCollection(rootPackageCollectionEdit);
+        }
+    }
+
+    /**
+     * Check if content package dir exists, if so, remove it (if configured)
+     *
+     * @throws IdUnusedException
+     * @throws TypeException
+     * @throws PermissionException
+     * @throws InUseException
+     * @throws ServerOverloadException
+     */
+    private void processContentPackageDirectory() throws IdUnusedException, TypeException, PermissionException, InUseException, ServerOverloadException {
+        if (removeExistingContentPackage) {
+            List<String> packageRootChildren = contentHostingService.getCollection(rootPackageCollectionPath).getMembers();
+            if (packageRootChildren.contains(contentPackageCollectionPath)) {
+                // delete existing package collection
+                contentHostingService.removeCollection(contentPackageCollectionPath);
+            }
+        }
+    }
+
+    /**
+     * Store the zip file in the root package directory
+     *
+     * @throws VirusFoundException 
+     * @throws ServerOverloadException 
+     * @throws OverQuotaException 
+     */
+    private String storeZipFile(InputStream inputStream) throws OverQuotaException, ServerOverloadException, VirusFoundException {
+        ContentResourceEdit zipFile = addOrEditResource(contentPackageZipFilePath);
+        zipFile.setContent(inputStream);
+        zipFile.setContentType(ZIP_MIMETYPE);
+        contentHostingService.commitResource(zipFile);
+
+        return zipFile.getId();
     }
 
     private ContentCollectionEdit addOrEditCollection(String collectionPath) {
@@ -151,12 +199,6 @@ public abstract class TinCanAPIContentServiceImpl extends ZipContentUtil impleme
     private ContentCollectionEdit addCollection(String collectionPath) throws IdUsedException {
         try {
             return contentHostingService.addCollection(collectionPath);
-        } catch (IdInvalidException e) {
-            e.printStackTrace();
-        } catch (PermissionException e) {
-            e.printStackTrace();
-        } catch (InconsistentException e) {
-            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -167,13 +209,7 @@ public abstract class TinCanAPIContentServiceImpl extends ZipContentUtil impleme
     private ContentCollectionEdit editCollection(String collectionPath) {
         try {
             return contentHostingService.editCollection(collectionPath);
-        } catch (IdUnusedException e) {
-            e.printStackTrace();
-        } catch (TypeException e) {
-            e.printStackTrace();
-        } catch (PermissionException e) {
-            e.printStackTrace();
-        } catch (InUseException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -191,15 +227,9 @@ public abstract class TinCanAPIContentServiceImpl extends ZipContentUtil impleme
     private ContentResourceEdit addResource(String resourcePath) throws IdUsedException {
         try {
             return contentHostingService.addResource(resourcePath);
-        } catch (PermissionException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (IdInvalidException e) {
-            e.printStackTrace();
-        } catch (InconsistentException e) {
-            e.printStackTrace();
-        } catch (ServerOverloadException e) {
-            e.printStackTrace();
-        }
+        } 
 
         return null;
     }
@@ -207,13 +237,7 @@ public abstract class TinCanAPIContentServiceImpl extends ZipContentUtil impleme
     private ContentResourceEdit editResource(String resourcePath) {
         try {
             return contentHostingService.editResource(resourcePath);
-        } catch (PermissionException e) {
-            e.printStackTrace();
-        } catch (IdUnusedException e) {
-            e.printStackTrace();
-        } catch (TypeException e) {
-            e.printStackTrace();
-        } catch (InUseException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

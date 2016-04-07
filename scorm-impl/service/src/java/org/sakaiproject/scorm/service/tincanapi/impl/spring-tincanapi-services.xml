@@ -22,7 +22,7 @@
   -->
 <beans>
 
-    <bean id="tinCanAPIContentService" class="org.sakaiproject.scorm.service.tincanapi.impl.TinCanAPIContentServiceImpl" singleton="true">
+    <bean id="tinCanAPIContentService" class="org.sakaiproject.scorm.service.tincanapi.impl.TinCanAPIContentServiceImpl" singleton="true" init-method="init">
         <!-- Service beans -->
         <lookup-method name="lms" bean="org.sakaiproject.scorm.service.api.LearningManagementSystem" />
         <lookup-method name="resourceService" bean="org.sakaiproject.scorm.service.api.ScormResourceService" />
