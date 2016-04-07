@@ -26,8 +26,10 @@
         <!-- Service beans -->
         <lookup-method name="lms" bean="org.sakaiproject.scorm.service.api.LearningManagementSystem" />
         <lookup-method name="resourceService" bean="org.sakaiproject.scorm.service.api.ScormResourceService" />
+
         <property name="contentHostingService" ref="org.sakaiproject.content.api.ContentHostingService" />
-        
+        <property name="serverConfigurationService" ref="org.sakaiproject.component.api.ServerConfigurationService" />
+
         <!-- Data Access Objects -->
         <!-- lookup-method name="contentPackageDao" bean="org.sakaiproject.scorm.dao.api.ContentPackageDao" />
         <lookup-method name="contentPackageManifestDao" bean="org.sakaiproject.scorm.dao.api.ContentPackageManifestDao" />
