@@ -43,7 +43,10 @@
 	
 	<!-- Bring in the sakai content hosting handler beans -->
 	<import resource="classpath*:org/sakaiproject/**/spring-sakai-content.xml" />
-	
+
+    <!-- Bring the TinCanAPI services -->
+    <import resource="classpath*:org/sakaiproject/**/spring-tincanapi-services.xml" />
+
 	<!-- // Comment this out if you want to use 'standalone' content storage in place of Sakai's standard repository -->
 	<!--
 	<import resource="spring-sakai-chh.xml" />

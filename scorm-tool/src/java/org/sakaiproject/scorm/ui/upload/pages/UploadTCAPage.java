@@ -220,7 +220,7 @@ public class UploadTCAPage extends ConsoleBasePage implements ScormConstants {
                             try {
                                 //String resourceId = resourceService.putArchive(upload.getInputStream(), upload.getClientFileName(), upload.getContentType(), isFileHidden(), getPriority());
                                 //int status = contentService.storeAndValidate(resourceId, isFileValidated(), serverConfigurationService.getString( "scorm.zip.encoding", "UTF-8"), IS_TINCANAPI_PACKAGE);
-                                int status = tinCanAPIContentService.validateAndStore(upload.getInputStream(), upload.getClientFileName(), upload.getContentType());
+                                int status = tinCanAPIContentService.validateAndProcess(upload.getInputStream(), upload.getClientFileName(), upload.getContentType());
                                 if(status == VALIDATION_SUCCESS) {
                                     setResponsePage(PackageListPage.class);
                                 } else {

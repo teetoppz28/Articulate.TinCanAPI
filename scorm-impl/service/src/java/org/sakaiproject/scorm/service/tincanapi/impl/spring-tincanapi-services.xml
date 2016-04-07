@@ -33,7 +33,6 @@
         <lookup-method name="contentPackageManifestDao" bean="org.sakaiproject.scorm.dao.api.ContentPackageManifestDao" />
         <lookup-method name="dataManagerDao" bean="org.sakaiproject.scorm.dao.api.DataManagerDao" />
         <lookup-method name="learnerDao" bean="org.sakaiproject.scorm.dao.LearnerDao" / -->
-
     </bean>
 
 </beans>
