@@ -29,12 +29,22 @@
 
         <property name="contentHostingService" ref="org.sakaiproject.content.api.ContentHostingService" />
         <property name="serverConfigurationService" ref="org.sakaiproject.component.api.ServerConfigurationService" />
+        <property name="tinCanAPIDocumentUtils" ref="tinCanAPIDocumentUtils" />
+        <property name="tinCanAPIContentEntityUtils" ref="tinCanAPIContentEntityUtils" />
 
         <!-- Data Access Objects -->
-        <!-- lookup-method name="contentPackageDao" bean="org.sakaiproject.scorm.dao.api.ContentPackageDao" />
-        <lookup-method name="contentPackageManifestDao" bean="org.sakaiproject.scorm.dao.api.ContentPackageManifestDao" />
+        <lookup-method name="contentPackageDao" bean="org.sakaiproject.scorm.dao.api.ContentPackageDao" />
+        <!-- lookup-method name="contentPackageManifestDao" bean="org.sakaiproject.scorm.dao.api.ContentPackageManifestDao" />
         <lookup-method name="dataManagerDao" bean="org.sakaiproject.scorm.dao.api.DataManagerDao" />
         <lookup-method name="learnerDao" bean="org.sakaiproject.scorm.dao.LearnerDao" / -->
+    </bean>
+
+    <bean id="tinCanAPIDocumentUtils" class="org.sakaiproject.scorm.service.tincanapi.impl.util.TinCanAPIDocumentUtils" singleton="true">
+        <property name="contentHostingService" ref="org.sakaiproject.content.api.ContentHostingService" />
+    </bean>
+
+    <bean id="tinCanAPIContentEntityUtils" class="org.sakaiproject.scorm.service.tincanapi.impl.util.TinCanAPIContentEntityUtils" singleton="true">
+        <property name="contentHostingService" ref="org.sakaiproject.content.api.ContentHostingService" />
     </bean>
 
 </beans>

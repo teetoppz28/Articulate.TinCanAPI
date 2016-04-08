@@ -1,11 +1,17 @@
 package org.sakaiproject.scorm.model.tincanapi;
 
+import org.apache.commons.lang.StringUtils;
+
 public class TinCanAPIMeta {
 
     private String courseId;
     private String id;
     private String title;
 
+    public final static String ATTR_COURSEID = "courseid";
+    public final static String ATTR_ID = "id";
+    public final static String ATTR_TITLE = "title";
+    
     public TinCanAPIMeta() {
     }
 
@@ -39,4 +45,17 @@ public class TinCanAPIMeta {
         this.title = title;
     }
 
+    public boolean isValid() {
+        if (StringUtils.isBlank(this.courseId)) {
+            return false;
+        }
+        if (StringUtils.isBlank(this.id)) {
+            return false;
+        }
+        if (StringUtils.isBlank(this.title)) {
+            return false;
+        }
+
+        return true;
+    }
 }
