@@ -1,7 +1,12 @@
 package org.sakaiproject.scorm.service.tincanapi.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import lombok.Setter;
 
@@ -12,6 +17,7 @@ import org.sakaiproject.antivirus.api.VirusFoundException;
 import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.content.api.ContentCollectionEdit;
 import org.sakaiproject.content.api.ContentHostingService;
+import org.sakaiproject.content.api.ContentResource;
 import org.sakaiproject.content.api.ContentResourceEdit;
 import org.sakaiproject.content.util.ZipContentUtil;
 import org.sakaiproject.entity.api.Edit;
@@ -28,9 +34,16 @@ import org.sakaiproject.exception.ServerOverloadException;
 import org.sakaiproject.exception.TypeException;
 import org.sakaiproject.scorm.api.ScormConstants;
 import org.sakaiproject.scorm.model.tincanapi.TinCanAPIManifest;
+import org.sakaiproject.scorm.model.tincanapi.TinCanAPIMeta;
 import org.sakaiproject.scorm.service.api.LearningManagementSystem;
 import org.sakaiproject.scorm.service.api.ScormResourceService;
 import org.sakaiproject.scorm.service.tincanapi.api.TinCanAPIContentService;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 public abstract class TinCanAPIContentServiceImpl extends ZipContentUtil implements TinCanAPIContentService, ScormConstants {
 
@@ -45,6 +58,7 @@ public abstract class TinCanAPIContentServiceImpl extends ZipContentUtil impleme
     protected abstract ScormResourceService resourceService();
 
     private final static String ZIP_MIMETYPE = "application/zip";
+    private final static String META_XML_FILE = "meta.xml";
 
     private String collectionPackageRoot;
     private String launchPage;
@@ -56,6 +70,7 @@ public abstract class TinCanAPIContentServiceImpl extends ZipContentUtil impleme
     private String contentPackageCollectionId;
     private String contentPackageCollectionPath;
     private String contentPackageZipFilePath;
+    private Document metaXmlDocument;
 
     public void init() {
         collectionPackageRoot = serverConfigurationService.getString("tincanapi.package.root.dir", "TinCanAPI_Packages");
@@ -81,6 +96,8 @@ public abstract class TinCanAPIContentServiceImpl extends ZipContentUtil impleme
         setPathVariables(packageName);
 
         String launchUrl = processPackage(inputStream, packageName, contentType);
+        createMetaDocument();
+        createManifest();
 
         return VALIDATION_SUCCESS;
     }
@@ -88,9 +105,53 @@ public abstract class TinCanAPIContentServiceImpl extends ZipContentUtil impleme
     @Override
     public TinCanAPIManifest createManifest() {
         // TODO implement this
-        TinCanAPIManifest tinCanAPIManifest = new TinCanAPIManifest();
+        TinCanAPIMeta tinCanAPIMeta = processMetaXml();
+        TinCanAPIManifest tinCanAPIManifest = new TinCanAPIManifest(tinCanAPIMeta);
 
         return tinCanAPIManifest;
+    }
+
+    /**
+     * Get the required data from the meta.xml file
+     * @return
+     */
+    private TinCanAPIMeta processMetaXml() {
+        NodeList projectList = metaXmlDocument.getElementsByTagName("project");
+        Node project = projectList.item(0);
+        Element element = (Element) project;
+
+        TinCanAPIMeta tinCanAPIMeta = new TinCanAPIMeta(
+            element.getAttribute("courseid"),
+            element.getAttribute("id"),
+            element.getAttribute("title")
+        );
+
+        return tinCanAPIMeta;
+    }
+
+    private void createMetaDocument() {
+        ContentResource metaFile = null;
+        try {
+            metaFile = contentHostingService.getResource(contentPackageCollectionPath + META_XML_FILE);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        DocumentBuilderFactory factory = null;
+        DocumentBuilder builder = null;
+
+        try {
+            factory = DocumentBuilderFactory.newInstance();
+              builder = factory.newDocumentBuilder();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            metaXmlDocument = builder.parse(new ByteArrayInputStream(metaFile.getContent()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
