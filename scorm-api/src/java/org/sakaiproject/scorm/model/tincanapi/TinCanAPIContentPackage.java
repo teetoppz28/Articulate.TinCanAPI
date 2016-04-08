@@ -3,38 +3,47 @@ package org.sakaiproject.scorm.model.tincanapi;
 import org.apache.commons.lang.StringUtils;
 import org.sakaiproject.scorm.model.api.ContentPackage;
 
-public class TinCanAPIContentPackage extends ContentPackage {
+public class TinCanAPIContentPackage {
 
     private static final long serialVersionUID = 1L;
 
+    private ContentPackage contentPackage;
+
     public TinCanAPIContentPackage() {
-        super();
+        contentPackage = new ContentPackage();
     }
 
     public TinCanAPIContentPackage(TinCanAPIMeta tinCanAPIMeta) {
-        super();
-        setContext(tinCanAPIMeta.getCourseId());
-        setTitle(tinCanAPIMeta.getTitle());
-        setResourceId(tinCanAPIMeta.getId());
-        setDeleted(false);
+        this();
+        contentPackage.setContext(tinCanAPIMeta.getCourseId());
+        contentPackage.setTitle(tinCanAPIMeta.getTitle());
+        contentPackage.setResourceId(tinCanAPIMeta.getId());
+        contentPackage.setDeleted(false);
     }
 
     public TinCanAPIContentPackage(TinCanAPIMeta tinCanAPIMeta, String launchUrl) {
         this(tinCanAPIMeta);
-        setUrl(launchUrl);
+        contentPackage.setUrl(launchUrl);
+    }
+
+    public ContentPackage getContentPackage() {
+        return contentPackage;
     }
 
     public boolean isValid() {
-        if (StringUtils.isBlank(getContext())) {
+        if (this.contentPackage == null) {
             return false;
         }
-        if (StringUtils.isBlank(getTitle())) {
+        if (StringUtils.isBlank(contentPackage.getContext())) {
             return false;
         }
-        if (StringUtils.isBlank(getResourceId())) {
+        if (StringUtils.isBlank(contentPackage.getTitle())) {
             return false;
         }
-        if (StringUtils.isBlank(getUrl())) {
+        if (StringUtils.isBlank(contentPackage.getResourceId())) {
+            return false;
+        }
+        if (StringUtils.isBlank(contentPackage.getUrl())) {
             return false;
         }
 
@@ -43,7 +52,11 @@ public class TinCanAPIContentPackage extends ContentPackage {
 
     @Override
     public String toString() {
-        return "TinCanAPIManifest :: context: " + getContext() + ", title: " + getTitle() + ", resourceId: " + getResourceId() + ", launchUrl: " + getUrl();
+        return "TinCanAPIManifest :: " +
+                    "context: " + contentPackage.getContext() +
+                    ", title: " + contentPackage.getTitle() +
+                    ", resourceId: " + contentPackage.getResourceId() +
+                    ", launchUrl: " + contentPackage.getUrl();
     }
 
 }
