@@ -1,9 +1,12 @@
 package org.sakaiproject.scorm.model.tincanapi;
 
+import java.io.Serializable;
+import java.util.Date;
+
 import org.apache.commons.lang.StringUtils;
 import org.sakaiproject.scorm.model.api.ContentPackage;
 
-public class TinCanAPIContentPackage {
+public class TinCanAPIContentPackage implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -15,10 +18,17 @@ public class TinCanAPIContentPackage {
 
     public TinCanAPIContentPackage(TinCanAPIMeta tinCanAPIMeta) {
         this();
-        contentPackage.setContext(tinCanAPIMeta.getCourseId());
-        contentPackage.setTitle(tinCanAPIMeta.getTitle());
-        contentPackage.setResourceId(tinCanAPIMeta.getId());
-        contentPackage.setDeleted(false);
+        if (tinCanAPIMeta != null) {
+            contentPackage.setContext(tinCanAPIMeta.getCourseId());
+            contentPackage.setTitle(tinCanAPIMeta.getTitle());
+            contentPackage.setResourceId(tinCanAPIMeta.getId());
+            contentPackage.setDeleted(false);
+            contentPackage.setReleaseOn(new Date());
+            contentPackage.setCreatedOn(new Date());
+            contentPackage.setCreatedBy(tinCanAPIMeta.getCreatedBy());
+            contentPackage.setModifiedOn(new Date());
+            contentPackage.setModifiedBy(tinCanAPIMeta.getCreatedBy());
+        }
     }
 
     public TinCanAPIContentPackage(TinCanAPIMeta tinCanAPIMeta, String launchUrl) {

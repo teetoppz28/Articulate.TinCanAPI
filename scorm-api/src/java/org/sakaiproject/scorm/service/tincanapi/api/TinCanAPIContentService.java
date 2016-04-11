@@ -30,9 +30,9 @@ public interface TinCanAPIContentService {
     /**
      * Get the required data from the meta.xml file
      * 
-     * @return true if the {@link TinCanAPIMeta} object is valid
+     * @return the {@link TinCanAPIMeta} object, if valid
      */
-    public boolean processMetaXml();
+    public TinCanAPIMeta processMetaXml();
 
     /**
      * Creates a content package object

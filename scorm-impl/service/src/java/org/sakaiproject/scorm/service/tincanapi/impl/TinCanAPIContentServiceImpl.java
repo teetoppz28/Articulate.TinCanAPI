@@ -13,12 +13,13 @@ import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.content.api.ContentCollectionEdit;
 import org.sakaiproject.content.api.ContentHostingService;
 import org.sakaiproject.content.api.ContentResourceEdit;
+import org.sakaiproject.entity.api.Entity;
 import org.sakaiproject.entity.api.ResourceProperties;
+import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.scorm.dao.api.ContentPackageDao;
 import org.sakaiproject.scorm.model.tincanapi.TinCanAPIConstants;
 import org.sakaiproject.scorm.model.tincanapi.TinCanAPIContentPackage;
 import org.sakaiproject.scorm.model.tincanapi.TinCanAPIMeta;
-import org.sakaiproject.scorm.service.api.LearningManagementSystem;
 import org.sakaiproject.scorm.service.api.ScormResourceService;
 import org.sakaiproject.scorm.service.tincanapi.api.TinCanAPIContentService;
 import org.sakaiproject.scorm.service.tincanapi.impl.util.TinCanAPIContentEntityUtils;
@@ -37,31 +38,35 @@ public abstract class TinCanAPIContentServiceImpl implements TinCanAPIContentSer
     @Setter
     private ServerConfigurationService serverConfigurationService;
     @Setter
+    private DeveloperHelperService developerHelperService;
+    @Setter
     private TinCanAPIDocumentUtils tinCanAPIDocumentUtils;
     @Setter
     private TinCanAPIContentEntityUtils tinCanAPIContentEntityUtils;
 
     protected abstract ContentPackageDao contentPackageDao();
-    protected abstract LearningManagementSystem lms();
     protected abstract ScormResourceService resourceService();
 
+    /*
+     * Default settings
+     */
+    private static String DEFAULT_PACKAGE_ROOT_NAME = "TinCanAPI_Packages";
+    private static String DEFAULT_LAUNCH_PAGE = "stroy.html";
+    private static boolean DEFAULT_HIDE_ROOT_DIRECTORY = true;
+
     private String launchPage;
-    private boolean removeExistingContentPackage;
     private boolean hideContentPackageRoot;
     private String packageName;
     private String packageCollectionRootName;
     private String zipFileId;
     private Document metaXmlDocument;
-    private TinCanAPIMeta tinCanAPIMeta;
     private TinCanAPIContentPackage tinCanAPIContentPackage;
-    private String launchUrl;
     private String timestamp;
 
     public void init() {
-        packageCollectionRootName = serverConfigurationService.getString("tincanapi.package.root.dir", "TinCanAPI_Packages");
-        launchPage = serverConfigurationService.getString("tincanapi.package.default.launch.page", "story.html");
-        removeExistingContentPackage = serverConfigurationService.getBoolean("tincanapi.package.remove.existing.package.dir", true);
-        hideContentPackageRoot = serverConfigurationService.getBoolean("tincanapi.package.hide.root.package.dir", true);
+        packageCollectionRootName = serverConfigurationService.getString("tincanapi.package.root.dir", DEFAULT_PACKAGE_ROOT_NAME);
+        launchPage = serverConfigurationService.getString("tincanapi.package.default.launch.page", DEFAULT_LAUNCH_PAGE);
+        hideContentPackageRoot = serverConfigurationService.getBoolean("tincanapi.package.hide.root.package.dir", DEFAULT_HIDE_ROOT_DIRECTORY);
     }
 
     @Override
@@ -80,7 +85,7 @@ public abstract class TinCanAPIContentServiceImpl implements TinCanAPIContentSer
         }
 
         this.packageName = packageName;
-        this.timestamp = "-" + Long.toString((new Date()).getTime());
+        setTimestamp();
 
         // extract archive, save to resources, get the launch URL for content, delete archive file
         boolean packageProcessedSuccessfully = processPackage(inputStream, packageName, contentType);
@@ -96,9 +101,6 @@ public abstract class TinCanAPIContentServiceImpl implements TinCanAPIContentSer
         if (!contentPackageCreatedSuccessfully) {
             return VALIDATION_CONVERTFAILED;
         }
-
-        // save the content package to the database
-        contentPackageDao().save(tinCanAPIContentPackage.getContentPackage());
 
         // move the temp file directory to the permanent directory (if configured)
         moveContentPackage();
@@ -132,7 +134,7 @@ public abstract class TinCanAPIContentServiceImpl implements TinCanAPIContentSer
             }
 
             // get the relative URL for launching the content
-            calculateLaunchUrl(true);
+            getLaunchUrl(true);
         } catch (Exception e) {
             log.error("An error occurred extracting the TinCanAPI zip file into resources.", e);
             return false;
@@ -143,34 +145,42 @@ public abstract class TinCanAPIContentServiceImpl implements TinCanAPIContentSer
 
     @Override
     public boolean createContentPackage() {
-        boolean validMetaXml = processMetaXml();
-        if (!validMetaXml) {
+        tinCanAPIContentPackage = new TinCanAPIContentPackage(processMetaXml(), getLaunchUrl(true));
+
+        if (!tinCanAPIContentPackage.isValid()) {
+            log.error("The TinCanAPI Content Package is invalid. It has been deleted. \n" + tinCanAPIContentPackage.toString());
+            removeArchiveCollection();
+
             return false;
         }
 
-        tinCanAPIContentPackage = new TinCanAPIContentPackage(tinCanAPIMeta, launchUrl);
+        // save the content package to the database
+        contentPackageDao().save(tinCanAPIContentPackage.getContentPackage());
 
-        return tinCanAPIContentPackage.isValid();
+        return true;
     }
 
     @Override
-    public boolean processMetaXml() {
+    public TinCanAPIMeta processMetaXml() {
+        TinCanAPIMeta tinCanAPIMeta = null;
+
         try {
             NodeList projectList = metaXmlDocument.getElementsByTagName("project");
             Node project = projectList.item(0);
             Element element = (Element) project;
-    
+
             tinCanAPIMeta = new TinCanAPIMeta(
-                element.getAttribute(lms().currentContext()),
+                getCurrentContext(),
+                getCurrentUserId(),
                 element.getAttribute(TinCanAPIMeta.ATTR_ID),
                 element.getAttribute(TinCanAPIMeta.ATTR_TITLE)
             );
         } catch (Exception e) {
             log.error("Error occurred processing the meta XML document.", e);
-            return false;
+            removeArchiveCollection();
         }
 
-        return tinCanAPIMeta.isValid();
+        return tinCanAPIMeta;
     }
 
     /**
@@ -196,25 +206,22 @@ public abstract class TinCanAPIContentServiceImpl implements TinCanAPIContentSer
 
     /**
      * Check if root package directory exists, if not, create it
+     * If it exists, update the configured settings
      *
      * @return true, if the root directory is valid
      */
     private boolean processRootDirectory() {
         try {
-            List<String> siteRootChildren = contentHostingService.getCollection(getSiteCollectionRootPath()).getMembers();
-            if (!siteRootChildren.contains(getPackageCollectionRootPath())) {
-                // root collection not found, create it
-                ContentCollectionEdit rootPackageCollectionEdit = tinCanAPIContentEntityUtils.addOrEditCollection(getPackageCollectionRootPath());
-                rootPackageCollectionEdit.setHidden();
-                rootPackageCollectionEdit = (ContentCollectionEdit) tinCanAPIContentEntityUtils.addProperties(
-                    rootPackageCollectionEdit,
-                    new String[] {ResourceProperties.PROP_DISPLAY_NAME, ResourceProperties.PROP_HIDDEN_WITH_ACCESSIBLE_CONTENT},
-                    new String[] {packageCollectionRootName, Boolean.toString(hideContentPackageRoot)}
-                );
-                contentHostingService.commitCollection(rootPackageCollectionEdit);
-            }
+            ContentCollectionEdit rootPackageCollectionEdit = tinCanAPIContentEntityUtils.addOrEditCollection(getPackageCollectionRootPath());
+            rootPackageCollectionEdit = (ContentCollectionEdit) tinCanAPIContentEntityUtils.addProperties(
+                rootPackageCollectionEdit,
+                new String[] {ResourceProperties.PROP_DISPLAY_NAME, ResourceProperties.PROP_HIDDEN_WITH_ACCESSIBLE_CONTENT},
+                new String[] {packageCollectionRootName, Boolean.toString(hideContentPackageRoot)}
+            );
+
+            contentHostingService.commitCollection(rootPackageCollectionEdit);
         } catch (Exception e) {
-            log.error("Error occurred processing the root directory");
+            log.error("Error occurred processing the root directory.", e);
             return false;
         }
 
@@ -268,67 +275,82 @@ public abstract class TinCanAPIContentServiceImpl implements TinCanAPIContentSer
      * @return
      */
     private boolean moveContentPackage() {
-        if (removeExistingContentPackage) {
-            String existingDirectory = getPackageCollectionPath(false);
+        String existingDirectory = getPackageCollectionPath(false);
 
-            try {
-                List<String> packageCollectionRootChildren = contentHostingService.getCollection(getPackageCollectionRootPath()).getMembers();
-                if (packageCollectionRootChildren.contains(existingDirectory)) {
-                    contentHostingService.removeCollection(existingDirectory);
-                }
-            } catch (Exception e) {
-                log.error("Error removing existing directory: " + existingDirectory, e);
-                return false;
+        try {
+            List<String> packageCollectionRootChildren = contentHostingService.getCollection(getPackageCollectionRootPath()).getMembers();
+            if (packageCollectionRootChildren.contains(existingDirectory)) {
+                contentHostingService.removeCollection(existingDirectory);
             }
-
-            ContentCollectionEdit newCollectionEdit = tinCanAPIContentEntityUtils.addOrEditCollection(getPackageCollectionPath(true));
-            newCollectionEdit = (ContentCollectionEdit) tinCanAPIContentEntityUtils.addProperties(
-                newCollectionEdit,
-                new String[] {ResourceProperties.PROP_DISPLAY_NAME},
-                new String[] {getPackageCollectionId(false)}
-            );
-            contentHostingService.commitCollection(newCollectionEdit);
-
-            // get the latest URL for the content launch page
-            calculateLaunchUrl(false);
+        } catch (Exception e) {
+            log.error("Error removing existing directory: " + existingDirectory, e);
+            return false;
         }
 
+        ContentCollectionEdit newCollectionEdit = tinCanAPIContentEntityUtils.addOrEditCollection(getPackageCollectionPath(true));
+        newCollectionEdit = (ContentCollectionEdit) tinCanAPIContentEntityUtils.addProperties(
+            newCollectionEdit,
+            new String[] {ResourceProperties.PROP_DISPLAY_NAME},
+            new String[] {getPackageCollectionId(false)}
+        );
+        contentHostingService.commitCollection(newCollectionEdit);
+
+        // get the latest URL for the content launch page
+        getLaunchUrl(false);
+
         return true;
+    }
+
+    /**
+     * Sets the timestamp for the temp directory
+     * e.g "-1234567890"
+     */
+    private void setTimestamp() {
+        this.timestamp = "-" + Long.toString((new Date()).getTime());
     }
 
     /**
      * Path: MY_CONTENT_PACKAGE (optional timestamp suffix: "-1234567890")
      */
     private String getPackageCollectionId(boolean includeTimestamp) {
-        return packageName.substring(0, packageName.lastIndexOf(".")) + timestamp;
+        String suffix = includeTimestamp ? timestamp : "";
+
+        return packageName.substring(0, packageName.lastIndexOf(".")) + suffix;
     }
 
     /**
      * Path: SITE_ID
      */
     private String getCurrentContext() {
-        return lms().currentContext();
+        return developerHelperService.getCurrentLocationId();
+    }
+
+    /**
+     * Get the current user's internal USER_ID (not EID)
+     */
+    private String getCurrentUserId() {
+        return developerHelperService.getCurrentUserId();
     }
 
     /**
      * Path: /group/SITE_ID/
      */
     private String getSiteCollectionRootPath() {
-        return ContentHostingService.COLLECTION_SITE + getCurrentContext() + "/";
+        return ContentHostingService.COLLECTION_SITE + getCurrentContext() + Entity.SEPARATOR;
     }
 
     /**
      * Path: /group/SITE_ID/TinCanAPI_Packages/
      */
     private String getPackageCollectionRootPath() {
-        return getSiteCollectionRootPath() + packageCollectionRootName + "/";
+        return getSiteCollectionRootPath() + packageCollectionRootName + Entity.SEPARATOR;
     }
 
     /**
      * Path: /group/SITE_ID/TinCanAPI_Packages/MY_CONTENT_PACKAGE-1234567890
      */
     private String getPackageCollectionPath(boolean includeTimestamp) {
-        return getPackageCollectionRootPath() + getPackageCollectionId(includeTimestamp) + "/";
+        return getPackageCollectionRootPath() + getPackageCollectionId(includeTimestamp) + Entity.SEPARATOR;
     }
 
     /**
@@ -341,8 +363,8 @@ public abstract class TinCanAPIContentServiceImpl implements TinCanAPIContentSer
     /**
      * Path: /group/SITE_ID/TinCanAPI_Packages/MY_CONTENT_PACKAGE-1234567890/story.html
      */
-    private void calculateLaunchUrl(boolean includeTimestamp) {
-        launchUrl = getPackageCollectionPath(includeTimestamp) + launchPage;
+    private String getLaunchUrl(boolean includeTimestamp) {
+        return getPackageCollectionPath(includeTimestamp) + launchPage;
     }
 
 }
