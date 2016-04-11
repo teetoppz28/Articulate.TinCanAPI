@@ -28,6 +28,7 @@ public class TinCanAPIContentPackage implements Serializable {
             contentPackage.setCreatedBy(tinCanAPIMeta.getCreatedBy());
             contentPackage.setModifiedOn(new Date());
             contentPackage.setModifiedBy(tinCanAPIMeta.getCreatedBy());
+            contentPackage.setTinCanAPI(true);
         }
     }
 
