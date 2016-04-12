@@ -5,7 +5,7 @@ import java.io.InputStream;
 import org.sakaiproject.scorm.model.tincanapi.TinCanAPIContentPackage;
 import org.sakaiproject.scorm.model.tincanapi.TinCanAPIMeta;
 
-public interface TinCanAPIContentService {
+public interface TinCanAPIImporter {
 
     /**
      * Validates the file uploaded is a valid TinCanAPI zip archive and processes it

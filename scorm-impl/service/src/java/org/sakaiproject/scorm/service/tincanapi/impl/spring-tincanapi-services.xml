@@ -22,7 +22,7 @@
   -->
 <beans>
 
-    <bean id="tinCanAPIContentService" class="org.sakaiproject.scorm.service.tincanapi.impl.TinCanAPIContentServiceImpl" init-method="init">
+    <bean id="tinCanAPIImporter" class="org.sakaiproject.scorm.service.tincanapi.impl.TinCanAPIImporterImpl" init-method="init">
         <!-- Service beans -->
         <lookup-method name="resourceService" bean="org.sakaiproject.scorm.service.api.ScormResourceService" />
 
@@ -42,6 +42,10 @@
 
     <bean id="tinCanAPIContentEntityUtils" class="org.sakaiproject.scorm.service.tincanapi.impl.util.TinCanAPIContentEntityUtils">
         <property name="contentHostingService" ref="org.sakaiproject.content.api.ContentHostingService" />
+    </bean>
+
+    <!--  Entity Provider -->
+    <bean class="org.sakaiproject.scorm.entity.tincanapi.TinCanAPIEntityProvider">
     </bean>
 
 </beans>

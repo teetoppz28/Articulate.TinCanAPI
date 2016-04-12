@@ -504,4 +504,10 @@ public class ScormEntityProviderImpl implements ScormEntityProvider, CoreEntityP
     @Override public void       updateEntity( EntityReference ref, Object entity, Map<String, Object> params )  {}
     @Override public void       deleteEntity( EntityReference ref, Map<String, Object> params )                 {}
     @Override public void       setPropertyValue( String reference, String name, String value )                 {}
+
+    @Override
+    public void setRequestGetter(RequestGetter requestGetter) {
+        // TODO Auto-generated method stub
+        
+    }
 }

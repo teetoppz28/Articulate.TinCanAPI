@@ -51,7 +51,7 @@ import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.event.api.NotificationService;
 import org.sakaiproject.scorm.api.ScormConstants;
 import org.sakaiproject.scorm.service.api.ScormResourceService;
-import org.sakaiproject.scorm.service.tincanapi.api.TinCanAPIContentService;
+import org.sakaiproject.scorm.service.tincanapi.api.TinCanAPIImporter;
 import org.sakaiproject.scorm.ui.console.pages.ConsoleBasePage;
 import org.sakaiproject.scorm.ui.console.pages.PackageListPage;
 import org.sakaiproject.wicket.markup.html.form.CancelButton;
@@ -68,7 +68,7 @@ public class UploadTCAPage extends ConsoleBasePage implements ScormConstants {
     ServerConfigurationService serverConfigurationService;
 
     @SpringBean(name="tinCanAPIContentService")
-    TinCanAPIContentService tinCanAPIContentService;
+    TinCanAPIImporter tinCanAPIContentService;
 
     @SpringBean(name="org.sakaiproject.scorm.service.api.ScormResourceService")
     ScormResourceService resourceService;

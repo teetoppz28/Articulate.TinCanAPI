@@ -21,7 +21,7 @@ import org.sakaiproject.scorm.model.tincanapi.TinCanAPIConstants;
 import org.sakaiproject.scorm.model.tincanapi.TinCanAPIContentPackage;
 import org.sakaiproject.scorm.model.tincanapi.TinCanAPIMeta;
 import org.sakaiproject.scorm.service.api.ScormResourceService;
-import org.sakaiproject.scorm.service.tincanapi.api.TinCanAPIContentService;
+import org.sakaiproject.scorm.service.tincanapi.api.TinCanAPIImporter;
 import org.sakaiproject.scorm.service.tincanapi.impl.util.TinCanAPIContentEntityUtils;
 import org.sakaiproject.scorm.service.tincanapi.impl.util.TinCanAPIDocumentUtils;
 import org.w3c.dom.Document;
@@ -29,9 +29,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public abstract class TinCanAPIContentServiceImpl implements TinCanAPIContentService, TinCanAPIConstants {
+public abstract class TinCanAPIImporterImpl implements TinCanAPIImporter, TinCanAPIConstants {
 
-    private Log log = LogFactory.getLog(TinCanAPIContentServiceImpl.class);
+    private Log log = LogFactory.getLog(TinCanAPIImporterImpl.class);
 
     @Setter
     private ContentHostingService contentHostingService;
