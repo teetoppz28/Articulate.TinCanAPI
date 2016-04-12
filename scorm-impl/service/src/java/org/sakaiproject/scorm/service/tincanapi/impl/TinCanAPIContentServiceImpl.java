@@ -51,8 +51,9 @@ public abstract class TinCanAPIContentServiceImpl implements TinCanAPIContentSer
      * Default settings
      */
     private static String DEFAULT_PACKAGE_ROOT_NAME = "TinCanAPI_Packages";
-    private static String DEFAULT_LAUNCH_PAGE = "stroy.html";
+    private static String DEFAULT_LAUNCH_PAGE = "story.html";
     private static boolean DEFAULT_HIDE_ROOT_DIRECTORY = true;
+    private final static String DEFAULT_PATH_PREFIX = "/access/content";
 
     private String launchPage;
     private boolean hideContentPackageRoot;
@@ -361,10 +362,10 @@ public abstract class TinCanAPIContentServiceImpl implements TinCanAPIContentSer
     }
 
     /**
-     * Path: /group/SITE_ID/TinCanAPI_Packages/MY_CONTENT_PACKAGE-1234567890/story.html
+     * Path: /access/content/group/SITE_ID/TinCanAPI_Packages/MY_CONTENT_PACKAGE-1234567890/story.html
      */
     private String getLaunchUrl(boolean includeTimestamp) {
-        return getPackageCollectionPath(includeTimestamp) + launchPage;
+        return DEFAULT_PATH_PREFIX + getPackageCollectionPath(includeTimestamp) + launchPage;
     }
 
 }

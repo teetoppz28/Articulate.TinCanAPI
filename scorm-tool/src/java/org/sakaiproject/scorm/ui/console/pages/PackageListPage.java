@@ -47,6 +47,7 @@ import org.sakaiproject.scorm.service.api.LearningManagementSystem;
 import org.sakaiproject.scorm.service.api.ScormContentService;
 import org.sakaiproject.scorm.ui.console.components.DecoratedDatePropertyColumn;
 import org.sakaiproject.scorm.ui.player.pages.PlayerPage;
+import org.sakaiproject.scorm.ui.player.pages.PlayerTCAPage;
 import org.sakaiproject.scorm.ui.reporting.pages.LearnerResultsPage;
 import org.sakaiproject.scorm.ui.reporting.pages.ResultsListPage;
 import org.sakaiproject.wicket.markup.html.link.BookmarkablePageLabeledLink;
@@ -70,7 +71,8 @@ public class PackageListPage extends ConsoleBasePage implements ScormConstants {
 	@SpringBean(name="org.sakaiproject.scorm.service.api.ScormContentService")
 	ScormContentService contentService;
 
-	public PackageListPage(PageParameters params) {
+	@SuppressWarnings("unchecked")
+    public PackageListPage(PageParameters params) {
 
 		List<ContentPackage> contentPackages = contentService.getContentPackages();
 
@@ -84,12 +86,20 @@ public class PackageListPage extends ConsoleBasePage implements ScormConstants {
 
 		ActionColumn actionColumn = new ActionColumn(new StringResourceModel("column.header.content.package.name", this, null), "title", "title");
 
-		String[] paramPropertyExpressions = {"contentPackageId", "resourceId", "title"};
+		String[] paramPropertyExpressions = {"contentPackageId", "resourceId", "title", "url"};
 
-		Action launchAction = new Action("title", PlayerPage.class, paramPropertyExpressions){
+		Action launchAction = new Action("title", paramPropertyExpressions){
 			private static final long serialVersionUID = 1L;
 			@Override
 			public Component newLink(String id, Object bean) {
+                ContentPackage contentPackage = (ContentPackage) bean;
+                pageClass = (contentPackage.isTinCanAPI()) ? PlayerTCAPage.class : PlayerPage.class;
+
+                if (lms.canLaunchNewWindow()) {
+                    String windowName = (contentPackage.isTinCanAPI()) ? "TinCanAPIPLayer" : "ScormPlayer";
+                    setPopupWindowName(windowName);
+                }
+
 				IModel<String> labelModel;
 				if (displayModel != null) {
 					labelModel = displayModel;
@@ -101,7 +111,7 @@ public class PackageListPage extends ConsoleBasePage implements ScormConstants {
 				PageParameters params = buildPageParameters(paramPropertyExpressions, bean);
 				Link link = new BookmarkablePageLabeledLink(id, labelModel, pageClass, params);
 
-				if (popupWindowName != null) {
+				if (popupWindowName != null && !contentPackage.isTinCanAPI()) {
 					PopupSettings popupSettings = new PopupSettings(PageMap.forName(popupWindowName), PopupSettings.RESIZABLE);
 					popupSettings.setWidth(1020);
 					popupSettings.setHeight(740);
@@ -111,18 +121,14 @@ public class PackageListPage extends ConsoleBasePage implements ScormConstants {
 					link.setPopupSettings(popupSettings);
 				}
 
-				link.setEnabled(isEnabled(bean) && lms.canLaunch((ContentPackage)bean));
+				link.setEnabled(isEnabled(bean) && lms.canLaunch(contentPackage));
 				link.setVisible(isVisible(bean));
 
 				return link;
 			}
 		};
 
-		actionColumn.addAction(launchAction);
-
-		if (lms.canLaunchNewWindow()) {
-			launchAction.setPopupWindowName("ScormPlayer");
-		}
+        actionColumn.addAction(launchAction);
 
 		if (canConfigure)
 		{
