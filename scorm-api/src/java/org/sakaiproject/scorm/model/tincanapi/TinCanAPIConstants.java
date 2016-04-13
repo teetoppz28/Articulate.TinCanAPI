@@ -8,4 +8,6 @@ public interface TinCanAPIConstants extends ScormConstants {
     public final static String META_XML_FILE = "meta.xml";
     public final static String TINCAN_XML_FILE = "tincan.xml";
 
+    public final static String PAYLOAD_CONTENT_VARIABLE = "content=";
+
 }

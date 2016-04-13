@@ -67,8 +67,8 @@ public class UploadTCAPage extends ConsoleBasePage implements ScormConstants {
     @SpringBean(name = "org.sakaiproject.component.api.ServerConfigurationService")
     ServerConfigurationService serverConfigurationService;
 
-    @SpringBean(name="tinCanAPIContentService")
-    TinCanAPIImporter tinCanAPIContentService;
+    @SpringBean(name="tinCanAPIImporter")
+    TinCanAPIImporter tinCanAPIImporter;
 
     @SpringBean(name="org.sakaiproject.scorm.service.api.ScormResourceService")
     ScormResourceService resourceService;
@@ -218,7 +218,7 @@ public class UploadTCAPage extends ConsoleBasePage implements ScormConstants {
 
                         if(upload != null) {
                             try {
-                                int status = tinCanAPIContentService.validateAndProcess(upload.getInputStream(), upload.getClientFileName(), upload.getContentType());
+                                int status = tinCanAPIImporter.validateAndProcess(upload.getInputStream(), upload.getClientFileName(), upload.getContentType());
                                 if(status == VALIDATION_SUCCESS) {
                                     setResponsePage(PackageListPage.class);
                                 } else {
