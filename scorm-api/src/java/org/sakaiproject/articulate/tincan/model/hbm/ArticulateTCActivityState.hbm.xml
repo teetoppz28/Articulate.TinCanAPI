@@ -20,9 +20,9 @@
   -->
 
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
-<hibernate-mapping default-cascade="all" package="org.sakaiproject.scorm.model.api" default-lazy="false">
+<hibernate-mapping default-cascade="all" package="org.sakaiproject.articulate.tincan.model" default-lazy="false">
 
-    <class name="org.sakaiproject.articulate.tincan.model.ArticulateTCAActivityState" table="ARTICULATE_TC_ACTIVITY_STATE">
+    <class name="org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAActivityState" table="ARTICULATE_TC_ACTIVITY_STATE">
         <id name="id" column="ID" type="long">
             <generator class="native">
                 <param name="sequence">TINCANAPI_ACTIVITY_STATE_S</param>

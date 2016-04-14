@@ -1,4 +1,4 @@
-package org.sakaiproject.articulate.tincan.model;
+package org.sakaiproject.articulate.tincan.model.hibernate;
 
 public class ArticulateTCActivityState {
 

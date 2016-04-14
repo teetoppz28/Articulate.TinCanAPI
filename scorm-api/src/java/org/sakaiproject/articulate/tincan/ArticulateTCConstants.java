@@ -1,4 +1,4 @@
-package org.sakaiproject.articulate.tincan.model;
+package org.sakaiproject.articulate.tincan;
 
 import org.sakaiproject.scorm.api.ScormConstants;
 

@@ -48,7 +48,7 @@
     </bean>
 
     <!--  Entity Provider -->
-    <bean parent="org.sakaiproject.entitybroker.entityprovider.AbstractEntityProvider" class="org.sakaiproject.articulate.tincan.entity.tincanapi.ArticulateTCEntityProvider">
+    <bean parent="org.sakaiproject.entitybroker.entityprovider.AbstractEntityProvider" class="org.sakaiproject.articulate.tincan.entity.ArticulateTCEntityProvider">
         <property name="articulateTCEntityProviderService" ref="articulateTCEntityProviderService" />
     </bean>
 
