@@ -47,33 +47,33 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.lang.Bytes;
+import org.sakaiproject.articulate.tincan.api.ArticulateTCImporter;
+import org.sakaiproject.articulate.tincan.model.ArticulateTCConstants;
 import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.event.api.NotificationService;
-import org.sakaiproject.scorm.api.ScormConstants;
 import org.sakaiproject.scorm.service.api.ScormResourceService;
-import org.sakaiproject.scorm.service.tincanapi.api.TinCanAPIImporter;
 import org.sakaiproject.scorm.ui.console.pages.ConsoleBasePage;
 import org.sakaiproject.scorm.ui.console.pages.PackageListPage;
 import org.sakaiproject.wicket.markup.html.form.CancelButton;
 
-public class UploadTCAPage extends ConsoleBasePage implements ScormConstants {
+public class ArticulateTCUploadPage extends ConsoleBasePage implements ArticulateTCConstants {
 
     private static final long serialVersionUID = 1L;
     private static final ResourceReference PAGE_ICON = new ResourceReference(ConsoleBasePage.class, "res/table_add.png");
-    private Log log = LogFactory.getLog(UploadTCAPage.class);
+    private Log log = LogFactory.getLog(ArticulateTCUploadPage.class);
 
     // SCO-97 sakai.property to enable/disable (show/hide) email sending (drop down)
     private static final String SAK_PROP_SCORM_ENABLE_EMAIL = "scorm.enable.email";
     @SpringBean(name = "org.sakaiproject.component.api.ServerConfigurationService")
     ServerConfigurationService serverConfigurationService;
 
-    @SpringBean(name="tinCanAPIImporter")
-    TinCanAPIImporter tinCanAPIImporter;
+    @SpringBean(name="articulateTCImporter")
+    ArticulateTCImporter articulateTCImporter;
 
     @SpringBean(name="org.sakaiproject.scorm.service.api.ScormResourceService")
     ScormResourceService resourceService;
 
-    public UploadTCAPage(PageParameters params) {
+    public ArticulateTCUploadPage(PageParameters params) {
         add(new FileUploadForm("uploadForm"));
     }
 
@@ -145,13 +145,13 @@ public class UploadTCAPage extends ConsoleBasePage implements ScormConstants {
                     public Object getDisplayValue(Object object) {
                         switch(((Integer) object)) {
                             case NotificationService.NOTI_NONE: {
-                                return getLocalizer().getString("NotificationService.NOTI_NONE", UploadTCAPage.this);
+                                return getLocalizer().getString("NotificationService.NOTI_NONE", ArticulateTCUploadPage.this);
                             }
                             case NotificationService.NOTI_OPTIONAL: {
-                                return getLocalizer().getString("NotificationService.NOTI_OPTIONAL", UploadTCAPage.this);
+                                return getLocalizer().getString("NotificationService.NOTI_OPTIONAL", ArticulateTCUploadPage.this);
                             }
                             case NotificationService.NOTI_REQUIRED: {
-                                return getLocalizer().getString("NotificationService.NOTI_REQUIRED", UploadTCAPage.this);
+                                return getLocalizer().getString("NotificationService.NOTI_REQUIRED", ArticulateTCUploadPage.this);
                             }
                         }
 
@@ -179,8 +179,8 @@ public class UploadTCAPage extends ConsoleBasePage implements ScormConstants {
                 priorityLabel.setVisibilityAllowed(false);
             }
 
-            add( priorityLabel );
-            add( emailNotificationDropDown );
+            add(priorityLabel);
+            add(emailNotificationDropDown);
 
             // SCO-98 - disable buttons on submit, add spinner
             final CancelButton btnCancel = new CancelButton("btnCancel", PackageListPage.class);
@@ -218,7 +218,7 @@ public class UploadTCAPage extends ConsoleBasePage implements ScormConstants {
 
                         if(upload != null) {
                             try {
-                                int status = tinCanAPIImporter.validateAndProcess(upload.getInputStream(), upload.getClientFileName(), upload.getContentType());
+                                int status = articulateTCImporter.validateAndProcess(upload.getInputStream(), upload.getClientFileName(), upload.getContentType());
                                 if(status == VALIDATION_SUCCESS) {
                                     setResponsePage(PackageListPage.class);
                                 } else {
@@ -228,7 +228,7 @@ public class UploadTCAPage extends ConsoleBasePage implements ScormConstants {
                                     setResponsePage(ConfirmTCAPage.class, params);
                                 }
                             } catch(Exception e) {
-                                UploadTCAPage.this.warn(getLocalizer().getString("upload.failed", UploadTCAPage.this, new Model(e)));
+                                ArticulateTCUploadPage.this.warn(getLocalizer().getString("upload.failed", ArticulateTCUploadPage.this, new Model(e)));
                                 log.error("Failed to upload file", e);
                             }
                         }

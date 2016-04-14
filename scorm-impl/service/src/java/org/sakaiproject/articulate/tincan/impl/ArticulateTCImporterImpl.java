@@ -1,4 +1,4 @@
-package org.sakaiproject.scorm.service.tincanapi.impl;
+package org.sakaiproject.articulate.tincan.impl;
 
 import java.io.InputStream;
 import java.util.Date;
@@ -9,6 +9,12 @@ import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.sakaiproject.articulate.tincan.api.ArticulateTCImporter;
+import org.sakaiproject.articulate.tincan.model.ArticulateTCConstants;
+import org.sakaiproject.articulate.tincan.model.ArticulateTCContentPackage;
+import org.sakaiproject.articulate.tincan.model.ArticulateTCMeta;
+import org.sakaiproject.articulate.tincan.util.ArticulateTCContentEntityUtils;
+import org.sakaiproject.articulate.tincan.util.ArticulateTCDocumentUtils;
 import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.content.api.ContentCollectionEdit;
 import org.sakaiproject.content.api.ContentHostingService;
@@ -17,21 +23,15 @@ import org.sakaiproject.entity.api.Entity;
 import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.scorm.dao.api.ContentPackageDao;
-import org.sakaiproject.scorm.model.tincanapi.TinCanAPIConstants;
-import org.sakaiproject.scorm.model.tincanapi.TinCanAPIContentPackage;
-import org.sakaiproject.scorm.model.tincanapi.TinCanAPIMeta;
 import org.sakaiproject.scorm.service.api.ScormResourceService;
-import org.sakaiproject.scorm.service.tincanapi.api.TinCanAPIImporter;
-import org.sakaiproject.scorm.service.tincanapi.impl.util.TinCanAPIContentEntityUtils;
-import org.sakaiproject.scorm.service.tincanapi.impl.util.TinCanAPIDocumentUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public abstract class TinCanAPIImporterImpl implements TinCanAPIImporter, TinCanAPIConstants {
+public abstract class ArticulateTCImporterImpl implements ArticulateTCImporter, ArticulateTCConstants {
 
-    private Log log = LogFactory.getLog(TinCanAPIImporterImpl.class);
+    private Log log = LogFactory.getLog(ArticulateTCImporterImpl.class);
 
     @Setter
     private ContentHostingService contentHostingService;
@@ -40,20 +40,12 @@ public abstract class TinCanAPIImporterImpl implements TinCanAPIImporter, TinCan
     @Setter
     private DeveloperHelperService developerHelperService;
     @Setter
-    private TinCanAPIDocumentUtils tinCanAPIDocumentUtils;
+    private ArticulateTCDocumentUtils articulateTCDocumentUtils;
     @Setter
-    private TinCanAPIContentEntityUtils tinCanAPIContentEntityUtils;
+    private ArticulateTCContentEntityUtils articulateTCContentEntityUtils;
 
     protected abstract ContentPackageDao contentPackageDao();
     protected abstract ScormResourceService resourceService();
-
-    /*
-     * Default settings
-     */
-    private static String DEFAULT_PACKAGE_ROOT_NAME = "TinCanAPI_Packages";
-    private static String DEFAULT_LAUNCH_PAGE = "story.html";
-    private static boolean DEFAULT_HIDE_ROOT_DIRECTORY = true;
-    private final static String DEFAULT_PATH_PREFIX = "/access/content";
 
     private String launchPage;
     private boolean hideContentPackageRoot;
@@ -61,13 +53,13 @@ public abstract class TinCanAPIImporterImpl implements TinCanAPIImporter, TinCan
     private String packageCollectionRootName;
     private String zipFileId;
     private Document metaXmlDocument;
-    private TinCanAPIContentPackage tinCanAPIContentPackage;
+    private ArticulateTCContentPackage articulateTCContentPackage;
     private String timestamp;
 
     public void init() {
-        packageCollectionRootName = serverConfigurationService.getString("tincanapi.package.root.dir", DEFAULT_PACKAGE_ROOT_NAME);
-        launchPage = serverConfigurationService.getString("tincanapi.package.default.launch.page", DEFAULT_LAUNCH_PAGE);
-        hideContentPackageRoot = serverConfigurationService.getBoolean("tincanapi.package.hide.root.package.dir", DEFAULT_HIDE_ROOT_DIRECTORY);
+        packageCollectionRootName = serverConfigurationService.getString("tincanapi.package.root.dir", ARCHIVE_DEFAULT_PACKAGE_ROOT_NAME);
+        launchPage = serverConfigurationService.getString("tincanapi.package.default.launch.page", ARCHIVE_DEFAULT_LAUNCH_PAGE);
+        hideContentPackageRoot = serverConfigurationService.getBoolean("tincanapi.package.hide.root.package.dir", ARCHIVE_DEFAULT_HIDE_ROOT_DIRECTORY);
     }
 
     @Override
@@ -80,8 +72,8 @@ public abstract class TinCanAPIImporterImpl implements TinCanAPIImporter, TinCan
             log.error("Package name cannot be empty.");
             return VALIDATION_NOTWELLFORMED;
         }
-        if (!StringUtils.equals(ZIP_MIMETYPE, contentType)) {
-            log.error("Uploaded file is not of type " + ZIP_MIMETYPE);
+        if (!StringUtils.equals(ARCHIVE_ZIP_MIMETYPE, contentType)) {
+            log.error("Uploaded file is not of type " + ARCHIVE_ZIP_MIMETYPE);
             return VALIDATION_WRONGMIMETYPE;
         }
 
@@ -95,7 +87,7 @@ public abstract class TinCanAPIImporterImpl implements TinCanAPIImporter, TinCan
         }
 
         // parse meta.xml for content package data
-        metaXmlDocument = tinCanAPIDocumentUtils.parseResourceAsDocument(getPackageCollectionPath(true) + META_XML_FILE);
+        metaXmlDocument = articulateTCDocumentUtils.parseResourceAsDocument(getPackageCollectionPath(true) + ARCHIVE_META_XML_FILE);
 
         // TinCanAPI content package
         boolean contentPackageCreatedSuccessfully = createContentPackage();
@@ -120,7 +112,7 @@ public abstract class TinCanAPIImporterImpl implements TinCanAPIImporter, TinCan
             // remove the content package zip file after it's extracted
             removeZipFile();
 
-            boolean validated = validateTinCanAPIArchive();
+            boolean validated = validateArticulateTinCanAPIArchive();
             if (!validated) {
                 // not a valid TinCanAPI archive package, remove it
                 removeArchiveCollection();
@@ -146,35 +138,35 @@ public abstract class TinCanAPIImporterImpl implements TinCanAPIImporter, TinCan
 
     @Override
     public boolean createContentPackage() {
-        tinCanAPIContentPackage = new TinCanAPIContentPackage(processMetaXml(), getLaunchUrl(true));
+        articulateTCContentPackage = new ArticulateTCContentPackage(processMetaXml(), getLaunchUrl(true));
 
-        if (!tinCanAPIContentPackage.isValid()) {
-            log.error("The TinCanAPI Content Package is invalid. It has been deleted. \n" + tinCanAPIContentPackage.toString());
+        if (!articulateTCContentPackage.isValid()) {
+            log.error("The Articulate TinCanAPI Content Package is invalid. It has been deleted. \n" + articulateTCContentPackage.toString());
             removeArchiveCollection();
 
             return false;
         }
 
         // save the content package to the database
-        contentPackageDao().save(tinCanAPIContentPackage.getContentPackage());
+        contentPackageDao().save(articulateTCContentPackage.getContentPackage());
 
         return true;
     }
 
     @Override
-    public TinCanAPIMeta processMetaXml() {
-        TinCanAPIMeta tinCanAPIMeta = null;
+    public ArticulateTCMeta processMetaXml() {
+        ArticulateTCMeta tinCanAPIMeta = null;
 
         try {
             NodeList projectList = metaXmlDocument.getElementsByTagName("project");
             Node project = projectList.item(0);
             Element element = (Element) project;
 
-            tinCanAPIMeta = new TinCanAPIMeta(
+            tinCanAPIMeta = new ArticulateTCMeta(
                 getCurrentContext(),
                 getCurrentUserId(),
-                element.getAttribute(TinCanAPIMeta.ATTR_ID),
-                element.getAttribute(TinCanAPIMeta.ATTR_TITLE)
+                element.getAttribute(ArticulateTCMeta.ATTR_ID),
+                element.getAttribute(ArticulateTCMeta.ATTR_TITLE)
             );
         } catch (Exception e) {
             log.error("Error occurred processing the meta XML document.", e);
@@ -192,10 +184,10 @@ public abstract class TinCanAPIImporterImpl implements TinCanAPIImporter, TinCan
      * 
      * @return true, if all the files above exist (content not verified)
      */
-    private boolean validateTinCanAPIArchive() {
+    private boolean validateArticulateTinCanAPIArchive() {
         try {
-            contentHostingService.getResource(getPackageCollectionPath(true) + TINCAN_XML_FILE);
-            contentHostingService.getResource(getPackageCollectionPath(true) + META_XML_FILE);
+            contentHostingService.getResource(getPackageCollectionPath(true) + ARCHIVE_TINCAN_XML_FILE);
+            contentHostingService.getResource(getPackageCollectionPath(true) + ARCHIVE_META_XML_FILE);
             contentHostingService.getResource(getPackageCollectionPath(true) + launchPage);
         } catch (Exception e) {
             log.error("Error validating archive.", e);
@@ -213,8 +205,8 @@ public abstract class TinCanAPIImporterImpl implements TinCanAPIImporter, TinCan
      */
     private boolean processRootDirectory() {
         try {
-            ContentCollectionEdit rootPackageCollectionEdit = tinCanAPIContentEntityUtils.addOrEditCollection(getPackageCollectionRootPath());
-            rootPackageCollectionEdit = (ContentCollectionEdit) tinCanAPIContentEntityUtils.addProperties(
+            ContentCollectionEdit rootPackageCollectionEdit = articulateTCContentEntityUtils.addOrEditCollection(getPackageCollectionRootPath());
+            rootPackageCollectionEdit = (ContentCollectionEdit) articulateTCContentEntityUtils.addProperties(
                 rootPackageCollectionEdit,
                 new String[] {ResourceProperties.PROP_DISPLAY_NAME, ResourceProperties.PROP_HIDDEN_WITH_ACCESSIBLE_CONTENT},
                 new String[] {packageCollectionRootName, Boolean.toString(hideContentPackageRoot)}
@@ -236,9 +228,9 @@ public abstract class TinCanAPIImporterImpl implements TinCanAPIImporter, TinCan
      */
     private boolean storeZipFile(InputStream inputStream) {
         try {
-            ContentResourceEdit zipFile = tinCanAPIContentEntityUtils.addOrEditResource(getPackageArchiveFilePath(true));
+            ContentResourceEdit zipFile = articulateTCContentEntityUtils.addOrEditResource(getPackageArchiveFilePath(true));
             zipFile.setContent(inputStream);
-            zipFile.setContentType(ZIP_MIMETYPE);
+            zipFile.setContentType(ARCHIVE_ZIP_MIMETYPE);
             contentHostingService.commitResource(zipFile);
             zipFileId = zipFile.getId();
         } catch (Exception e) {
@@ -288,8 +280,8 @@ public abstract class TinCanAPIImporterImpl implements TinCanAPIImporter, TinCan
             return false;
         }
 
-        ContentCollectionEdit newCollectionEdit = tinCanAPIContentEntityUtils.addOrEditCollection(getPackageCollectionPath(true));
-        newCollectionEdit = (ContentCollectionEdit) tinCanAPIContentEntityUtils.addProperties(
+        ContentCollectionEdit newCollectionEdit = articulateTCContentEntityUtils.addOrEditCollection(getPackageCollectionPath(true));
+        newCollectionEdit = (ContentCollectionEdit) articulateTCContentEntityUtils.addProperties(
             newCollectionEdit,
             new String[] {ResourceProperties.PROP_DISPLAY_NAME},
             new String[] {getPackageCollectionId(false)}
@@ -365,7 +357,7 @@ public abstract class TinCanAPIImporterImpl implements TinCanAPIImporter, TinCan
      * Path: /access/content/group/SITE_ID/TinCanAPI_Packages/MY_CONTENT_PACKAGE-1234567890/story.html
      */
     private String getLaunchUrl(boolean includeTimestamp) {
-        return DEFAULT_PATH_PREFIX + getPackageCollectionPath(includeTimestamp) + launchPage;
+        return ARCHIVE_DEFAULT_PATH_PREFIX + getPackageCollectionPath(includeTimestamp) + launchPage;
     }
 
 }

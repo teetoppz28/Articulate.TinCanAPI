@@ -1,4 +1,4 @@
-package org.sakaiproject.scorm.service.tincanapi.impl.util;
+package org.sakaiproject.articulate.tincan.util;
 
 import lombok.Setter;
 
@@ -11,9 +11,9 @@ import org.sakaiproject.entity.api.Edit;
 import org.sakaiproject.entity.api.ResourcePropertiesEdit;
 import org.sakaiproject.exception.IdUsedException;
 
-public class TinCanAPIContentEntityUtils {
+public class ArticulateTCContentEntityUtils {
 
-    private Log log = LogFactory.getLog(TinCanAPIContentEntityUtils.class);
+    private Log log = LogFactory.getLog(ArticulateTCContentEntityUtils.class);
 
     @Setter
     private ContentHostingService contentHostingService;

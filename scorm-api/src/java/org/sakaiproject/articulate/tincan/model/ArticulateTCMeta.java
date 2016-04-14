@@ -1,8 +1,8 @@
-package org.sakaiproject.scorm.model.tincanapi;
+package org.sakaiproject.articulate.tincan.model;
 
 import org.apache.commons.lang.StringUtils;
 
-public class TinCanAPIMeta {
+public class ArticulateTCMeta {
 
     private String courseId;
     private String createdBy;
@@ -12,10 +12,10 @@ public class TinCanAPIMeta {
     public final static String ATTR_ID = "id";
     public final static String ATTR_TITLE = "title";
     
-    public TinCanAPIMeta() {
+    public ArticulateTCMeta() {
     }
 
-    public TinCanAPIMeta(String courseId, String createdBy, String id, String title) {
+    public ArticulateTCMeta(String courseId, String createdBy, String id, String title) {
         this.courseId = courseId;
         this.createdBy = createdBy;
         this.id = id;

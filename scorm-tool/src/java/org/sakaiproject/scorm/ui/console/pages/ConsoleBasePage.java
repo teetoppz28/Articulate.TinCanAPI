@@ -37,7 +37,7 @@ import org.sakaiproject.scorm.ui.Icon;
 import org.sakaiproject.scorm.ui.console.components.BreadcrumbPanel;
 import org.sakaiproject.scorm.ui.console.components.SakaiFeedbackPanel;
 import org.sakaiproject.scorm.ui.upload.pages.UploadPage;
-import org.sakaiproject.scorm.ui.upload.pages.UploadTCAPage;
+import org.sakaiproject.scorm.ui.upload.pages.ArticulateTCUploadPage;
 import org.sakaiproject.tool.api.ToolManager;
 import org.sakaiproject.wicket.markup.html.SakaiPortletWebPage;
 import org.sakaiproject.wicket.markup.html.link.NavIntraLink;
@@ -84,14 +84,14 @@ public class ConsoleBasePage extends SakaiPortletWebPage implements IHeaderContr
 		
         NavIntraLink listLink = new NavIntraLink("listLink", new ResourceModel("link.list"), PackageListPage.class);
         NavIntraLink uploadLink = new NavIntraLink("uploadLink", new ResourceModel("link.upload"), UploadPage.class);
-        NavIntraLink uploadTCALink = new NavIntraLink("uploadTCALink", new ResourceModel("link.upload.tca"), UploadTCAPage.class);
+        NavIntraLink articulateTCUploadLink = new NavIntraLink("articulate-tc-upload-link", new ResourceModel("link.upload.articulate.tc"), ArticulateTCUploadPage.class);
         
         WebMarkupContainer listContainer = new WebMarkupContainer( "listContainer" );
         WebMarkupContainer uploadContainer = new WebMarkupContainer( "uploadContainer" );
-        WebMarkupContainer uploadTCAContainer = new WebMarkupContainer( "uploadTCAContainer" );
+        WebMarkupContainer articulateTCUploadContainer = new WebMarkupContainer( "articulate-tc-upload-container" );
         listContainer.add( listLink );
         uploadContainer.add( uploadLink );
-        uploadTCAContainer.add(uploadTCALink);
+        articulateTCUploadContainer.add(articulateTCUploadLink);
 
         SimpleAttributeModifier className = new SimpleAttributeModifier( "class", "current" );
         if( listLink.linksTo( getPage() ) )
@@ -104,9 +104,9 @@ public class ConsoleBasePage extends SakaiPortletWebPage implements IHeaderContr
             uploadContainer.add( className );
             uploadLink.add( className );
         }
-        else if(uploadTCALink.linksTo(getPage())) {
-            uploadTCAContainer.add(className);
-            uploadTCALink.add(className);
+        else if(articulateTCUploadLink.linksTo(getPage())) {
+            articulateTCUploadContainer.add(className);
+            articulateTCUploadLink.add(className);
         }
 
         listLink.setVisible(canUpload || canValidate);
@@ -118,7 +118,7 @@ public class ConsoleBasePage extends SakaiPortletWebPage implements IHeaderContr
         
         Icon listIcon = new Icon("listIcon", LIST_ICON);
         Icon uploadIcon = new Icon("uploadIcon", UPLOAD_ICON);
-        Icon uploadTCAIcon = new Icon("uploadTCAIcon", UPLOAD_ICON);
+        Icon articulateTCUploadIcon = new Icon("articulate-tc-upload-icon", UPLOAD_ICON);
         //Icon validateIcon = new Icon("validateIcon", VALIDATE_ICON);
         
         // SCO-109 - conditionally show the icons in the menu bar buttons
@@ -126,7 +126,7 @@ public class ConsoleBasePage extends SakaiPortletWebPage implements IHeaderContr
         if(enableMenuBarIcons) {
             listIcon.setVisible(canUpload || canValidate);
             uploadIcon.setVisible(canUpload);
-            uploadTCAIcon.setVisible(canUpload);
+            articulateTCUploadIcon.setVisible(canUpload);
 
             // SCO-107 hide the validate link (interface is currently unimplemented)
             //validateIcon.setVisible(canValidate);
@@ -134,17 +134,17 @@ public class ConsoleBasePage extends SakaiPortletWebPage implements IHeaderContr
         } else {
             listIcon.setVisibilityAllowed( false );
             uploadIcon.setVisibilityAllowed( false );
-            uploadTCAIcon.setVisibilityAllowed(false);
+            articulateTCUploadIcon.setVisibilityAllowed(false);
             //validateIcon.setVisibilityAllowed( false );
         }
         
         listContainer.add(listIcon);
         uploadContainer.add(uploadIcon);
-        uploadTCAContainer.add(uploadTCAIcon);
+        articulateTCUploadContainer.add(articulateTCUploadIcon);
 
         wmc.add( listContainer );
         wmc.add( uploadContainer );
-        wmc.add(uploadTCAContainer);
+        wmc.add(articulateTCUploadContainer);
 
         // add the toolbar container
         add(wmc);

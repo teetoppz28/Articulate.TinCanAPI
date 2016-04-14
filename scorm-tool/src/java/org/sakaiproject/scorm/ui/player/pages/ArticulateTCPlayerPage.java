@@ -22,21 +22,20 @@ package org.sakaiproject.scorm.ui.player.pages;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.link.InlineFrame;
+import org.sakaiproject.articulate.tincan.model.ArticulateTCConstants;
 
 
-public class PlayerTCAPage extends BaseToolPage {
+public class ArticulateTCPlayerPage extends BaseToolPage implements ArticulateTCConstants {
 
     private static final long serialVersionUID = 1L;
 
-    protected static final String TINCANAPI_CSS = "styles/tincanapi.css";
-    protected static final String HEADSCRIPTS = "/library/js/headscripts.js";
-    protected static final String BODY_ONLOAD_ADDTL="setMainFrameHeight(window.name)";
+    
 
-    public PlayerTCAPage() {
+    public ArticulateTCPlayerPage() {
         this(new PageParameters());
     }
 
-    public PlayerTCAPage(final PageParameters pageParams) {
+    public ArticulateTCPlayerPage(final PageParameters pageParams) {
         super();
 
         InlineFrame iframe = new InlineFrame("launch-frame", this){
@@ -60,11 +59,11 @@ public class PlayerTCAPage extends BaseToolPage {
     }
 
     public void renderHead(IHeaderResponse response) {
-        response.renderJavascriptReference(HEADSCRIPTS);
-        response.renderOnLoadJavascript(BODY_ONLOAD_ADDTL);
+        response.renderJavascriptReference(HTML_HEADSCRIPTS);
+        response.renderOnLoadJavascript(HTML_BODY_ONLOAD_ADDTL);
         response.renderCSSReference(TOOLBASE_CSS);
         response.renderCSSReference(TOOL_CSS);
-        response.renderCSSReference(TINCANAPI_CSS);
+        response.renderCSSReference(HTML_TINCANAPI_CSS);
     }
 
 }

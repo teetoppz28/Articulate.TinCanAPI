@@ -1,4 +1,4 @@
-package org.sakaiproject.scorm.entity.tincanapi;
+package org.sakaiproject.articulate.tincan.entity;
 
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +11,8 @@ import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.sakaiproject.articulate.tincan.api.ArticulateTCEntityProviderService;
+import org.sakaiproject.articulate.tincan.model.ArticulateTCConstants;
 import org.sakaiproject.entitybroker.EntityReference;
 import org.sakaiproject.entitybroker.EntityView;
 import org.sakaiproject.entitybroker.entityprovider.annotations.EntityCustomAction;
@@ -21,27 +23,25 @@ import org.sakaiproject.entitybroker.entityprovider.extension.Formats;
 import org.sakaiproject.entitybroker.entityprovider.extension.RequestGetter;
 import org.sakaiproject.entitybroker.entityprovider.search.Search;
 import org.sakaiproject.entitybroker.util.AbstractEntityProvider;
-import org.sakaiproject.scorm.model.tincanapi.TinCanAPIConstants;
-import org.sakaiproject.scorm.service.tincanapi.api.TinCanAPIEntityProviderService;
 
-public class TinCanAPIEntityProvider extends AbstractEntityProvider implements RESTful, RequestAware, TinCanAPIConstants {
+public class ArticulateTCEntityProvider extends AbstractEntityProvider implements RESTful, RequestAware, ArticulateTCConstants {
 
-    private Log log = LogFactory.getLog(TinCanAPIEntityProvider.class);
+    private Log log = LogFactory.getLog(ArticulateTCEntityProvider.class);
 
     private RequestGetter requestGetter;
 
     @Setter
-    private TinCanAPIEntityProviderService tinCanAPIEntityProviderService;
+    private ArticulateTCEntityProviderService articulateTCEntityProviderService;
 
     public void init() {
     }
 
     public String getEntityPrefix() {
-        return PREFIX;
+        return REST_PREFIX;
     }
 
     public Object getSampleEntity() {
-        return PREFIX;
+        return REST_PREFIX;
     }
 
     @Override
@@ -64,8 +64,8 @@ public class TinCanAPIEntityProvider extends AbstractEntityProvider implements R
         if (StringUtils.equals(path2, PATH_STATEMENTS)) {
             log.info("Path: tincanapi-lrs/action/statements called");
 
-            String statementJson = tinCanAPIEntityProviderService.processContentPayload(request);
-            tinCanAPIEntityProviderService.sendStatementToLRS(statementJson);
+            String statementJson = articulateTCEntityProviderService.processContentPayload(request);
+            articulateTCEntityProviderService.sendStatementToLRS(statementJson);
         }
 
         // tincanapi-lrs/action/activities/

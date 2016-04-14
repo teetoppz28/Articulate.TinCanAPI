@@ -1,8 +1,8 @@
-package org.sakaiproject.scorm.service.tincanapi.api;
+package org.sakaiproject.articulate.tincan.api;
 
 import javax.servlet.http.HttpServletRequest;
 
-public interface TinCanAPIEntityProviderService {
+public interface ArticulateTCEntityProviderService {
 
     /**
      * 1. Retrieve the content payload from the request

@@ -1,4 +1,4 @@
-package org.sakaiproject.scorm.model.tincanapi;
+package org.sakaiproject.articulate.tincan.model;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -6,34 +6,34 @@ import java.util.Date;
 import org.apache.commons.lang.StringUtils;
 import org.sakaiproject.scorm.model.api.ContentPackage;
 
-public class TinCanAPIContentPackage implements Serializable {
+public class ArticulateTCContentPackage implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private ContentPackage contentPackage;
 
-    public TinCanAPIContentPackage() {
+    public ArticulateTCContentPackage() {
         contentPackage = new ContentPackage();
     }
 
-    public TinCanAPIContentPackage(TinCanAPIMeta tinCanAPIMeta) {
+    public ArticulateTCContentPackage(ArticulateTCMeta articulateTCMeta) {
         this();
-        if (tinCanAPIMeta != null) {
-            contentPackage.setContext(tinCanAPIMeta.getCourseId());
-            contentPackage.setTitle(tinCanAPIMeta.getTitle());
-            contentPackage.setResourceId(tinCanAPIMeta.getId());
+        if (articulateTCMeta != null) {
+            contentPackage.setContext(articulateTCMeta.getCourseId());
+            contentPackage.setTitle(articulateTCMeta.getTitle());
+            contentPackage.setResourceId(articulateTCMeta.getId());
             contentPackage.setDeleted(false);
             contentPackage.setReleaseOn(new Date());
             contentPackage.setCreatedOn(new Date());
-            contentPackage.setCreatedBy(tinCanAPIMeta.getCreatedBy());
+            contentPackage.setCreatedBy(articulateTCMeta.getCreatedBy());
             contentPackage.setModifiedOn(new Date());
-            contentPackage.setModifiedBy(tinCanAPIMeta.getCreatedBy());
+            contentPackage.setModifiedBy(articulateTCMeta.getCreatedBy());
             contentPackage.setTinCanAPI(true);
         }
     }
 
-    public TinCanAPIContentPackage(TinCanAPIMeta tinCanAPIMeta, String launchUrl) {
-        this(tinCanAPIMeta);
+    public ArticulateTCContentPackage(ArticulateTCMeta articulateTCMeta, String launchUrl) {
+        this(articulateTCMeta);
         contentPackage.setUrl(launchUrl);
     }
 
@@ -63,7 +63,7 @@ public class TinCanAPIContentPackage implements Serializable {
 
     @Override
     public String toString() {
-        return "TinCanAPIManifest :: " +
+        return "ArticulateTCContentPackage :: " +
                     "context: " + contentPackage.getContext() +
                     ", title: " + contentPackage.getTitle() +
                     ", resourceId: " + contentPackage.getResourceId() +

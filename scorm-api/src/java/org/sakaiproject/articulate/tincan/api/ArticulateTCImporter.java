@@ -1,11 +1,11 @@
-package org.sakaiproject.scorm.service.tincanapi.api;
+package org.sakaiproject.articulate.tincan.api;
 
 import java.io.InputStream;
 
-import org.sakaiproject.scorm.model.tincanapi.TinCanAPIContentPackage;
-import org.sakaiproject.scorm.model.tincanapi.TinCanAPIMeta;
+import org.sakaiproject.articulate.tincan.model.ArticulateTCContentPackage;
+import org.sakaiproject.articulate.tincan.model.ArticulateTCMeta;
 
-public interface TinCanAPIImporter {
+public interface ArticulateTCImporter {
 
     /**
      * Validates the file uploaded is a valid TinCanAPI zip archive and processes it
@@ -30,14 +30,14 @@ public interface TinCanAPIImporter {
     /**
      * Get the required data from the meta.xml file
      * 
-     * @return the {@link TinCanAPIMeta} object, if valid
+     * @return the {@link ArticulateTCMeta} object, if valid
      */
-    public TinCanAPIMeta processMetaXml();
+    public ArticulateTCMeta processMetaXml();
 
     /**
      * Creates a content package object
      *
-     * @return true, if the {@link TinCanAPIContentPackage} object is valid
+     * @return true, if the {@link ArticulateTCContentPackage} object is valid
      */
     boolean createContentPackage();
 

@@ -1,4 +1,4 @@
-package org.sakaiproject.scorm.service.tincanapi.impl.util;
+package org.sakaiproject.articulate.tincan.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,7 +18,7 @@ import com.google.gson.JsonObject;
  * 
  * @author Robert Long (rlong @ unicon.net)
  */
-public class TinCanAPIJsonUtils {
+public class ArticulateTCJsonUtils {
 
     /**
      * Creates a JSON string from the given object

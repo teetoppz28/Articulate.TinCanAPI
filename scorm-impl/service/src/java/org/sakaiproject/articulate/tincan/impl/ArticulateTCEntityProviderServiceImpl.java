@@ -1,18 +1,18 @@
-package org.sakaiproject.scorm.service.tincanapi.impl;
+package org.sakaiproject.articulate.tincan.impl;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.sakaiproject.articulate.tincan.api.ArticulateTCEntityProviderService;
+import org.sakaiproject.articulate.tincan.util.ArticulateTCEntityProviderServiceUtils;
 import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.event.api.LearningResourceStoreService;
-import org.sakaiproject.scorm.service.tincanapi.api.TinCanAPIEntityProviderService;
-import org.sakaiproject.scorm.service.tincanapi.impl.util.TinCanAPIEntityProviderServiceUtils;
 
-public class TinCanAPIEntityProviderServiceImpl implements TinCanAPIEntityProviderService {
+public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntityProviderService {
 
-    private Log log = LogFactory.getLog(TinCanAPIEntityProviderServiceImpl.class);
+    private Log log = LogFactory.getLog(ArticulateTCEntityProviderServiceImpl.class);
 
     private LearningResourceStoreService learningResourceStoreService;
 
@@ -26,8 +26,8 @@ public class TinCanAPIEntityProviderServiceImpl implements TinCanAPIEntityProvid
             throw new IllegalArgumentException("Request cannot be null");
         }
 
-        String payload = TinCanAPIEntityProviderServiceUtils.getRequestPayload(request);
-        String contentStr = TinCanAPIEntityProviderServiceUtils.getContentFromPayload(payload);
+        String payload = ArticulateTCEntityProviderServiceUtils.getRequestPayload(request);
+        String contentStr = ArticulateTCEntityProviderServiceUtils.getContentFromPayload(payload);
 
         return contentStr;
     }

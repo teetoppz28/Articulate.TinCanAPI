@@ -1,4 +1,4 @@
-package org.sakaiproject.scorm.service.tincanapi.impl.util;
+package org.sakaiproject.articulate.tincan.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,11 +10,11 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.sakaiproject.scorm.model.tincanapi.TinCanAPIConstants;
+import org.sakaiproject.articulate.tincan.model.ArticulateTCConstants;
 
-public class TinCanAPIEntityProviderServiceUtils implements TinCanAPIConstants {
+public class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConstants {
 
-    private static Log log = LogFactory.getLog(TinCanAPIEntityProviderServiceUtils.class);
+    private static Log log = LogFactory.getLog(ArticulateTCEntityProviderServiceUtils.class);
 
     /**
      * Decodes the URL-encoded string
@@ -73,12 +73,12 @@ public class TinCanAPIEntityProviderServiceUtils implements TinCanAPIConstants {
             throw new IllegalArgumentException("Payload string cannot be blank");
         }
 
-        String decodedPayload = TinCanAPIEntityProviderServiceUtils.decodeString(str);
+        String decodedPayload = ArticulateTCEntityProviderServiceUtils.decodeString(str);
 
         String[] split = StringUtils.split(decodedPayload, "&");
         for (String s : split) {
-            if (StringUtils.startsWith(s, PAYLOAD_CONTENT_VARIABLE)) {
-                return StringUtils.removeStart(s, PAYLOAD_CONTENT_VARIABLE);
+            if (StringUtils.startsWith(s, STATEMENT_PAYLOAD_CONTENT_VARIABLE)) {
+                return StringUtils.removeStart(s, STATEMENT_PAYLOAD_CONTENT_VARIABLE);
             }
         }
 

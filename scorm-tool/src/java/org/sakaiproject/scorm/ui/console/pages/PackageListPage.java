@@ -47,7 +47,7 @@ import org.sakaiproject.scorm.service.api.LearningManagementSystem;
 import org.sakaiproject.scorm.service.api.ScormContentService;
 import org.sakaiproject.scorm.ui.console.components.DecoratedDatePropertyColumn;
 import org.sakaiproject.scorm.ui.player.pages.PlayerPage;
-import org.sakaiproject.scorm.ui.player.pages.PlayerTCAPage;
+import org.sakaiproject.scorm.ui.player.pages.ArticulateTCPlayerPage;
 import org.sakaiproject.scorm.ui.reporting.pages.LearnerResultsPage;
 import org.sakaiproject.scorm.ui.reporting.pages.ResultsListPage;
 import org.sakaiproject.wicket.markup.html.link.BookmarkablePageLabeledLink;
@@ -93,7 +93,7 @@ public class PackageListPage extends ConsoleBasePage implements ScormConstants {
 			@Override
 			public Component newLink(String id, Object bean) {
                 ContentPackage contentPackage = (ContentPackage) bean;
-                pageClass = (contentPackage.isTinCanAPI()) ? PlayerTCAPage.class : PlayerPage.class;
+                pageClass = (contentPackage.isTinCanAPI()) ? ArticulateTCPlayerPage.class : PlayerPage.class;
 
                 if (lms.canLaunchNewWindow()) {
                     String windowName = (contentPackage.isTinCanAPI()) ? "TinCanAPIPLayer" : "ScormPlayer";

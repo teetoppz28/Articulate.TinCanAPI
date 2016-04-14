@@ -22,34 +22,34 @@
   -->
 <beans>
 
-    <bean id="tinCanAPIImporter" class="org.sakaiproject.scorm.service.tincanapi.impl.TinCanAPIImporterImpl" init-method="init">
+    <bean id="articulateTCImporter" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCImporterImpl" init-method="init">
         <!-- Service beans -->
         <lookup-method name="resourceService" bean="org.sakaiproject.scorm.service.api.ScormResourceService" />
 
         <property name="contentHostingService" ref="org.sakaiproject.content.api.ContentHostingService" />
         <property name="developerHelperService" ref="org.sakaiproject.entitybroker.DeveloperHelperService" />
         <property name="serverConfigurationService" ref="org.sakaiproject.component.api.ServerConfigurationService" />
-        <property name="tinCanAPIDocumentUtils" ref="tinCanAPIDocumentUtils" />
-        <property name="tinCanAPIContentEntityUtils" ref="tinCanAPIContentEntityUtils" />
+        <property name="articulateTCDocumentUtils" ref="articulateTCDocumentUtils" />
+        <property name="articulateTCContentEntityUtils" ref="articulateTCContentEntityUtils" />
 
         <!-- Data Access Objects -->
         <lookup-method name="contentPackageDao" bean="org.sakaiproject.scorm.dao.api.ContentPackageDao" />
     </bean>
 
-    <bean id="tinCanAPIDocumentUtils" class="org.sakaiproject.scorm.service.tincanapi.impl.util.TinCanAPIDocumentUtils">
+    <bean id="articulateTCDocumentUtils" class="org.sakaiproject.articulate.tincan.util.ArticulateTCDocumentUtils">
         <property name="contentHostingService" ref="org.sakaiproject.content.api.ContentHostingService" />
     </bean>
 
-    <bean id="tinCanAPIContentEntityUtils" class="org.sakaiproject.scorm.service.tincanapi.impl.util.TinCanAPIContentEntityUtils">
+    <bean id="articulateTCContentEntityUtils" class="org.sakaiproject.articulate.tincan.util.ArticulateTCContentEntityUtils">
         <property name="contentHostingService" ref="org.sakaiproject.content.api.ContentHostingService" />
     </bean>
 
-    <bean id="tinCanAPIEntityProviderService" class="org.sakaiproject.scorm.service.tincanapi.impl.TinCanAPIEntityProviderServiceImpl" init-method="init">
+    <bean id="articulateTCEntityProviderService" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCEntityProviderServiceImpl" init-method="init">
     </bean>
 
     <!--  Entity Provider -->
-    <bean parent="org.sakaiproject.entitybroker.entityprovider.AbstractEntityProvider" class="org.sakaiproject.scorm.entity.tincanapi.TinCanAPIEntityProvider">
-        <property name="tinCanAPIEntityProviderService" ref="tinCanAPIEntityProviderService" />
+    <bean parent="org.sakaiproject.entitybroker.entityprovider.AbstractEntityProvider" class="org.sakaiproject.articulate.tincan.entity.tincanapi.ArticulateTCEntityProvider">
+        <property name="articulateTCEntityProviderService" ref="articulateTCEntityProviderService" />
     </bean>
 
 </beans>
