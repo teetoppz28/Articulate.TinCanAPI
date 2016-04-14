@@ -63,7 +63,7 @@ public class TinCanAPIJsonUtils {
     }
 
     /**
-     * Creates a list of POJOs from the given JSON string
+     * Creates a map of the POJO from the given JSON string
      * 
      * @param jsonStr the JSON to parse
      * @return a Map of the POJO created

@@ -1,9 +1,6 @@
 package org.sakaiproject.scorm.entity.tincanapi;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -24,22 +21,17 @@ import org.sakaiproject.entitybroker.entityprovider.extension.Formats;
 import org.sakaiproject.entitybroker.entityprovider.extension.RequestGetter;
 import org.sakaiproject.entitybroker.entityprovider.search.Search;
 import org.sakaiproject.entitybroker.util.AbstractEntityProvider;
-import org.sakaiproject.scorm.service.tincanapi.api.TinCanAPIService;
+import org.sakaiproject.scorm.model.tincanapi.TinCanAPIConstants;
+import org.sakaiproject.scorm.service.tincanapi.api.TinCanAPIEntityProviderService;
 
-public class TinCanAPIEntityProvider extends AbstractEntityProvider implements RESTful, RequestAware {
+public class TinCanAPIEntityProvider extends AbstractEntityProvider implements RESTful, RequestAware, TinCanAPIConstants {
 
     private Log log = LogFactory.getLog(TinCanAPIEntityProvider.class);
 
-    public static String PREFIX = "tincanapi-lrs";
     private RequestGetter requestGetter;
 
-    private static final String PATH_ACTION = "action";
-    private static final String PATH_STATEMENTS = "statements";
-    private static final String PATH_ACTIVITIES = "activities";
-    private static final String PATH_STATE = "state";
-
     @Setter
-    private TinCanAPIService tinCanAPIService;
+    private TinCanAPIEntityProviderService tinCanAPIEntityProviderService;
 
     public void init() {
     }
@@ -61,7 +53,6 @@ public class TinCanAPIEntityProvider extends AbstractEntityProvider implements R
         return new String[] {Formats.HTML};
     }
 
-    @SuppressWarnings("unchecked")
     @EntityCustomAction(action = PATH_ACTION, viewKey = "")
     public ActionReturn action(EntityView view, Map<String, Object> params) {
         HttpServletRequest request = requestGetter.getRequest();
@@ -72,13 +63,14 @@ public class TinCanAPIEntityProvider extends AbstractEntityProvider implements R
         // tincanapi-lrs/action/statements
         if (StringUtils.equals(path2, PATH_STATEMENTS)) {
             log.info("Path: tincanapi-lrs/action/statements called");
-            String payload = tinCanAPIService.getRequestPayload(request);
-            String contentStr = tinCanAPIService.getContentFromPayload(payload);
-            Map<String, Object> statementObj = (Map<String, Object>) tinCanAPIService.getObjectFromJSON(contentStr);
+
+            String statementJson = tinCanAPIEntityProviderService.processContentPayload(request);
+            tinCanAPIEntityProviderService.sendStatementToLRS(statementJson);
         }
 
         // tincanapi-lrs/action/activities/
         if (StringUtils.equals(path2, PATH_ACTIVITIES)) {
+         // tincanapi-lrs/action/activities/{path3}
             String path3 = view.getPathSegment(3);
 
             // tincanapi-lrs/action/activities/state
@@ -93,6 +85,7 @@ public class TinCanAPIEntityProvider extends AbstractEntityProvider implements R
                 }
             }
         }
+
         Map<String,Object> map = new HashMap<String, Object>();
         return new ActionReturn(map);
     }
@@ -101,6 +94,10 @@ public class TinCanAPIEntityProvider extends AbstractEntityProvider implements R
     public void setRequestGetter(RequestGetter requestGetter) {
         this.requestGetter = requestGetter;
     }
+
+    /*
+     * Inherited methods (not used)
+     */
 
     @Override
     public String createEntity(EntityReference ref, Object entity, Map<String, Object> params) {

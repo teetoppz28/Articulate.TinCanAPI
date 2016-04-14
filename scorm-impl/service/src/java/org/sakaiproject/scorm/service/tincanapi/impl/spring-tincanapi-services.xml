@@ -44,12 +44,12 @@
         <property name="contentHostingService" ref="org.sakaiproject.content.api.ContentHostingService" />
     </bean>
 
-    <bean id="tinCanAPIService" class="org.sakaiproject.scorm.service.tincanapi.impl.TinCanAPIServiceImpl">
+    <bean id="tinCanAPIEntityProviderService" class="org.sakaiproject.scorm.service.tincanapi.impl.TinCanAPIEntityProviderServiceImpl" init-method="init">
     </bean>
 
     <!--  Entity Provider -->
     <bean parent="org.sakaiproject.entitybroker.entityprovider.AbstractEntityProvider" class="org.sakaiproject.scorm.entity.tincanapi.TinCanAPIEntityProvider">
-        <property name="tinCanAPIService" ref="tinCanAPIService" />
+        <property name="tinCanAPIEntityProviderService" ref="tinCanAPIEntityProviderService" />
     </bean>
 
 </beans>
