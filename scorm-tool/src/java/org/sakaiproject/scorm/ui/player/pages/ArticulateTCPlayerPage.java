@@ -22,7 +22,7 @@ package org.sakaiproject.scorm.ui.player.pages;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.link.InlineFrame;
-import org.sakaiproject.articulate.tincan.model.ArticulateTCConstants;
+import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 
 
 public class ArticulateTCPlayerPage extends BaseToolPage implements ArticulateTCConstants {
@@ -63,7 +63,7 @@ public class ArticulateTCPlayerPage extends BaseToolPage implements ArticulateTC
         response.renderOnLoadJavascript(HTML_BODY_ONLOAD_ADDTL);
         response.renderCSSReference(TOOLBASE_CSS);
         response.renderCSSReference(TOOL_CSS);
-        response.renderCSSReference(HTML_TINCANAPI_CSS);
+        response.renderCSSReference(HTML_ARTICULATE_TC_CSS);
     }
 
 }

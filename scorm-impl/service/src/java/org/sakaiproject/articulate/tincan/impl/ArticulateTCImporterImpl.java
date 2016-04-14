@@ -10,7 +10,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCImporter;
-import org.sakaiproject.articulate.tincan.model.ArticulateTCConstants;
+import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.model.ArticulateTCContentPackage;
 import org.sakaiproject.articulate.tincan.model.ArticulateTCMeta;
 import org.sakaiproject.articulate.tincan.util.ArticulateTCContentEntityUtils;

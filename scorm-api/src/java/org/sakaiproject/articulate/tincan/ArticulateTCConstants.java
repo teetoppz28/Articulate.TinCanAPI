@@ -25,7 +25,7 @@ public interface ArticulateTCConstants extends ScormConstants {
     public final static String ARCHIVE_META_XML_FILE = "meta.xml";
     public final static String ARCHIVE_TINCAN_XML_FILE = "tincan.xml";
 
-    public static final String HTML_TINCANAPI_CSS = "styles/articulatetc.css";
+    public static final String HTML_ARTICULATE_TC_CSS = "styles/articulatetc.css";
     public static final String HTML_HEADSCRIPTS = "/library/js/headscripts.js";
     public static final String HTML_BODY_ONLOAD_ADDTL="setMainFrameHeight(window.name)";
 

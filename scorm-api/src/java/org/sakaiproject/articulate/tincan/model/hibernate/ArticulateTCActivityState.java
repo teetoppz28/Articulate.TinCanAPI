@@ -1,6 +1,10 @@
 package org.sakaiproject.articulate.tincan.model.hibernate;
 
-public class ArticulateTCActivityState {
+import java.io.Serializable;
+
+public class ArticulateTCActivityState implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private long id;
     private String activityId;

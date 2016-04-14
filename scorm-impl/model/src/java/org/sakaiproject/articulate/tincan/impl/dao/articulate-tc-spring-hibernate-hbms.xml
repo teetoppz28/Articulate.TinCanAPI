@@ -23,6 +23,7 @@
     "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <beans>
+
     <bean id="org.sakaiproject.articulate.tincan.impl.dao.HBMMappingList" class="java.util.ArrayList">
         <constructor-arg>
             <list>
@@ -30,6 +31,5 @@
             </list>
         </constructor-arg>
     </bean>
+
 </beans>
-
-

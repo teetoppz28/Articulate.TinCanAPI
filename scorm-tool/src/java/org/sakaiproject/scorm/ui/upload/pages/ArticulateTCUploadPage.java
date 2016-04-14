@@ -48,7 +48,7 @@ import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.lang.Bytes;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCImporter;
-import org.sakaiproject.articulate.tincan.model.ArticulateTCConstants;
+import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.event.api.NotificationService;
 import org.sakaiproject.scorm.service.api.ScormResourceService;
@@ -225,7 +225,7 @@ public class ArticulateTCUploadPage extends ConsoleBasePage implements Articulat
                                     PageParameters params = new PageParameters();
                                     params.add("filename", upload.getClientFileName());
                                     params.put("status", status);
-                                    setResponsePage(ConfirmTCAPage.class, params);
+                                    setResponsePage(ArticulateTCConfirmPage.class, params);
                                 }
                             } catch(Exception e) {
                                 ArticulateTCUploadPage.this.warn(getLocalizer().getString("upload.failed", ArticulateTCUploadPage.this, new Model(e)));
