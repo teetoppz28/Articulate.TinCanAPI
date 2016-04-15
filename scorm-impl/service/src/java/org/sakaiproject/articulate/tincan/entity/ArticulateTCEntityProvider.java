@@ -81,7 +81,7 @@ public class ArticulateTCEntityProvider extends AbstractEntityProvider implement
                     // TODO get activity state data from db
                 } else if (StringUtils.equalsIgnoreCase(view.getMethod(), "PUT") || StringUtils.equalsIgnoreCase(view.getMethod(), "POST")){
                     // store the activity state
-                    //articulateTCEntityProviderService.processStatePayload(request);
+                    articulateTCEntityProviderService.processStatePayload(request);
                     // TODO save state data to db
                 } else if (StringUtils.equalsIgnoreCase(view.getMethod(), "DELETE")) {
                     // delete the activity state

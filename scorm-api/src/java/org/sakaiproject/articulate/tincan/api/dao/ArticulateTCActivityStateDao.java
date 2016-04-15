@@ -5,4 +5,5 @@ import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCActivitySt
 public interface ArticulateTCActivityStateDao {
 
     void save(ArticulateTCActivityState articulateTCActivityState);
+
 }

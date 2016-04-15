@@ -23,11 +23,7 @@
 <hibernate-mapping default-cascade="all" package="org.sakaiproject.articulate.tincan.model.hibernate" default-lazy="false">
 
     <class name="org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCActivityState" table="ARTICULATE_TC_ACTIVITY_STATE">
-        <id name="id" column="ID" type="long">
-            <generator class="native">
-                <param name="sequence">TINCANAPI_ACTIVITY_STATE_S</param>
-            </generator>
-        </id>
+        <id name="id" column="ID"></id>
         <property name="activityId" column="ACTIVITY_ID"  type="text" />
         <property name="agent" column="AGENT" type="text" />
         <property name="content" column="CONTENT" type="text" />

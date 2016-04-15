@@ -22,11 +22,16 @@ package org.sakaiproject.scorm.ui.player.pages;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.link.InlineFrame;
+import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
+import org.sakaiproject.articulate.tincan.api.ArticulateTCLaunchService;
 
 public class ArticulateTCPlayerPage extends BaseToolPage implements ArticulateTCConstants {
 
     private static final long serialVersionUID = 1L;
+
+    @SpringBean(name="articulateTCLaunchService")
+    private ArticulateTCLaunchService articulateTCLaunchService;
 
     public ArticulateTCPlayerPage() {
         this(new PageParameters());
@@ -35,19 +40,28 @@ public class ArticulateTCPlayerPage extends BaseToolPage implements ArticulateTC
     public ArticulateTCPlayerPage(final PageParameters pageParams) {
         super();
 
+        /**
+         * iFrame that holds the Articulate TinCanAPI content player
+         */
         InlineFrame iframe = new InlineFrame("launch-frame", this){
-
             private static final long serialVersionUID = 1L;
 
             @Override
             protected CharSequence getURL() {
-                String launchUrl = pageParams.getString("url");
+
+                String baseUrl = pageParams.getString("url");
+                String packageId = pageParams.getString("contentPackageId");
+                String launchUrl = baseUrl;
                 // TODO testing this query statement
                 //launchUrl += "?endpoint=%09https%3A%2F%2Fcloud.scorm.com%2Ftc%2F73834736OC%2Fsandbox%2F&auth=Basic+aklDQjItalM2bzlsN0VQQ0NiNDpoSlNaV2JMT1lqUS1TV21Qc1Q4&actor=%7B\"name\"%3A%20%5B\"First%20Last\"%5D%2C%20\"mbox\"%3A%20%5B\"mailto%3Afirstlast%40mycompany.com\"%5D%7D";
-                launchUrl += "?endpoint=%09http%3A%2F%2Flocalhost%2Fdirect%2Ftincanapi-lrs%2Faction%2F";
-                launchUrl += "&auth=Basic+aklDQjItalM2bzlsN0VQQ0NiNDpoSlNaV2JMT1lqUS1TV21Qc1Q4";
+                /*launchUrl += "?endpoint=%2Fdirect%2Ftincanapi-lrs%2Faction%2F";
+                launchUrl += "&auth=";
                 launchUrl += "&actor=%7B\"name\"%3A%20%5B\"First%20Last\"%5D%2C%20\"mbox\"%3A%20%5B\"mailto%3Afirstlast%40mycompany.com\"%5D%7D";
                 launchUrl += "&siteid=site1";
+                launchUrl += "&userid=inst1";
+                launchUrl += "&packageid=12";*/
+
+                launchUrl += articulateTCLaunchService.calculateLaunchParams(packageId);
 
                 return launchUrl;
             }

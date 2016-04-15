@@ -48,6 +48,11 @@
         <property name="articulateTCActivityStateDao" ref="articulateTCActivityStateDao" />
     </bean>
 
+    <bean id="articulateTCLaunchService" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCLaunchServiceImpl" init-method="init">
+        <property name="developerHelperService" ref="org.sakaiproject.entitybroker.DeveloperHelperService" />
+        <property name="userDirectoryService" ref="org.sakaiproject.user.api.UserDirectoryService" />
+    </bean>
+
     <!--  Entity Provider -->
     <bean parent="org.sakaiproject.entitybroker.entityprovider.AbstractEntityProvider" class="org.sakaiproject.articulate.tincan.entity.ArticulateTCEntityProvider">
         <property name="articulateTCEntityProviderService" ref="articulateTCEntityProviderService" />

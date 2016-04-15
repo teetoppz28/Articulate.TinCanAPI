@@ -96,7 +96,7 @@ public class PackageListPage extends ConsoleBasePage implements ScormConstants {
                 pageClass = (contentPackage.isTinCanAPI()) ? ArticulateTCPlayerPage.class : PlayerPage.class;
 
                 if (lms.canLaunchNewWindow()) {
-                    String windowName = (contentPackage.isTinCanAPI()) ? "TinCanAPIPLayer" : "ScormPlayer";
+                    String windowName = (contentPackage.isTinCanAPI()) ? "ArticulateTinCanAPIPlayer" : "ScormPlayer";
                     setPopupWindowName(windowName);
                 }
 
