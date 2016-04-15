@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -68,22 +70,69 @@ public class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConst
      * @param str
      * @return
      */
-    public static String getContentFromPayload(String str) {
+    public static String getContentDataFromPayload(String str) {
         if (StringUtils.isBlank(str)) {
             throw new IllegalArgumentException("Payload string cannot be blank");
         }
 
-        String decodedPayload = ArticulateTCEntityProviderServiceUtils.decodeString(str);
+        String decodedPayload = decodeString(str);
 
         String[] split = StringUtils.split(decodedPayload, "&");
         for (String s : split) {
-            if (StringUtils.startsWith(s, STATEMENT_PAYLOAD_CONTENT_VARIABLE)) {
-                return StringUtils.removeStart(s, STATEMENT_PAYLOAD_CONTENT_VARIABLE);
+            if (StringUtils.startsWith(s, STATEMENT_DATA_KEY_CONTENT)) {
+                return StringUtils.removeStart(s, STATEMENT_DATA_KEY_CONTENT + "=");
             }
         }
 
         // should not get here... there must not be a "content" portion in the payload
         throw new IllegalArgumentException("Request payload does not contain a valid content statement string.");
+    }
+
+    /**
+     * Gets a mapping of payload data
+     * 
+     * @param str
+     * @return
+     */
+    public static Map<String, String> getStateDataFromPayload(String str) {
+        if (StringUtils.isBlank(str)) {
+            throw new IllegalArgumentException("Payload string cannot be blank");
+        }
+
+        Map<String, String> stateData = new HashMap<String, String>();
+
+        String decodedPayload = decodeString(str);
+
+        String[] split = StringUtils.split(decodedPayload, "&");
+        for (String s : split) {
+            if (StringUtils.startsWith(s, STATE_DATA_KEY_ACTIVITY_ID)) {
+                stateData.put(STATE_DATA_KEY_ACTIVITY_ID, StringUtils.removeStart(s, STATE_DATA_KEY_ACTIVITY_ID + "="));
+                continue;
+            }
+            if (StringUtils.startsWith(s, STATE_DATA_KEY_AGENT)) {
+                stateData.put(STATE_DATA_KEY_AGENT, StringUtils.removeStart(s, STATE_DATA_KEY_AGENT + "="));
+                continue;
+            }
+            if (StringUtils.startsWith(s, STATE_DATA_KEY_CONTENT)) {
+                stateData.put(STATE_DATA_KEY_CONTENT, StringUtils.removeStart(s, STATE_DATA_KEY_CONTENT + "="));
+                continue;
+            }
+            if (StringUtils.startsWith(s, STATE_DATA_KEY_STATE_ID)) {
+                stateData.put(STATE_DATA_KEY_STATE_ID, StringUtils.removeStart(s, STATE_DATA_KEY_STATE_ID + "="));
+                continue;
+            }
+            if (StringUtils.startsWith(s, STATE_DATA_KEY_SITE_ID)) {
+                stateData.put(STATE_DATA_KEY_SITE_ID, StringUtils.removeStart(s, STATE_DATA_KEY_SITE_ID + "="));
+                continue;
+            }
+        }
+
+        // should not get here... there must not be a "content" portion in the payload
+        if (stateData.isEmpty()) {
+            throw new IllegalArgumentException("Request payload does not contain a valid activity state string.");
+        }
+
+        return stateData;
     }
 
 }

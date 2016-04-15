@@ -45,6 +45,7 @@
     </bean>
 
     <bean id="articulateTCEntityProviderService" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCEntityProviderServiceImpl" init-method="init">
+        <property name="articulateTCActivityStateDao" ref="articulateTCActivityStateDao" />
     </bean>
 
     <!--  Entity Provider -->

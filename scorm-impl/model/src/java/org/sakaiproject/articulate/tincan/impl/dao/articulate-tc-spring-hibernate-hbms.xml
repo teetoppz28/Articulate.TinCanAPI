@@ -32,4 +32,8 @@
         </constructor-arg>
     </bean>
 
+    <bean id="org.sakaiproject.springframework.orm.hibernate.impl.AdditionalHibernateMappingsImpl.articulate" class="org.sakaiproject.springframework.orm.hibernate.impl.AdditionalHibernateMappingsImpl">
+        <property name="mappingResources" ref="org.sakaiproject.articulate.tincan.impl.dao.HBMMappingList"/>
+    </bean>
+
 </beans>

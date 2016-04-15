@@ -9,11 +9,25 @@ public interface ArticulateTCConstants extends ScormConstants {
      */
     public final static String REST_PREFIX = "tincanapi-lrs";
 
-    public final static String STATEMENT_PAYLOAD_CONTENT_VARIABLE = "content=";
     public final static String PATH_ACTION = "action";
     public final static String PATH_STATEMENTS = "statements";
     public final static String PATH_ACTIVITIES = "activities";
     public final static String PATH_STATE = "state";
+    public final static String PATH_QUERY_PARAM_GET = "method=get";
+
+    /*
+     * Activity statement data keys
+     */
+    public final static String STATEMENT_DATA_KEY_CONTENT = "content";
+
+    /*
+     * Activity state data keys
+     */
+    public final static String STATE_DATA_KEY_ACTIVITY_ID = "activityId";
+    public final static String STATE_DATA_KEY_CONTENT = "content";
+    public final static String STATE_DATA_KEY_AGENT = "agent";
+    public final static String STATE_DATA_KEY_STATE_ID = "stateId";
+    public final static String STATE_DATA_KEY_SITE_ID = "siteid";
 
     public final static String DEFAULT_ENCODING = "UTF-8";
 

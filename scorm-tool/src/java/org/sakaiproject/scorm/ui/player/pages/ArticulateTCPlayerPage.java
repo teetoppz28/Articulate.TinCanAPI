@@ -24,12 +24,9 @@ import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.link.InlineFrame;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 
-
 public class ArticulateTCPlayerPage extends BaseToolPage implements ArticulateTCConstants {
 
     private static final long serialVersionUID = 1L;
-
-    
 
     public ArticulateTCPlayerPage() {
         this(new PageParameters());
@@ -46,10 +43,11 @@ public class ArticulateTCPlayerPage extends BaseToolPage implements ArticulateTC
             protected CharSequence getURL() {
                 String launchUrl = pageParams.getString("url");
                 // TODO testing this query statement
-                //launchUrl += "?endpoint=%09https%3A%2F%2Fcloud.scorm.com%2Ftc%2FOZ13EN933G%2F&auth=Basic+aklDQjItalM2bzlsN0VQQ0NiNDpoSlNaV2JMT1lqUS1TV21Qc1Q4&actor=%7B\"name\"%3A%20%5B\"First%20Last\"%5D%2C%20\"mbox\"%3A%20%5B\"mailto%3Afirstlast%40mycompany.com\"%5D%7D";
+                //launchUrl += "?endpoint=%09https%3A%2F%2Fcloud.scorm.com%2Ftc%2F73834736OC%2Fsandbox%2F&auth=Basic+aklDQjItalM2bzlsN0VQQ0NiNDpoSlNaV2JMT1lqUS1TV21Qc1Q4&actor=%7B\"name\"%3A%20%5B\"First%20Last\"%5D%2C%20\"mbox\"%3A%20%5B\"mailto%3Afirstlast%40mycompany.com\"%5D%7D";
                 launchUrl += "?endpoint=%09http%3A%2F%2Flocalhost%2Fdirect%2Ftincanapi-lrs%2Faction%2F";
                 launchUrl += "&auth=Basic+aklDQjItalM2bzlsN0VQQ0NiNDpoSlNaV2JMT1lqUS1TV21Qc1Q4";
                 launchUrl += "&actor=%7B\"name\"%3A%20%5B\"First%20Last\"%5D%2C%20\"mbox\"%3A%20%5B\"mailto%3Afirstlast%40mycompany.com\"%5D%7D";
+                launchUrl += "&siteid=site1";
 
                 return launchUrl;
             }

@@ -64,7 +64,7 @@ public class ArticulateTCEntityProvider extends AbstractEntityProvider implement
         if (StringUtils.equals(path2, PATH_STATEMENTS)) {
             log.info("Path: tincanapi-lrs/action/statements called");
 
-            String statementJson = articulateTCEntityProviderService.processContentPayload(request);
+            String statementJson = articulateTCEntityProviderService.processStatementPayload(request);
             articulateTCEntityProviderService.sendStatementToLRS(statementJson);
         }
 
@@ -76,12 +76,16 @@ public class ArticulateTCEntityProvider extends AbstractEntityProvider implement
             // tincanapi-lrs/action/activities/state
             if (StringUtils.equals(path3, PATH_STATE)) {
                 log.info("Path: tincanapi-lrs/action/activities/state called. Method: " + view.getMethod());
-                if (StringUtils.equalsIgnoreCase(view.getMethod(), "GET")) {
+                if (StringUtils.equalsIgnoreCase(view.getMethod(), "GET") || StringUtils.equalsIgnoreCase((String) params.get("queryString"), PATH_QUERY_PARAM_GET)) {
                     // get the activity state
                     // TODO get activity state data from db
-                } else if (StringUtils.equalsIgnoreCase(view.getMethod(), "PUT")){
+                } else if (StringUtils.equalsIgnoreCase(view.getMethod(), "PUT") || StringUtils.equalsIgnoreCase(view.getMethod(), "POST")){
                     // store the activity state
+                    //articulateTCEntityProviderService.processStatePayload(request);
                     // TODO save state data to db
+                } else if (StringUtils.equalsIgnoreCase(view.getMethod(), "DELETE")) {
+                    // delete the activity state
+                    // TODO delete state data from db
                 }
             }
         }
