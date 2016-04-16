@@ -14,6 +14,7 @@ public interface ArticulateTCConstants extends ScormConstants {
     public final static String PATH_ACTIVITIES = "activities";
     public final static String PATH_STATE = "state";
     public final static String PATH_QUERY_PARAM_GET = "method=get";
+    public final static String PATH_QUERY_PARAM_DELETE = "method=delete";
 
     /*
      * Activity statement data keys

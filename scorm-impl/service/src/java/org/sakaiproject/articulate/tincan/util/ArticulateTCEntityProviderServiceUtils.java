@@ -129,6 +129,10 @@ public class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConst
                 stateData.put(STATE_DATA_KEY_USER_ID, StringUtils.removeStart(s, STATE_DATA_KEY_USER_ID + "="));
                 continue;
             }
+            if (StringUtils.startsWith(s, STATE_DATA_KEY_PACKAGE_ID)) {
+                stateData.put(STATE_DATA_KEY_PACKAGE_ID, StringUtils.removeStart(s, STATE_DATA_KEY_PACKAGE_ID + "="));
+                continue;
+            }
         }
 
         // should not get here... there must not be a "content" portion in the payload

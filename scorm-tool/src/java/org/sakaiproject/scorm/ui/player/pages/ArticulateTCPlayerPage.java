@@ -52,14 +52,6 @@ public class ArticulateTCPlayerPage extends BaseToolPage implements ArticulateTC
                 String baseUrl = pageParams.getString("url");
                 String packageId = pageParams.getString("contentPackageId");
                 String launchUrl = baseUrl;
-                // TODO testing this query statement
-                //launchUrl += "?endpoint=%09https%3A%2F%2Fcloud.scorm.com%2Ftc%2F73834736OC%2Fsandbox%2F&auth=Basic+aklDQjItalM2bzlsN0VQQ0NiNDpoSlNaV2JMT1lqUS1TV21Qc1Q4&actor=%7B\"name\"%3A%20%5B\"First%20Last\"%5D%2C%20\"mbox\"%3A%20%5B\"mailto%3Afirstlast%40mycompany.com\"%5D%7D";
-                /*launchUrl += "?endpoint=%2Fdirect%2Ftincanapi-lrs%2Faction%2F";
-                launchUrl += "&auth=";
-                launchUrl += "&actor=%7B\"name\"%3A%20%5B\"First%20Last\"%5D%2C%20\"mbox\"%3A%20%5B\"mailto%3Afirstlast%40mycompany.com\"%5D%7D";
-                launchUrl += "&siteid=site1";
-                launchUrl += "&userid=inst1";
-                launchUrl += "&packageid=12";*/
 
                 launchUrl += articulateTCLaunchService.calculateLaunchParams(packageId);
 

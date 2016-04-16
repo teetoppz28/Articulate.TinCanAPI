@@ -56,42 +56,38 @@ public class ArticulateTCEntityProvider extends AbstractEntityProvider implement
     @EntityCustomAction(action = PATH_ACTION, viewKey = "")
     public ActionReturn action(EntityView view, Map<String, Object> params) {
         HttpServletRequest request = requestGetter.getRequest();
+        log.debug("Path: " + request.getPathInfo() + " called. Method: " + view.getMethod());
+        String retVal = "";
 
-        // tincanapi-lrs/action/{path2}
+        // {PREFIX}/action/{path2}
         String path2 = view.getPathSegment(2);
 
-        // tincanapi-lrs/action/statements
+        // {PREFIX}/action/statements
         if (StringUtils.equals(path2, PATH_STATEMENTS)) {
-            log.info("Path: tincanapi-lrs/action/statements called");
-
-            String statementJson = articulateTCEntityProviderService.processStatementPayload(request);
-            articulateTCEntityProviderService.sendStatementToLRS(statementJson);
+            articulateTCEntityProviderService.postStatementPayload(request);
         }
 
-        // tincanapi-lrs/action/activities/
+        // {PREFIX}/action/activities/
         if (StringUtils.equals(path2, PATH_ACTIVITIES)) {
-         // tincanapi-lrs/action/activities/{path3}
+            // {PREFIX}/action/activities/{path3}
             String path3 = view.getPathSegment(3);
 
-            // tincanapi-lrs/action/activities/state
+            // {PREFIX}/action/activities/state
             if (StringUtils.equals(path3, PATH_STATE)) {
-                log.info("Path: tincanapi-lrs/action/activities/state called. Method: " + view.getMethod());
                 if (StringUtils.equalsIgnoreCase(view.getMethod(), "GET") || StringUtils.equalsIgnoreCase((String) params.get("queryString"), PATH_QUERY_PARAM_GET)) {
                     // get the activity state
-                    // TODO get activity state data from db
+                    retVal = articulateTCEntityProviderService.getStatePayload(request);
                 } else if (StringUtils.equalsIgnoreCase(view.getMethod(), "PUT") || StringUtils.equalsIgnoreCase(view.getMethod(), "POST")){
                     // store the activity state
-                    articulateTCEntityProviderService.processStatePayload(request);
-                    // TODO save state data to db
-                } else if (StringUtils.equalsIgnoreCase(view.getMethod(), "DELETE")) {
+                    articulateTCEntityProviderService.postStatePayload(request);
+                } else if (StringUtils.equalsIgnoreCase(view.getMethod(), "DELETE") || StringUtils.equalsIgnoreCase((String) params.get("queryString"), PATH_QUERY_PARAM_DELETE)) {
                     // delete the activity state
-                    // TODO delete state data from db
+                    articulateTCEntityProviderService.deleteStateData(request);
                 }
             }
         }
 
-        Map<String,Object> map = new HashMap<String, Object>();
-        return new ActionReturn(map);
+        return new ActionReturn(retVal);
     }
 
     @Override

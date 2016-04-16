@@ -52,7 +52,7 @@ public class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService,
             User user = userDirectoryService.getCurrentUser();
             String name = user.getDisplayName();
             String email = user.getEmail();
-            String actor = "{\"name\":\"" + name + "\",\"mbox\":\"" + email + "\"}";
+            String actor = "{\"name\":\"" + name + "\",\"mbox\":\"mailto:" + email + "\"}";
 
             return URLEncoder.encode(actor, DEFAULT_ENCODING);
         } catch (UnsupportedEncodingException e) {
@@ -90,7 +90,7 @@ public class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService,
 
     @Override
     public String calculateEndPoint() {
-        String endpoint = EntityView.SEPARATOR + REST_PREFIX + EntityView.SEPARATOR + PATH_ACTION + EntityView.SEPARATOR;
+        String endpoint = EntityView.DIRECT_PREFIX + EntityView.SEPARATOR + REST_PREFIX + EntityView.SEPARATOR + PATH_ACTION + EntityView.SEPARATOR;
 
         try {
             return URLEncoder.encode(endpoint, DEFAULT_ENCODING);

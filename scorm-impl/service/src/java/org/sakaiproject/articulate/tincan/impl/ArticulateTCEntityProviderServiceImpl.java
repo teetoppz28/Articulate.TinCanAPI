@@ -30,19 +30,19 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
     }
 
     @Override
-    public String processStatementPayload(HttpServletRequest request) {
+    public void postStatementPayload(HttpServletRequest request) {
         if (request == null) {
             throw new IllegalArgumentException("Request cannot be null");
         }
 
         String payload = ArticulateTCEntityProviderServiceUtils.getRequestPayload(request);
-        String contentStr = ArticulateTCEntityProviderServiceUtils.getContentDataFromPayload(payload);
+        String statementJson = ArticulateTCEntityProviderServiceUtils.getContentDataFromPayload(payload);
 
-        return contentStr;
+        sendStatementToLRS(statementJson);
     }
 
     @Override
-    public ArticulateTCActivityState processStatePayload(HttpServletRequest request) {
+    public void postStatePayload(HttpServletRequest request) {
         if (request == null) {
             throw new IllegalArgumentException("Request cannot be null");
         }
@@ -52,8 +52,41 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
         ArticulateTCActivityState articulateTCActivityState = new ArticulateTCActivityState(content);
 
         articulateTCActivityStateDao.save(articulateTCActivityState);
+    }
 
-        return articulateTCActivityState;
+    @Override
+    public String getStatePayload(HttpServletRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Request cannot be null");
+        }
+
+        String stateData = null;
+
+        String payload  = ArticulateTCEntityProviderServiceUtils.getRequestPayload(request);
+        Map<String, String> content = ArticulateTCEntityProviderServiceUtils.getStateDataFromPayload(payload);
+        ArticulateTCActivityState articulateTCActivityState = new ArticulateTCActivityState(content);
+
+        articulateTCActivityState = articulateTCActivityStateDao.get(articulateTCActivityState.getId());
+
+        if (articulateTCActivityState != null) {
+            stateData = articulateTCActivityState.getContent();
+        }
+
+        return stateData;
+    }
+
+    @Override
+    public void deleteStateData(HttpServletRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Request cannot be null");
+        }
+
+
+        String payload  = ArticulateTCEntityProviderServiceUtils.getRequestPayload(request);
+        Map<String, String> content = ArticulateTCEntityProviderServiceUtils.getStateDataFromPayload(payload);
+        ArticulateTCActivityState articulateTCActivityState = new ArticulateTCActivityState(content);
+
+        articulateTCActivityStateDao.remove(articulateTCActivityState);
     }
 
     @Override
@@ -70,7 +103,4 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
         }
     }
 
-    public String getActivityStateJSON() {
-        return null;
-    }
 }

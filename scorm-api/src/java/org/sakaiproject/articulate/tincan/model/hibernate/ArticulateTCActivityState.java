@@ -1,6 +1,7 @@
 package org.sakaiproject.articulate.tincan.model.hibernate;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Map;
 
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
@@ -9,21 +10,22 @@ public class ArticulateTCActivityState implements Serializable, ArticulateTCCons
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * ID Format: userId::siteId::packageId
-     */
-    private String id;
     private String activityId;
     private String agent;
     private String content;
+    private long id;
+    private String packageId;
     private String registration;
     private String stateId;
+    private String userId;
+    private boolean deleted = false;
+    private Date created;
+    private Date modified;
 
     public ArticulateTCActivityState() {
     }
 
-    public ArticulateTCActivityState(String id, String activityId, String agent, String content, String registration, String stateId) {
-        this.id = id;
+    public ArticulateTCActivityState(String userId, String registration, String packageId, String activityId, String agent, String content, String stateId) {
         this.activityId = activityId;
         this.agent = agent;
         this.content = content;
@@ -32,20 +34,13 @@ public class ArticulateTCActivityState implements Serializable, ArticulateTCCons
     }
 
     public ArticulateTCActivityState(Map<String, String> data) {
-        this.id = buildId(data.get(STATE_DATA_KEY_ID), data.get(STATE_DATA_KEY_SITE_ID), data.get(STATE_DATA_KEY_PACKAGE_ID));
         this.activityId = data.get(STATE_DATA_KEY_ACTIVITY_ID);
         this.agent = data.get(STATE_DATA_KEY_AGENT);
         this.content = data.get(STATE_DATA_KEY_CONTENT);
-        this.stateId = data.get(STATE_DATA_KEY_STATE_ID);
+        this.packageId = data.get(STATE_DATA_KEY_PACKAGE_ID);
         this.registration = data.get(STATE_DATA_KEY_SITE_ID);
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
+        this.stateId = data.get(STATE_DATA_KEY_STATE_ID);
+        this.userId = data.get(STATE_DATA_KEY_USER_ID);
     }
 
     public String getActivityId() {
@@ -72,6 +67,21 @@ public class ArticulateTCActivityState implements Serializable, ArticulateTCCons
         this.content = content;
     }
 
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getPackageId() {
+        return packageId;
+    }
+
+    public void setPackageId(String packageId) {
+        this.packageId = packageId;
+    }
     public String getRegistration() {
         return registration;
     }
@@ -88,17 +98,36 @@ public class ArticulateTCActivityState implements Serializable, ArticulateTCCons
         this.stateId = stateId;
     }
 
-    /**
-     * Builds the ID in the specified format
-     * e.g. userID::siteID::packageID
-     * 
-     * @param userId
-     * @param siteId
-     * @param packageId
-     * @return
-     */
-    public String buildId(String userId, String siteId, String packageId) {
-        return userId + STATE_DATA_ID_SEPARATOR + siteId + STATE_DATA_ID_SEPARATOR + packageId;
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
+    }
+
+    public Date getModified() {
+        return modified;
+    }
+
+    public void setModified(Date modified) {
+        this.modified = modified;
     }
 
 }
