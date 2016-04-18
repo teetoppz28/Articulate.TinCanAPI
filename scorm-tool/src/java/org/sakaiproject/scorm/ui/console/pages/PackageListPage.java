@@ -130,10 +130,22 @@ public class PackageListPage extends ConsoleBasePage implements ScormConstants {
 
         actionColumn.addAction(launchAction);
 
-		if (canConfigure)
-		{
-			actionColumn.addAction(new Action(new ResourceModel("column.action.edit.label"), PackageConfigurationPage.class, paramPropertyExpressions));
-		}
+        if (canConfigure) {
+            actionColumn.addAction(
+                new Action(new ResourceModel("column.action.edit.label"), paramPropertyExpressions) {
+                    private static final long serialVersionUID = 1L;
+                    @Override
+                    public Component newLink(String id, Object bean) {
+                        ContentPackage contentPackage = (ContentPackage) bean;
+                        pageClass = (contentPackage.isTinCanAPI()) ? ArticulateTCPackageConfigurationPage.class : PackageConfigurationPage.class;
+                        PageParameters params = buildPageParameters(paramPropertyExpressions, bean);
+                        Link link = new BookmarkablePageLabeledLink(id, new ResourceModel("column.action.edit.label"), pageClass, params);
+
+                        return link;
+                    }
+                }
+            );
+        }
 		if (canGrade) {
 			actionColumn.addAction(new Action(new StringResourceModel("column.action.grade.label", this, null), ResultsListPage.class, paramPropertyExpressions));
 		}

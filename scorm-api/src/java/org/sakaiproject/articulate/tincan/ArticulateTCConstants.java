@@ -56,4 +56,10 @@ public interface ArticulateTCConstants extends ScormConstants {
     public final static String HTML_HEADSCRIPTS = "/library/js/headscripts.js";
     public final static String HTML_BODY_ONLOAD_ADDTL="setMainFrameHeight(window.name)";
 
+    /*
+     * Configuration page
+     */
+    public final static Double CONFIGURATION_DEFAULT_POINTS = 100d;
+    public final static int CONFIGURATION_DEFAULT_ATTEMPTS = 10;
+
 }
