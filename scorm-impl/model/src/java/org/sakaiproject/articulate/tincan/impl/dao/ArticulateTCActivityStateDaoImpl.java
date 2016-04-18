@@ -28,7 +28,7 @@ public class ArticulateTCActivityStateDaoImpl extends HibernateDaoSupport implem
                 articulateTCActivityState.setModified(new Date());
                 getHibernateTemplate().saveOrUpdate(articulateTCActivityState);
             } catch (Throwable e) {
-                logger.error("problem saving state data:", e);
+                logger.error("Error saving activity state data: ", e);
                 session.getTransaction().rollback();
             } finally {
                 if (!session.getTransaction().wasRolledBack()) {
