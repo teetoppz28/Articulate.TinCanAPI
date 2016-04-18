@@ -3,18 +3,45 @@ package org.sakaiproject.articulate.tincan.impl.dao;
 import java.util.Date;
 import java.util.List;
 
+import org.hibernate.Session;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCActivityStateDao;
 import org.sakaiproject.articulate.tincan.model.ArticulateTCRequestPayload;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCActivityState;
 import org.springframework.dao.DataAccessException;
+import org.springframework.orm.hibernate3.SessionHolder;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-public class ArticulateTCActivityStateImpl extends HibernateDaoSupport implements ArticulateTCActivityStateDao {
+public class ArticulateTCActivityStateDaoImpl extends HibernateDaoSupport implements ArticulateTCActivityStateDao {
 
     @Override
     public void save(ArticulateTCActivityState articulateTCActivityState) {
-        articulateTCActivityState.setModified(new Date());
-        getHibernateTemplate().saveOrUpdate(articulateTCActivityState);
+        Session session = null;
+
+        try {
+            // Since we are in a thread that doesn't have a hibernate session we need to manage it here
+            session = getSessionFactory().openSession();
+            TransactionSynchronizationManager.bindResource(getSessionFactory(), new SessionHolder(session));
+
+            try {
+                session.beginTransaction();
+                articulateTCActivityState.setModified(new Date());
+                getHibernateTemplate().saveOrUpdate(articulateTCActivityState);
+            } catch (Throwable e) {
+                logger.error("problem saving state data:", e);
+                session.getTransaction().rollback();
+            } finally {
+                if (!session.getTransaction().wasRolledBack()) {
+                    session.flush();
+                    session.getTransaction().commit();
+                }
+            }
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+            TransactionSynchronizationManager.unbindResource(getSessionFactory());
+        }
     }
 
     @Override
@@ -44,7 +71,7 @@ public class ArticulateTCActivityStateImpl extends HibernateDaoSupport implement
     @SuppressWarnings("unchecked")
     @Override
     public List<ArticulateTCActivityState> findByContext(String context, boolean deleted) {
-        String statement = new StringBuilder("from ").append(ArticulateTCActivityState.class.getName()).append(" where registration = ? and deleted = ? ").toString();
+        String statement = new StringBuilder(" FROM ").append(ArticulateTCActivityState.class.getName()).append(" WHERE registration = ? AND deleted = ? ").toString();
 
         return getHibernateTemplate().find(statement, new Object[] {context, deleted});
     }
@@ -52,7 +79,7 @@ public class ArticulateTCActivityStateImpl extends HibernateDaoSupport implement
     @SuppressWarnings("unchecked")
     @Override
     public ArticulateTCActivityState findOneByUniqueKey(String userId, String siteId, String packageId) {
-        String statement = new StringBuilder("from ").append(ArticulateTCActivityState.class.getName()).append(" where userId = ? AND registration = ? and packageId = ? ").toString();
+        String statement = new StringBuilder(" FROM ").append(ArticulateTCActivityState.class.getName()).append(" WHERE userId = ? AND registration = ? AND packageId = ? ").toString();
 
         List<ArticulateTCActivityState> list = getHibernateTemplate().find(statement, new Object[] {userId, siteId, packageId});
 

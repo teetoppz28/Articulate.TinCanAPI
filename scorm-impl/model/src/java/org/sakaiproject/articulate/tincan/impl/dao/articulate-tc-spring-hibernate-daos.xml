@@ -24,7 +24,7 @@
 
 <beans>
 
-    <bean id="articulateTCActivityStateDao" class="org.sakaiproject.articulate.tincan.impl.dao.ArticulateTCActivityStateImpl">
+    <bean id="articulateTCActivityStateDao" class="org.sakaiproject.articulate.tincan.impl.dao.ArticulateTCActivityStateDaoImpl">
         <property name="sessionFactory">
             <ref bean="org.sakaiproject.springframework.orm.hibernate.GlobalSessionFactory" />
         </property>

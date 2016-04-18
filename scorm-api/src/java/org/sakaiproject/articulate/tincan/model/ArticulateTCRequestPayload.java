@@ -6,9 +6,7 @@ import java.lang.reflect.Field;
 import org.apache.commons.lang.StringUtils;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 
-public class ArticulateTCRequestPayload implements ArticulateTCConstants, Serializable{
-
-    private static final long serialVersionUID = 1L;
+public class ArticulateTCRequestPayload implements ArticulateTCConstants {
 
     private String activityId;
     private String agent;
@@ -107,21 +105,19 @@ public class ArticulateTCRequestPayload implements ArticulateTCConstants, Serial
     }
 
     /**
-     * Ensure all fields are valid for this state object
+     * Ensure all required fields are valid for this object
      * 
-     * @return true, if all fields have a value (which they must to save to the db)
+     * @return true, if all required fields have a value (which they must to save to the db)
      */
     public boolean isValid() {
-        Class<ArticulateTCRequestPayload> clazz = ArticulateTCRequestPayload.class;
-
-        for (Field field : clazz.getDeclaredFields()) {
-            try {
-                if (StringUtils.isBlank((String) field.get(this))) {
-                    return false;
-                }
-            } catch (Exception e) {
-                return false;
-            }
+        if (StringUtils.isBlank(this.userId)) {
+            return false;
+        }
+        if (StringUtils.isBlank(this.siteId)) {
+            return false;
+        }
+        if (StringUtils.isBlank(this.packageId)) {
+            return false;
         }
 
         return true;

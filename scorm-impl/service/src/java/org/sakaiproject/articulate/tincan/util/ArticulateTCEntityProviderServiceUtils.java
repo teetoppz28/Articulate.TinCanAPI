@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -101,7 +99,7 @@ public class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConst
         String decodedPayload = decodeString(str);
         ArticulateTCRequestPayload stateData = new ArticulateTCRequestPayload(decodedPayload);
 
-        if (stateData.isValid()) {
+        if (!stateData.isValid()) {
             // should not get here... there must not be a "content" portion in the payload
             throw new IllegalArgumentException("Request payload does not contain a valid activity state string.");
         }
