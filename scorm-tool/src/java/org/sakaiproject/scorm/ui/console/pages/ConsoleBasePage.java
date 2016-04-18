@@ -84,6 +84,7 @@ public class ConsoleBasePage extends SakaiPortletWebPage implements IHeaderContr
 		
         NavIntraLink listLink = new NavIntraLink("listLink", new ResourceModel("link.list"), PackageListPage.class);
         NavIntraLink uploadLink = new NavIntraLink("uploadLink", new ResourceModel("link.upload"), UploadPage.class);
+
         NavIntraLink articulateTCUploadLink = new NavIntraLink("articulate-tc-upload-link", new ResourceModel("link.upload.articulate.tc"), ArticulateTCUploadPage.class);
         
         WebMarkupContainer listContainer = new WebMarkupContainer( "listContainer" );
@@ -119,10 +120,12 @@ public class ConsoleBasePage extends SakaiPortletWebPage implements IHeaderContr
         Icon listIcon = new Icon("listIcon", LIST_ICON);
         Icon uploadIcon = new Icon("uploadIcon", UPLOAD_ICON);
         Icon articulateTCUploadIcon = new Icon("articulate-tc-upload-icon", UPLOAD_ICON);
+
         //Icon validateIcon = new Icon("validateIcon", VALIDATE_ICON);
         
         // SCO-109 - conditionally show the icons in the menu bar buttons
         boolean enableMenuBarIcons = serverConfigurationService.getBoolean( SAK_PROP_ENABLE_MENU_BUTTON_ICONS, true );
+
         if(enableMenuBarIcons) {
             listIcon.setVisible(canUpload || canValidate);
             uploadIcon.setVisible(canUpload);
@@ -140,6 +143,7 @@ public class ConsoleBasePage extends SakaiPortletWebPage implements IHeaderContr
         
         listContainer.add(listIcon);
         uploadContainer.add(uploadIcon);
+
         articulateTCUploadContainer.add(articulateTCUploadIcon);
 
         wmc.add( listContainer );
