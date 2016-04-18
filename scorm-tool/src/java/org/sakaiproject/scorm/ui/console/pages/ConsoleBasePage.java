@@ -37,7 +37,7 @@ import org.sakaiproject.scorm.ui.Icon;
 import org.sakaiproject.scorm.ui.console.components.BreadcrumbPanel;
 import org.sakaiproject.scorm.ui.console.components.SakaiFeedbackPanel;
 import org.sakaiproject.scorm.ui.upload.pages.UploadPage;
-import org.sakaiproject.scorm.ui.validation.pages.ValidationPage;
+import org.sakaiproject.scorm.ui.upload.pages.ArticulateTCUploadPage;
 import org.sakaiproject.tool.api.ToolManager;
 import org.sakaiproject.wicket.markup.html.SakaiPortletWebPage;
 import org.sakaiproject.wicket.markup.html.link.NavIntraLink;
@@ -50,7 +50,7 @@ public class ConsoleBasePage extends SakaiPortletWebPage implements IHeaderContr
 	private static ResourceReference CONSOLE_CSS = new CompressedResourceReference(ConsoleBasePage.class, "res/scorm_console.css");
 	private static ResourceReference LIST_ICON = new ResourceReference(ConsoleBasePage.class, "res/table.png");
 	private static ResourceReference UPLOAD_ICON = new ResourceReference(ConsoleBasePage.class, "res/table_add.png");
-	private static ResourceReference VALIDATE_ICON = new ResourceReference(ConsoleBasePage.class, "res/table_link.png");
+    //private static ResourceReference VALIDATE_ICON = new ResourceReference(ConsoleBasePage.class, "res/table_link.png");
 
     private static final String SAK_PROP_ENABLE_MENU_BUTTON_ICONS = "scorm.menuButton.icons";
     @SpringBean( name = "org.sakaiproject.component.api.ServerConfigurationService" )
@@ -84,14 +84,15 @@ public class ConsoleBasePage extends SakaiPortletWebPage implements IHeaderContr
 		
         NavIntraLink listLink = new NavIntraLink("listLink", new ResourceModel("link.list"), PackageListPage.class);
         NavIntraLink uploadLink = new NavIntraLink("uploadLink", new ResourceModel("link.upload"), UploadPage.class);
-        //NavIntraLink validateLink = new NavIntraLink("validateLink", new ResourceModel("link.validate"), ValidationPage.class);
+
+        NavIntraLink articulateTCUploadLink = new NavIntraLink("articulate-tc-upload-link", new ResourceModel("link.upload.articulate.tc"), ArticulateTCUploadPage.class);
         
         WebMarkupContainer listContainer = new WebMarkupContainer( "listContainer" );
         WebMarkupContainer uploadContainer = new WebMarkupContainer( "uploadContainer" );
-        //WebMarkupContainer validateContainer = new WebMarkupContainer( "validateContainer" );
+        WebMarkupContainer articulateTCUploadContainer = new WebMarkupContainer( "articulate-tc-upload-container" );
         listContainer.add( listLink );
         uploadContainer.add( uploadLink );
-        //validateContainer.add( validateLink );
+        articulateTCUploadContainer.add(articulateTCUploadLink);
 
         SimpleAttributeModifier className = new SimpleAttributeModifier( "class", "current" );
         if( listLink.linksTo( getPage() ) )
@@ -104,12 +105,11 @@ public class ConsoleBasePage extends SakaiPortletWebPage implements IHeaderContr
             uploadContainer.add( className );
             uploadLink.add( className );
         }
-        //else if( validateLink.linksTo( getPage() ) )
-        //{
-        //    validateContainer.add( className );
-        //    validateLink.add( className );
-        //}
-        
+        else if(articulateTCUploadLink.linksTo(getPage())) {
+            articulateTCUploadContainer.add(className);
+            articulateTCUploadLink.add(className);
+        }
+
         listLink.setVisible(canUpload || canValidate);
         uploadLink.setVisible(canUpload);
         
@@ -119,33 +119,36 @@ public class ConsoleBasePage extends SakaiPortletWebPage implements IHeaderContr
         
         Icon listIcon = new Icon("listIcon", LIST_ICON);
         Icon uploadIcon = new Icon("uploadIcon", UPLOAD_ICON);
+        Icon articulateTCUploadIcon = new Icon("articulate-tc-upload-icon", UPLOAD_ICON);
+
         //Icon validateIcon = new Icon("validateIcon", VALIDATE_ICON);
         
         // SCO-109 - conditionally show the icons in the menu bar buttons
         boolean enableMenuBarIcons = serverConfigurationService.getBoolean( SAK_PROP_ENABLE_MENU_BUTTON_ICONS, true );
-        if( enableMenuBarIcons )
-        {
+
+        if(enableMenuBarIcons) {
             listIcon.setVisible(canUpload || canValidate);
             uploadIcon.setVisible(canUpload);
+            articulateTCUploadIcon.setVisible(canUpload);
 
             // SCO-107 hide the validate link (interface is currently unimplemented)
             //validateIcon.setVisible(canValidate);
             //validateIcon.setVisibilityAllowed(false);
-        }
-        else
-        {
+        } else {
             listIcon.setVisibilityAllowed( false );
             uploadIcon.setVisibilityAllowed( false );
+            articulateTCUploadIcon.setVisibilityAllowed(false);
             //validateIcon.setVisibilityAllowed( false );
         }
         
         listContainer.add(listIcon);
         uploadContainer.add(uploadIcon);
-        //validateContainer.add(validateIcon);
+
+        articulateTCUploadContainer.add(articulateTCUploadIcon);
 
         wmc.add( listContainer );
         wmc.add( uploadContainer );
-        //wmc.add( validateContainer );
+        wmc.add(articulateTCUploadContainer);
 
         // add the toolbar container
         add(wmc);

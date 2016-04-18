@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-
 <!--
   #%L
   SCORM Tool
@@ -20,15 +18,28 @@
   limitations under the License.
   #L%
   -->
-<beans>
 
-	<!-- SCORM multi-package player tool -->
-	<bean id="toolWicketApplication" class="org.sakaiproject.scorm.ui.player.ScormTool">
-		<property name="resourceService"><ref bean="org.sakaiproject.scorm.service.api.ScormResourceService"/></property>
-	</bean>
+<html xmlns="http://www.w3.org/1999/xhtml"  
+      xmlns:wicket="http://wicket.sourceforge.net/"
+      xmlns:wairole="http://www.w3.org/2005/01/wai-rdf/GUIRoleTaxonomy#"
+      xmlns:aaa="http://www.w3.org/2005/07/aaa"  
+      xml:lang="en"  
+      lang="en">
+<head>
+    <wicket:head>
+        <title><wicket:message key="page.title"/></title>
+    </wicket:head>
+</head>
+<body>
+    <wicket:extend>
 
-	<!-- SCORM single-package player tool -->
-    <bean id="scormSinglePackageApplication" class="org.sakaiproject.scorm.ui.player.SingleScormPackageApplication">
-    </bean>
+        <div id="contentDiv" class="highlightPanel">
+            <p class="shorttext">
+                <label for="title"> <wicket:message key="archive.title"/></label>
+                <span wicket:id="filename"></span>
+            </p>
+        </div>
 
-</beans>
+    </wicket:extend>
+</body>
+</html>

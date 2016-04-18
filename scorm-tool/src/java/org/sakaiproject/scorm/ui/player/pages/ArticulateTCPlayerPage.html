@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-
 <!--
   #%L
   SCORM Tool
@@ -20,15 +18,15 @@
   limitations under the License.
   #L%
   -->
-<beans>
 
-	<!-- SCORM multi-package player tool -->
-	<bean id="toolWicketApplication" class="org.sakaiproject.scorm.ui.player.ScormTool">
-		<property name="resourceService"><ref bean="org.sakaiproject.scorm.service.api.ScormResourceService"/></property>
-	</bean>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<head>
+    <title>Articulate TinCanAPI Content</title>
+</head>
+<wicket:extend>
 
-	<!-- SCORM single-package player tool -->
-    <bean id="scormSinglePackageApplication" class="org.sakaiproject.scorm.ui.player.SingleScormPackageApplication">
-    </bean>
+    <div class="launch-content">
+        <iframe wicket:id="launch-frame" frameBorder="0" scrolling="no" seamless="seamless">></iframe>
+    </div>
 
-</beans>
+</wicket:extend>
