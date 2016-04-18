@@ -50,9 +50,10 @@ public class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService,
     public String calculateActor() {
         try {
             User user = userDirectoryService.getCurrentUser();
-            String name = user.getDisplayName();
+            String first = user.getFirstName();
+            String last = user.getLastName();
             String email = user.getEmail();
-            String actor = "{\"name\":\"" + name + "\",\"mbox\":\"mailto:" + email + "\"}";
+            String actor = "{\"name\":\"" + first + " " + last + "\",\"mbox\":\"mailto:" + email + "\"}";
 
             return URLEncoder.encode(actor, DEFAULT_ENCODING);
         } catch (UnsupportedEncodingException e) {

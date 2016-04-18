@@ -2,9 +2,9 @@ package org.sakaiproject.articulate.tincan.model.hibernate;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Map;
 
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
+import org.sakaiproject.articulate.tincan.model.ArticulateTCRequestPayload;
 
 public class ArticulateTCActivityState implements Serializable, ArticulateTCConstants {
 
@@ -25,22 +25,14 @@ public class ArticulateTCActivityState implements Serializable, ArticulateTCCons
     public ArticulateTCActivityState() {
     }
 
-    public ArticulateTCActivityState(String userId, String registration, String packageId, String activityId, String agent, String content, String stateId) {
-        this.activityId = activityId;
-        this.agent = agent;
-        this.content = content;
-        this.registration = registration;
-        this.stateId = stateId;
-    }
-
-    public ArticulateTCActivityState(Map<String, String> data) {
-        this.activityId = data.get(STATE_DATA_KEY_ACTIVITY_ID);
-        this.agent = data.get(STATE_DATA_KEY_AGENT);
-        this.content = data.get(STATE_DATA_KEY_CONTENT);
-        this.packageId = data.get(STATE_DATA_KEY_PACKAGE_ID);
-        this.registration = data.get(STATE_DATA_KEY_SITE_ID);
-        this.stateId = data.get(STATE_DATA_KEY_STATE_ID);
-        this.userId = data.get(STATE_DATA_KEY_USER_ID);
+    public ArticulateTCActivityState(ArticulateTCRequestPayload articulateTCRequestPayload) {
+        this.activityId = articulateTCRequestPayload.getActivityId();
+        this.agent = articulateTCRequestPayload.getAgent();
+        this.content = articulateTCRequestPayload.getContent();
+        this.packageId = articulateTCRequestPayload.getPackageId();
+        this.registration = articulateTCRequestPayload.getSiteId();
+        this.stateId = articulateTCRequestPayload.getStateId();
+        this.userId = articulateTCRequestPayload.getUserId();
     }
 
     public String getActivityId() {
@@ -128,6 +120,16 @@ public class ArticulateTCActivityState implements Serializable, ArticulateTCCons
 
     public void setModified(Date modified) {
         this.modified = modified;
+    }
+
+    /**
+     * Updates only the allowed updatable db fields
+     * 
+     * @param articulateTCRequestPayload the {@link ArticulateTCRequestPayload} object
+     */
+    public void updateMutableFields(ArticulateTCRequestPayload articulateTCRequestPayload) {
+        this.content = articulateTCRequestPayload.getContent();
+        this.stateId = articulateTCRequestPayload.getStateId();
     }
 
 }

@@ -13,6 +13,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
+import org.sakaiproject.articulate.tincan.model.ArticulateTCRequestPayload;
 
 public class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConstants {
 
@@ -67,7 +68,7 @@ public class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConst
     /**
      * Gets the JSON string from the content variable in the payload
      * 
-     * @param str
+     * @param str the payload string from the request
      * @return
      */
     public static String getContentDataFromPayload(String str) {
@@ -76,67 +77,32 @@ public class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConst
         }
 
         String decodedPayload = decodeString(str);
+        ArticulateTCRequestPayload stateData = new ArticulateTCRequestPayload(decodedPayload);
 
-        String[] split = StringUtils.split(decodedPayload, "&");
-        for (String s : split) {
-            if (StringUtils.startsWith(s, STATEMENT_DATA_KEY_CONTENT)) {
-                return StringUtils.removeStart(s, STATEMENT_DATA_KEY_CONTENT + "=");
-            }
+        if (StringUtils.isBlank(stateData.getContent())) {
+            // should not get here... there must not be a "content" portion in the payload
+            throw new IllegalArgumentException("Request payload does not contain a valid content statement string.");
         }
 
-        // should not get here... there must not be a "content" portion in the payload
-        throw new IllegalArgumentException("Request payload does not contain a valid content statement string.");
+        return stateData.getContent();
     }
 
     /**
      * Gets a mapping of payload data
      * 
-     * @param str
+     * @param str the payload string from the request
      * @return
      */
-    public static Map<String, String> getStateDataFromPayload(String str) {
+    public static ArticulateTCRequestPayload getStateDataFromPayload(String str) {
         if (StringUtils.isBlank(str)) {
             throw new IllegalArgumentException("Payload string cannot be blank");
         }
 
-        Map<String, String> stateData = new HashMap<String, String>();
-
         String decodedPayload = decodeString(str);
+        ArticulateTCRequestPayload stateData = new ArticulateTCRequestPayload(decodedPayload);
 
-        String[] split = StringUtils.split(decodedPayload, "&");
-        for (String s : split) {
-            if (StringUtils.startsWith(s, STATE_DATA_KEY_ACTIVITY_ID)) {
-                stateData.put(STATE_DATA_KEY_ACTIVITY_ID, StringUtils.removeStart(s, STATE_DATA_KEY_ACTIVITY_ID + "="));
-                continue;
-            }
-            if (StringUtils.startsWith(s, STATE_DATA_KEY_AGENT)) {
-                stateData.put(STATE_DATA_KEY_AGENT, StringUtils.removeStart(s, STATE_DATA_KEY_AGENT + "="));
-                continue;
-            }
-            if (StringUtils.startsWith(s, STATE_DATA_KEY_CONTENT)) {
-                stateData.put(STATE_DATA_KEY_CONTENT, StringUtils.removeStart(s, STATE_DATA_KEY_CONTENT + "="));
-                continue;
-            }
-            if (StringUtils.startsWith(s, STATE_DATA_KEY_STATE_ID)) {
-                stateData.put(STATE_DATA_KEY_STATE_ID, StringUtils.removeStart(s, STATE_DATA_KEY_STATE_ID + "="));
-                continue;
-            }
-            if (StringUtils.startsWith(s, STATE_DATA_KEY_SITE_ID)) {
-                stateData.put(STATE_DATA_KEY_SITE_ID, StringUtils.removeStart(s, STATE_DATA_KEY_SITE_ID + "="));
-                continue;
-            }
-            if (StringUtils.startsWith(s, STATE_DATA_KEY_USER_ID)) {
-                stateData.put(STATE_DATA_KEY_USER_ID, StringUtils.removeStart(s, STATE_DATA_KEY_USER_ID + "="));
-                continue;
-            }
-            if (StringUtils.startsWith(s, STATE_DATA_KEY_PACKAGE_ID)) {
-                stateData.put(STATE_DATA_KEY_PACKAGE_ID, StringUtils.removeStart(s, STATE_DATA_KEY_PACKAGE_ID + "="));
-                continue;
-            }
-        }
-
-        // should not get here... there must not be a "content" portion in the payload
-        if (stateData.isEmpty()) {
+        if (stateData.isValid()) {
+            // should not get here... there must not be a "content" portion in the payload
             throw new IllegalArgumentException("Request payload does not contain a valid activity state string.");
         }
 

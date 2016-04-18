@@ -26,17 +26,16 @@
         <id name="id" column="ID">
             <generator class="increment"/>
         </id>
-        <composite-id>
-            <key-property name="userId" column="USER_ID" />
-            <key-property name="registration" column="REGISTRATION" />
-            <key-property name="packageId" column="CONTENT_PACKAGE_ID" />
-        </composite-id>
+        <properties name="activity_state_unique" unique="true">
+            <property name="userId" column="USER_ID" />
+            <property name="registration" column="REGISTRATION" />
+            <property name="packageId" column="CONTENT_PACKAGE_ID" />
+        </properties>
         <property name="activityId" column="ACTIVITY_ID" type="text" />
         <property name="agent" column="AGENT" type="text" />
         <property name="content" column="CONTENT" type="text" />
         <property name="stateId" column="STATE_ID" />
         <property name="deleted" column="DELETED" />
-        <property name="created" column="CREATED" />
         <property name="modified" column="MODIFIED" />
     </class>
 

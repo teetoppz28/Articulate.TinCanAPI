@@ -76,10 +76,10 @@ public class ArticulateTCEntityProvider extends AbstractEntityProvider implement
             if (StringUtils.equals(path3, PATH_STATE)) {
                 if (StringUtils.equalsIgnoreCase(view.getMethod(), "GET") || StringUtils.equalsIgnoreCase((String) params.get("queryString"), PATH_QUERY_PARAM_GET)) {
                     // get the activity state
-                    retVal = articulateTCEntityProviderService.getStatePayload(request);
+                    retVal = articulateTCEntityProviderService.getActivityStatePayload(request);
                 } else if (StringUtils.equalsIgnoreCase(view.getMethod(), "PUT") || StringUtils.equalsIgnoreCase(view.getMethod(), "POST")){
                     // store the activity state
-                    articulateTCEntityProviderService.postStatePayload(request);
+                    articulateTCEntityProviderService.postActivityStatePayload(request);
                 } else if (StringUtils.equalsIgnoreCase(view.getMethod(), "DELETE") || StringUtils.equalsIgnoreCase((String) params.get("queryString"), PATH_QUERY_PARAM_DELETE)) {
                     // delete the activity state
                     articulateTCEntityProviderService.deleteStateData(request);

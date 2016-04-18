@@ -24,7 +24,7 @@ public interface ArticulateTCEntityProviderService {
      * @param request the {@link HttpServletRequest} object
      * @return the {@link ArticulateTCActivityState} object
      */
-    void postStatePayload(HttpServletRequest request);
+    void postActivityStatePayload(HttpServletRequest request);
 
     /**
      * 1. Retrieve the content payload from the request
@@ -34,7 +34,7 @@ public interface ArticulateTCEntityProviderService {
      * @param request the {@link HttpServletRequest} object
      * @return the state data as a JSON object string
      */
-    String getStatePayload(HttpServletRequest request);
+    String getActivityStatePayload(HttpServletRequest request);
 
     /**
      * 1. Retrieve the content payload from the request

@@ -1,7 +1,5 @@
 package org.sakaiproject.articulate.tincan.impl;
 
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 
 import lombok.Setter;
@@ -9,14 +7,16 @@ import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCEntityProviderService;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCActivityStateDao;
+import org.sakaiproject.articulate.tincan.model.ArticulateTCRequestPayload;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCActivityState;
 import org.sakaiproject.articulate.tincan.util.ArticulateTCEntityProviderServiceUtils;
 import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.event.api.LearningResourceStoreService;
 
-public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntityProviderService {
+public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntityProviderService, ArticulateTCConstants {
 
     private Log log = LogFactory.getLog(ArticulateTCEntityProviderServiceImpl.class);
 
@@ -42,20 +42,28 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
     }
 
     @Override
-    public void postStatePayload(HttpServletRequest request) {
+    public void postActivityStatePayload(HttpServletRequest request) {
         if (request == null) {
             throw new IllegalArgumentException("Request cannot be null");
         }
 
         String payload  = ArticulateTCEntityProviderServiceUtils.getRequestPayload(request);
-        Map<String, String> content = ArticulateTCEntityProviderServiceUtils.getStateDataFromPayload(payload);
-        ArticulateTCActivityState articulateTCActivityState = new ArticulateTCActivityState(content);
+        ArticulateTCRequestPayload articulateTCRequestPayload = ArticulateTCEntityProviderServiceUtils.getStateDataFromPayload(payload);
+        ArticulateTCActivityState articulateTCActivityState = articulateTCActivityStateDao.findOne(articulateTCRequestPayload);
+
+        if (articulateTCActivityState == null) {
+            // row does not exist, create a new one
+            articulateTCActivityState = new ArticulateTCActivityState(articulateTCRequestPayload);
+        } else {
+            // row exists, update mutable fields
+            articulateTCActivityState.updateMutableFields(articulateTCRequestPayload);
+        }
 
         articulateTCActivityStateDao.save(articulateTCActivityState);
     }
 
     @Override
-    public String getStatePayload(HttpServletRequest request) {
+    public String getActivityStatePayload(HttpServletRequest request) {
         if (request == null) {
             throw new IllegalArgumentException("Request cannot be null");
         }
@@ -63,10 +71,8 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
         String stateData = null;
 
         String payload  = ArticulateTCEntityProviderServiceUtils.getRequestPayload(request);
-        Map<String, String> content = ArticulateTCEntityProviderServiceUtils.getStateDataFromPayload(payload);
-        ArticulateTCActivityState articulateTCActivityState = new ArticulateTCActivityState(content);
-
-        articulateTCActivityState = articulateTCActivityStateDao.get(articulateTCActivityState.getId());
+        ArticulateTCRequestPayload articulateTCRequestPayload = ArticulateTCEntityProviderServiceUtils.getStateDataFromPayload(payload);
+        ArticulateTCActivityState articulateTCActivityState = articulateTCActivityStateDao.findOne(articulateTCRequestPayload);
 
         if (articulateTCActivityState != null) {
             stateData = articulateTCActivityState.getContent();
@@ -83,8 +89,13 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
 
 
         String payload  = ArticulateTCEntityProviderServiceUtils.getRequestPayload(request);
-        Map<String, String> content = ArticulateTCEntityProviderServiceUtils.getStateDataFromPayload(payload);
-        ArticulateTCActivityState articulateTCActivityState = new ArticulateTCActivityState(content);
+        ArticulateTCRequestPayload articulateTCRequestPayload = ArticulateTCEntityProviderServiceUtils.getStateDataFromPayload(payload);
+        ArticulateTCActivityState articulateTCActivityState = articulateTCActivityStateDao.findOne(articulateTCRequestPayload);
+
+        // no row to delete
+        if (articulateTCActivityState == null) {
+            return;
+        }
 
         articulateTCActivityStateDao.remove(articulateTCActivityState);
     }
