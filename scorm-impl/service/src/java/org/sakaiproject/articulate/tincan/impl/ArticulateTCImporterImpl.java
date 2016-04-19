@@ -50,7 +50,6 @@ public abstract class ArticulateTCImporterImpl implements ArticulateTCImporter, 
     private ArticulateTCContentPackage articulateTCContentPackage;
     private String timestamp;
 
-
     @Override
     public int validateAndProcess(InputStream inputStream, String packageName, String contentType) {
         if (inputStream == null) {
