@@ -15,7 +15,6 @@ import org.sakaiproject.articulate.tincan.model.ArticulateTCContentPackage;
 import org.sakaiproject.articulate.tincan.model.ArticulateTCMeta;
 import org.sakaiproject.articulate.tincan.util.ArticulateTCContentEntityUtils;
 import org.sakaiproject.articulate.tincan.util.ArticulateTCDocumentUtils;
-import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.content.api.ContentCollectionEdit;
 import org.sakaiproject.content.api.ContentHostingService;
 import org.sakaiproject.content.api.ContentResourceEdit;
@@ -36,8 +35,6 @@ public abstract class ArticulateTCImporterImpl implements ArticulateTCImporter, 
     @Setter
     private ContentHostingService contentHostingService;
     @Setter
-    private ServerConfigurationService serverConfigurationService;
-    @Setter
     private DeveloperHelperService developerHelperService;
     @Setter
     private ArticulateTCDocumentUtils articulateTCDocumentUtils;
@@ -47,20 +44,11 @@ public abstract class ArticulateTCImporterImpl implements ArticulateTCImporter, 
     protected abstract ContentPackageDao contentPackageDao();
     protected abstract ScormResourceService resourceService();
 
-    private String launchPage;
-    private boolean hideContentPackageRoot;
     private String packageName;
-    private String packageCollectionRootName;
     private String zipFileId;
     private Document metaXmlDocument;
     private ArticulateTCContentPackage articulateTCContentPackage;
     private String timestamp;
-
-    public void init() {
-        packageCollectionRootName = serverConfigurationService.getString("tincanapi.package.root.dir", ARCHIVE_DEFAULT_PACKAGE_ROOT_NAME);
-        launchPage = serverConfigurationService.getString("tincanapi.package.default.launch.page", ARCHIVE_DEFAULT_LAUNCH_PAGE);
-        hideContentPackageRoot = serverConfigurationService.getBoolean("tincanapi.package.hide.root.package.dir", ARCHIVE_DEFAULT_HIDE_ROOT_DIRECTORY);
-    }
 
     @Override
     public int validateAndProcess(InputStream inputStream, String packageName, String contentType) {
@@ -126,8 +114,12 @@ public abstract class ArticulateTCImporterImpl implements ArticulateTCImporter, 
                 return false;
             }
 
-            // get the relative URL for launching the content
-            getLaunchUrl(true);
+            boolean siteValid = processSiteDirectory();
+            if (!siteValid) {
+                // not a valid site archive directory, remove the expanded archive package
+                removeArchiveCollection();
+                return false;
+            }
         } catch (Exception e) {
             log.error("An error occurred extracting the TinCanAPI zip file into resources.", e);
             return false;
@@ -188,7 +180,7 @@ public abstract class ArticulateTCImporterImpl implements ArticulateTCImporter, 
         try {
             contentHostingService.getResource(getPackageCollectionPath(true) + ARCHIVE_TINCAN_XML_FILE);
             contentHostingService.getResource(getPackageCollectionPath(true) + ARCHIVE_META_XML_FILE);
-            contentHostingService.getResource(getPackageCollectionPath(true) + launchPage);
+            contentHostingService.getResource(getPackageCollectionPath(true) + ARCHIVE_DEFAULT_LAUNCH_PAGE);
         } catch (Exception e) {
             log.error("Error validating archive.", e);
             return false;
@@ -198,23 +190,52 @@ public abstract class ArticulateTCImporterImpl implements ArticulateTCImporter, 
     }
 
     /**
-     * Check if root package directory exists, if not, create it
+     * Check if root articulate directory exists, if not, create it
      * If it exists, update the configured settings
      *
-     * @return true, if the root directory is valid
+     * @return true, if the root articulate directory is valid
      */
     private boolean processRootDirectory() {
-        try {
-            ContentCollectionEdit rootPackageCollectionEdit = articulateTCContentEntityUtils.addOrEditCollection(getPackageCollectionRootPath());
-            rootPackageCollectionEdit = (ContentCollectionEdit) articulateTCContentEntityUtils.addProperties(
-                rootPackageCollectionEdit,
-                new String[] {ResourceProperties.PROP_DISPLAY_NAME, ResourceProperties.PROP_HIDDEN_WITH_ACCESSIBLE_CONTENT},
-                new String[] {packageCollectionRootName, Boolean.toString(hideContentPackageRoot)}
-            );
+            ContentCollectionEdit articulateCollectionEdit = articulateTCContentEntityUtils.addOrEditCollection(ARCHIVE_DEFAULT_STORAGE_PATH_PREFIX);
 
-            contentHostingService.commitCollection(rootPackageCollectionEdit);
+            return processDirectory(articulateCollectionEdit, true);
+    }
+
+    /**
+     * Check if site directory exists, if not, create it
+     * If it exists, update the configured settings
+     *
+     * @return true, if the site directory is valid
+     */
+    private boolean processSiteDirectory() {
+        ContentCollectionEdit siteCollectionEdit = articulateTCContentEntityUtils.addOrEditCollection(getSiteCollectionRootPath());
+
+        return processDirectory(siteCollectionEdit, false);
+    }
+
+    /**
+     * Creates or updates the given collection edit object
+     * 
+     * @param contentCollectionEdit the {@link ContentCollectionEdit} object to modify
+     * @return true, if successfully modified
+     */
+    private boolean processDirectory(ContentCollectionEdit contentCollectionEdit, boolean isPublicAccess) {
+        if (contentCollectionEdit == null) {
+            return false;
+        }
+
+        try {
+            developerHelperService.setCurrentUser(DeveloperHelperService.ADMIN_USER_REF);
+
+            if (isPublicAccess) {
+                contentCollectionEdit.setPublicAccess();
+            }
+
+            contentHostingService.commitCollection(contentCollectionEdit);
+
+            developerHelperService.restoreCurrentUser();
         } catch (Exception e) {
-            log.error("Error occurred processing the root directory.", e);
+            log.error("Error occurred processing the directory.", e);
             return false;
         }
 
@@ -264,14 +285,15 @@ public abstract class ArticulateTCImporterImpl implements ArticulateTCImporter, 
     }
 
     /**
-     * Move the new package content to the permanent directory (if configured)
+     * Move the new package content to the permanent directory
+     * 
      * @return
      */
     private boolean moveContentPackage() {
         String existingDirectory = getPackageCollectionPath(false);
 
         try {
-            List<String> packageCollectionRootChildren = contentHostingService.getCollection(getPackageCollectionRootPath()).getMembers();
+            List<String> packageCollectionRootChildren = contentHostingService.getCollection(getSiteCollectionRootPath()).getMembers();
             if (packageCollectionRootChildren.contains(existingDirectory)) {
                 contentHostingService.removeCollection(existingDirectory);
             }
@@ -281,15 +303,17 @@ public abstract class ArticulateTCImporterImpl implements ArticulateTCImporter, 
         }
 
         ContentCollectionEdit newCollectionEdit = articulateTCContentEntityUtils.addOrEditCollection(getPackageCollectionPath(true));
+
+        if (newCollectionEdit == null) {
+            return false;
+        }
+
         newCollectionEdit = (ContentCollectionEdit) articulateTCContentEntityUtils.addProperties(
             newCollectionEdit,
             new String[] {ResourceProperties.PROP_DISPLAY_NAME},
             new String[] {getPackageCollectionId(false)}
         );
         contentHostingService.commitCollection(newCollectionEdit);
-
-        // get the latest URL for the content launch page
-        getLaunchUrl(false);
 
         return true;
     }
@@ -326,38 +350,31 @@ public abstract class ArticulateTCImporterImpl implements ArticulateTCImporter, 
     }
 
     /**
-     * Path: /group/SITE_ID/
+     * Path: /private/articulate/SITE_ID/
      */
     private String getSiteCollectionRootPath() {
-        return ContentHostingService.COLLECTION_SITE + getCurrentContext() + Entity.SEPARATOR;
+        return ARCHIVE_DEFAULT_STORAGE_PATH_PREFIX + getCurrentContext() + Entity.SEPARATOR;
     }
 
     /**
-     * Path: /group/SITE_ID/TinCanAPI_Packages/
-     */
-    private String getPackageCollectionRootPath() {
-        return getSiteCollectionRootPath() + packageCollectionRootName + Entity.SEPARATOR;
-    }
-
-    /**
-     * Path: /group/SITE_ID/TinCanAPI_Packages/MY_CONTENT_PACKAGE-1234567890
+     * Path: /private/articulate/SITE_ID/MY_CONTENT_PACKAGE-1234567890/
      */
     private String getPackageCollectionPath(boolean includeTimestamp) {
-        return getPackageCollectionRootPath() + getPackageCollectionId(includeTimestamp) + Entity.SEPARATOR;
+        return getSiteCollectionRootPath() + getPackageCollectionId(includeTimestamp) + Entity.SEPARATOR;
     }
 
     /**
-     * Path: /group/SITE_ID/TinCanAPI_Packages/MY_CONTENT_PACKAGE-1234567890.zip
+     * Path: /private/articulate/SITE_ID/MY_CONTENT_PACKAGE-1234567890.zip
      */
     private String getPackageArchiveFilePath(boolean includeTimestamp) {
-        return getPackageCollectionRootPath() + getPackageCollectionId(includeTimestamp) + ".zip";
+        return getSiteCollectionRootPath() + getPackageCollectionId(includeTimestamp) + ".zip";
     }
 
     /**
-     * Path: /access/content/group/SITE_ID/TinCanAPI_Packages/MY_CONTENT_PACKAGE-1234567890/story.html
+     * Path: /access/content/private/articulate/SITE_ID/MY_CONTENT_PACKAGE-1234567890/story.html
      */
     private String getLaunchUrl(boolean includeTimestamp) {
-        return ARCHIVE_DEFAULT_PATH_PREFIX + getPackageCollectionPath(includeTimestamp) + launchPage;
+        return ARCHIVE_DEFAULT_URL_PATH_PREFIX + getPackageCollectionPath(includeTimestamp) + ARCHIVE_DEFAULT_LAUNCH_PAGE;
     }
 
 }

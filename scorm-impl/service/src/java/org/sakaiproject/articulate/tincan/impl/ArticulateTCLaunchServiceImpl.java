@@ -91,7 +91,7 @@ public class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService,
 
     @Override
     public String calculateEndPoint() {
-        String endpoint = EntityView.DIRECT_PREFIX + EntityView.SEPARATOR + REST_PREFIX + EntityView.SEPARATOR + PATH_ACTION + EntityView.SEPARATOR;
+        String endpoint = EntityView.DIRECT_PREFIX + EntityView.SEPARATOR + REST_PREFIX + EntityView.SEPARATOR;
 
         try {
             return URLEncoder.encode(endpoint, DEFAULT_ENCODING);

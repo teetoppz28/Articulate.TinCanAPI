@@ -9,7 +9,9 @@ public interface ArticulateTCConstants extends ScormConstants {
      */
     public final static String REST_PREFIX = "tincanapi-lrs";
 
-    public final static String PATH_ACTION = "action";
+    /*
+     * RESTful API entity configuration
+     */
     public final static String PATH_STATEMENTS = "statements";
     public final static String PATH_ACTIVITIES = "activities";
     public final static String PATH_STATE = "state";
@@ -41,10 +43,9 @@ public interface ArticulateTCConstants extends ScormConstants {
     /*
      * Archive package processing
      */
-    public final static String ARCHIVE_DEFAULT_PATH_PREFIX = "/access/content";
-    public final static String ARCHIVE_DEFAULT_PACKAGE_ROOT_NAME = "Articulate_TinCanAPI_Packages";
+    public final static String ARCHIVE_DEFAULT_URL_PATH_PREFIX = "/access/content";
+    public final static String ARCHIVE_DEFAULT_STORAGE_PATH_PREFIX = "/private/articulate/";
     public final static String ARCHIVE_DEFAULT_LAUNCH_PAGE = "story.html";
-    public final static boolean ARCHIVE_DEFAULT_HIDE_ROOT_DIRECTORY = true;
     public final static String ARCHIVE_ZIP_MIMETYPE = "application/zip";
     public final static String ARCHIVE_META_XML_FILE = "meta.xml";
     public final static String ARCHIVE_TINCAN_XML_FILE = "tincan.xml";
