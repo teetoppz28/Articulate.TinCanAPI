@@ -1,6 +1,5 @@
 package org.sakaiproject.articulate.tincan.entity;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,37 +52,53 @@ public class ArticulateTCEntityProvider extends AbstractEntityProvider implement
         return new String[] {Formats.HTML};
     }
 
-    @EntityCustomAction(action = PATH_ACTION, viewKey = "")
-    public ActionReturn action(EntityView view, Map<String, Object> params) {
+    /**
+     * PATH: {PREFIX}/statements
+     * Pass through to put a statement to the configured LRS
+     * 
+     * @param view
+     * @param params
+     * @return
+     */
+    @EntityCustomAction(action = PATH_STATEMENTS, viewKey = "")
+    public ActionReturn actionStatements(EntityView view, Map<String, Object> params) {
         HttpServletRequest request = requestGetter.getRequest();
         log.debug("Path: " + request.getPathInfo() + " called. Method: " + view.getMethod());
         String retVal = "";
 
-        // {PREFIX}/action/{path2}
+        articulateTCEntityProviderService.postStatementPayload(request);
+
+        return new ActionReturn(retVal);
+    }
+
+    /**
+     * PATH: {PREFIX}/activities/{state}
+     * Gets or saves activity data
+     * 
+     * @param view
+     * @param params
+     * @return
+     */
+    @EntityCustomAction(action = PATH_ACTIVITIES, viewKey = "")
+    public ActionReturn actionActivitiesState(EntityView view, Map<String, Object> params) {
+        HttpServletRequest request = requestGetter.getRequest();
+        log.debug("Path: " + request.getPathInfo() + " called. Method: " + view.getMethod());
+        String retVal = "";
+
+        // {PREFIX}/activities/{path2}
         String path2 = view.getPathSegment(2);
 
-        // {PREFIX}/action/statements
-        if (StringUtils.equals(path2, PATH_STATEMENTS)) {
-            articulateTCEntityProviderService.postStatementPayload(request);
-        }
-
-        // {PREFIX}/action/activities/
-        if (StringUtils.equals(path2, PATH_ACTIVITIES)) {
-            // {PREFIX}/action/activities/{path3}
-            String path3 = view.getPathSegment(3);
-
-            // {PREFIX}/action/activities/state
-            if (StringUtils.equals(path3, PATH_STATE)) {
-                if (StringUtils.equalsIgnoreCase(view.getMethod(), "GET") || StringUtils.equalsIgnoreCase((String) params.get("queryString"), PATH_QUERY_PARAM_GET)) {
-                    // get the activity state
-                    retVal = articulateTCEntityProviderService.getActivityStatePayload(request);
-                } else if (StringUtils.equalsIgnoreCase(view.getMethod(), "PUT") || StringUtils.equalsIgnoreCase(view.getMethod(), "POST")){
-                    // store the activity state
-                    articulateTCEntityProviderService.postActivityStatePayload(request);
-                } else if (StringUtils.equalsIgnoreCase(view.getMethod(), "DELETE") || StringUtils.equalsIgnoreCase((String) params.get("queryString"), PATH_QUERY_PARAM_DELETE)) {
-                    // delete the activity state
-                    articulateTCEntityProviderService.deleteStateData(request);
-                }
+        // {PREFIX}/activities/state
+        if (StringUtils.equals(path2, PATH_STATE)) {
+            if (StringUtils.equalsIgnoreCase(view.getMethod(), "GET") || StringUtils.equalsIgnoreCase((String) params.get("queryString"), PATH_QUERY_PARAM_GET)) {
+                // get the activity state
+                retVal = articulateTCEntityProviderService.getActivityStatePayload(request);
+            } else if (StringUtils.equalsIgnoreCase(view.getMethod(), "PUT") || StringUtils.equalsIgnoreCase(view.getMethod(), "POST")){
+                // store the activity state
+                articulateTCEntityProviderService.postActivityStatePayload(request);
+            } else if (StringUtils.equalsIgnoreCase(view.getMethod(), "DELETE") || StringUtils.equalsIgnoreCase((String) params.get("queryString"), PATH_QUERY_PARAM_DELETE)) {
+                // delete the activity state
+                articulateTCEntityProviderService.deleteStateData(request);
             }
         }
 
@@ -99,25 +114,20 @@ public class ArticulateTCEntityProvider extends AbstractEntityProvider implement
      * Inherited methods (not used)
      */
 
-    @Override
     public String createEntity(EntityReference ref, Object entity, Map<String, Object> params) {
         return null;
     }
 
-    @Override
     public void updateEntity(EntityReference ref, Object entity, Map<String, Object> params) {
     }
 
-    @Override
     public Object getEntity(EntityReference ref) {
         return null;
     }
 
-    @Override
     public void deleteEntity(EntityReference ref, Map<String, Object> params) {
     }
 
-    @Override
     public List<?> getEntities(EntityReference ref, Search search) {
         return null;
     }

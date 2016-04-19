@@ -23,6 +23,7 @@ public class ArticulateTCContentEntityUtils {
             return addCollection(collectionPath);
         } catch (IdUsedException iue) {
             // id exists, edit the collection instead
+            log.debug("Collection exists. Getting the EDIT collection object instead for path: " + collectionPath);
             return editCollection(collectionPath);
         } catch (Exception e) {
             log.error("Error getting the add collection object.", e);
