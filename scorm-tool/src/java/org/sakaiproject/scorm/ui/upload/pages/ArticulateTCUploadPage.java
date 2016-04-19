@@ -96,7 +96,6 @@ public class ArticulateTCUploadPage extends ConsoleBasePage implements Articulat
         private FileUploadField fileUploadField;
         private boolean fileHidden = false;
         private int priority = NotificationService.NOTI_NONE;
-        private boolean fileValidated = false;
         private FileUpload fileInput;
 
         public FileUpload getFileInput() {
@@ -126,12 +125,6 @@ public class ArticulateTCUploadPage extends ConsoleBasePage implements Articulat
             fileUploadField = new FileUploadField("fileInput");
             fileUploadField.add( new AttributeAppender("onchange", new Model("document.getElementsByName( \"btnSubmit\" )[0].disabled = this.value === '';"), ";"));
             add(fileUploadField);
-
-            // add the validate checkbox
-            // TODO implement this functionality
-            CheckBox checkboxValidate = new CheckBox("fileValidated");
-            checkboxValidate.setEnabled(false);
-            add(checkboxValidate);
 
             // SCO-97 sakai.property to enable/disable (show/hide) email sending (drop down)
             @SuppressWarnings({"unchecked", "rawtypes"})
@@ -247,14 +240,6 @@ public class ArticulateTCUploadPage extends ConsoleBasePage implements Articulat
 
         public void setFileHidden(boolean fileHidden) {
             this.fileHidden = fileHidden;
-        }
-
-        public boolean isFileValidated() {
-            return fileValidated;
-        }
-
-        public void setFileValidated(boolean fileValidated) {
-            this.fileValidated = fileValidated;
         }
 
         public int getPriority() {

@@ -22,13 +22,12 @@
   -->
 <beans>
 
-    <bean id="articulateTCImporter" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCImporterImpl" init-method="init">
+    <bean id="articulateTCImporter" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCImporterImpl">
         <!-- Service beans -->
         <lookup-method name="resourceService" bean="org.sakaiproject.scorm.service.api.ScormResourceService" />
 
         <property name="contentHostingService" ref="org.sakaiproject.content.api.ContentHostingService" />
         <property name="developerHelperService" ref="org.sakaiproject.entitybroker.DeveloperHelperService" />
-        <property name="serverConfigurationService" ref="org.sakaiproject.component.api.ServerConfigurationService" />
         <property name="articulateTCDocumentUtils" ref="articulateTCDocumentUtils" />
         <property name="articulateTCContentEntityUtils" ref="articulateTCContentEntityUtils" />
 

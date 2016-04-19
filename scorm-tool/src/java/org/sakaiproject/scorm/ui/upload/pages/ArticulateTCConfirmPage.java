@@ -21,18 +21,13 @@ package org.sakaiproject.scorm.ui.upload.pages;
 
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
-import org.sakaiproject.scorm.service.api.ScormResourceService;
 import org.sakaiproject.scorm.ui.console.pages.ConsoleBasePage;
 
 public class ArticulateTCConfirmPage extends ConsoleBasePage implements ArticulateTCConstants {
 
     private static final long serialVersionUID = 1L;
 
-    @SpringBean(name="org.sakaiproject.scorm.service.api.ScormResourceService")
-    ScormResourceService resourceService;
-    
     public ArticulateTCConfirmPage(PageParameters params) {
         final String filename = params.getString("filename");
         final int status = params.getInt("status");
@@ -69,6 +64,8 @@ public class ArticulateTCConfirmPage extends ConsoleBasePage implements Articula
             return "validate.not.valid.profile";
         case VALIDATION_MISSINGREQUIREDFILES:
             return "validate.missing.files";
+        case VALIDATION_CONVERTFAILED:
+            return "validate.convert.failed";
         };
         return "validate.failed";
     }
