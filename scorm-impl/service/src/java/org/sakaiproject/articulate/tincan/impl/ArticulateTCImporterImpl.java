@@ -139,6 +139,8 @@ public abstract class ArticulateTCImporterImpl implements ArticulateTCImporter, 
             return false;
         }
 
+        articulateTCContentPackage.getContentPackage().setTitle(getDuplicateTitle());
+
         // save the content package to the database
         contentPackageDao().save(articulateTCContentPackage.getContentPackage());
 
@@ -311,11 +313,28 @@ public abstract class ArticulateTCImporterImpl implements ArticulateTCImporter, 
         newCollectionEdit = (ContentCollectionEdit) articulateTCContentEntityUtils.addProperties(
             newCollectionEdit,
             new String[] {ResourceProperties.PROP_DISPLAY_NAME},
-            new String[] {getPackageCollectionId(false)}
+            new String[] {getDuplicateTitle()}
         );
         contentHostingService.commitCollection(newCollectionEdit);
 
         return true;
+    }
+
+    /**
+     * Checks to see if a package with this name already exists, if so, append a numerical suffix
+     * 
+     * @return the name of the package with any necessary suffix
+     */
+    private String getDuplicateTitle() {
+        String title = articulateTCContentPackage.getContentPackage().getTitle();
+        int count = contentPackageDao().countContentPackages(getCurrentContext(), title);
+
+        // count return from method is 1, even if there are no rows with this title in the site
+        if (count > 1) {
+            title += " (" + --count + ")";
+        }
+
+        return title;
     }
 
     /**

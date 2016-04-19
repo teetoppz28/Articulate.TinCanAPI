@@ -180,7 +180,7 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
         });
 
         //scos.setVisible(gradebookSetup.isGradebookDefined() && !gradebookSetup.getAssessments().isEmpty());
-
+        scos.setVisible(true);
         form.add(new CancelButton("cancel", (params.getBoolean("no-toolbar")) ? DisplayDesignatedPackage.class : PackageListPage.class));
 
         add(form);
