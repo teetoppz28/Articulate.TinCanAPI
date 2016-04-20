@@ -63,8 +63,6 @@ public class ContentPackage implements Serializable {
 
 	private boolean isDeleted;
 
-    private Boolean isTinCanAPI = false;
-
 	public ContentPackage() {
 		this.isDeleted = false;
 	}
@@ -247,17 +245,5 @@ public class ContentPackage implements Serializable {
 	public void setUrl(String url) {
 		this.url = url;
 	}
-
-    public Boolean isTinCanAPI() {
-        return isTinCanAPI;
-    }
-
-    public void setTinCanAPI(Boolean isTinCanAPI) {
-        if (isTinCanAPI == null) {
-            isTinCanAPI = false;
-        }
-
-        this.isTinCanAPI = isTinCanAPI;
-    }
 
 }

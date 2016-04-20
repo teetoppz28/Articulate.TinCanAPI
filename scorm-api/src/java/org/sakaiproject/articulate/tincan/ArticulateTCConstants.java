@@ -62,5 +62,7 @@ public interface ArticulateTCConstants extends ScormConstants {
      */
     public final static Double CONFIGURATION_DEFAULT_POINTS = 100d;
     public final static int CONFIGURATION_DEFAULT_ATTEMPTS = 10;
+    public final static boolean CONFIGURATION_DEFAULT_IS_GRADED = false;
+    public final static String CONFIGURATION_DEFAULT_GRADEBOOK_EXTERNAL_APP = "Articulate TinCanAPI player";
 
 }

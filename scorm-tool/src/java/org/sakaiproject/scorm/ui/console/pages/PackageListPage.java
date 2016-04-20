@@ -41,6 +41,7 @@ import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.lang.PropertyResolver;
+import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageSettingsDao;
 import org.sakaiproject.scorm.api.ScormConstants;
 import org.sakaiproject.scorm.model.api.ContentPackage;
 import org.sakaiproject.scorm.service.api.LearningManagementSystem;
@@ -65,6 +66,9 @@ public class PackageListPage extends ConsoleBasePage implements ScormConstants {
 
 	private static final ResourceReference PAGE_ICON = new ResourceReference(PackageListPage.class, "res/table.png");
 	private static final ResourceReference DELETE_ICON = new ResourceReference(PackageListPage.class, "res/delete.png");
+
+    @SpringBean(name="articulateTCContentPackageSettingsDao")
+    private ArticulateTCContentPackageSettingsDao articulateTCContentPackageSettingsDao;
 
 	@SpringBean
 	LearningManagementSystem lms;
@@ -93,10 +97,11 @@ public class PackageListPage extends ConsoleBasePage implements ScormConstants {
 			@Override
 			public Component newLink(String id, Object bean) {
                 ContentPackage contentPackage = (ContentPackage) bean;
-                pageClass = (contentPackage.isTinCanAPI()) ? ArticulateTCPlayerPage.class : PlayerPage.class;
+                boolean isArticulate = articulateTCContentPackageSettingsDao.isArticulateContentPackage(contentPackage.getContentPackageId());
+                pageClass = (isArticulate) ? ArticulateTCPlayerPage.class : PlayerPage.class;
 
                 if (lms.canLaunchNewWindow()) {
-                    String windowName = (contentPackage.isTinCanAPI()) ? "ArticulateTinCanAPIPlayer" : "ScormPlayer";
+                    String windowName = (isArticulate) ? "ArticulateTinCanAPIPlayer" : "ScormPlayer";
                     setPopupWindowName(windowName);
                 }
 
@@ -111,7 +116,7 @@ public class PackageListPage extends ConsoleBasePage implements ScormConstants {
 				PageParameters params = buildPageParameters(paramPropertyExpressions, bean);
 				Link link = new BookmarkablePageLabeledLink(id, labelModel, pageClass, params);
 
-				if (popupWindowName != null && !contentPackage.isTinCanAPI()) {
+				if (popupWindowName != null && !isArticulate) {
 					PopupSettings popupSettings = new PopupSettings(PageMap.forName(popupWindowName), PopupSettings.RESIZABLE);
 					popupSettings.setWidth(1020);
 					popupSettings.setHeight(740);
@@ -137,7 +142,8 @@ public class PackageListPage extends ConsoleBasePage implements ScormConstants {
                     @Override
                     public Component newLink(String id, Object bean) {
                         ContentPackage contentPackage = (ContentPackage) bean;
-                        pageClass = (contentPackage.isTinCanAPI()) ? ArticulateTCPackageConfigurationPage.class : PackageConfigurationPage.class;
+                        boolean isArticulate = articulateTCContentPackageSettingsDao.isArticulateContentPackage(contentPackage.getContentPackageId());
+                        pageClass = (isArticulate) ? ArticulateTCPackageConfigurationPage.class : PackageConfigurationPage.class;
                         PageParameters params = buildPageParameters(paramPropertyExpressions, bean);
                         Link link = new BookmarkablePageLabeledLink(id, new ResourceModel("column.action.edit.label"), pageClass, params);
 
