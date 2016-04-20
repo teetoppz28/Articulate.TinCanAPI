@@ -20,11 +20,9 @@
 package org.sakaiproject.scorm.ui.console.pages;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.adl.validator.contentpackage.LaunchData;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.ResourceReference;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -36,8 +34,7 @@ import org.apache.wicket.markup.html.form.ChoiceRenderer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.markup.html.list.ListItem;
-import org.apache.wicket.markup.html.list.ListView;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
@@ -76,31 +73,24 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
         long contentPackageId = params.getLong("contentPackageId");
 
         final ContentPackage contentPackage = contentService.getContentPackage(contentPackageId);
-        final GradebookSetup gradebookSetup = getAssessmentSetup(contentPackage);
 
         Form<Object> form = new Form<Object>("configurationForm") {
             private static final long serialVersionUID = 1L;
 
             @Override
             protected void onSubmit() {
-                if (gradebookSetup.isGradebookDefined()) {
-                    List<AssessmentSetup> assessments = gradebookSetup.getAssessments();
+                boolean on = true;
+                String assessmentExternalId = contentPackage.getTitle();
+                String context = getContext();
+                boolean has = gradebookExternalAssessmentService.isExternalAssignmentDefined(context, assessmentExternalId);
+                String fixedTitle = getItemTitle(contentPackage, context);
 
-                    for (AssessmentSetup assessmentSetup : assessments) {
-                        boolean on = assessmentSetup.issynchronizeWithGradebook();
-                        String assessmentExternalId = getAssessmentExternalId(gradebookSetup, assessmentSetup);
-                        String context = getContext();
-                        boolean has = gradebookExternalAssessmentService.isExternalAssignmentDefined(context, assessmentExternalId);
-                        String fixedTitle = getItemTitle(assessmentSetup, context);
-
-                        if (has && on) {
-                            gradebookExternalAssessmentService.updateExternalAssessment(context, assessmentExternalId, null, fixedTitle, assessmentSetup.numberOfPoints, gradebookSetup.getContentPackage().getDueOn(), false);
-                        } else if (!has && on) {
-                            gradebookExternalAssessmentService.addExternalAssessment(context, assessmentExternalId, null, fixedTitle, assessmentSetup.numberOfPoints, gradebookSetup.getContentPackage().getDueOn(), "Articulate TinCanAPI player", false);
-                        } else if (has && !on) {
-                            gradebookExternalAssessmentService.removeExternalAssessment(context, assessmentExternalId);
-                        }
-                    }
+                if (has && on) {
+                    gradebookExternalAssessmentService.updateExternalAssessment(context, assessmentExternalId, null, fixedTitle, CONFIGURATION_DEFAULT_POINTS, contentPackage.getDueOn(), false);
+                } else if (!has && on) {
+                    gradebookExternalAssessmentService.addExternalAssessment(context, assessmentExternalId, null, fixedTitle, CONFIGURATION_DEFAULT_POINTS, contentPackage.getDueOn(), "Articulate TinCanAPI player", false);
+                } else if (has && !on) {
+                    gradebookExternalAssessmentService.removeExternalAssessment(context, assessmentExternalId);
                 }
 
                 contentService.updateContentPackage(contentPackage);
@@ -110,15 +100,6 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
                 } else {
                     setResponsePage(PackageListPage.class);
                 }
-            }
-
-            protected String getItemTitle(AssessmentSetup assessmentSetup, String context) {
-                String fixedTitle = assessmentSetup.getItemTitle();
-                int count = 1;
-                while (gradebookExternalAssessmentService.isAssignmentDefined(context, fixedTitle)) {
-                    fixedTitle = assessmentSetup.getItemTitle() + " (" + count++ + ")";
-                }
-                return fixedTitle;
             }
         };
 
@@ -146,63 +127,65 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
         form.add(new Label("modifiedBy", new DisplayNamePropertyModel(contentPackage, "modifiedBy")));
         form.add(new Label("modifiedOn", new SimpleDateFormatPropertyModel(contentPackage, "modifiedOn")));
 
-        ListView scos;
-        form.add(scos = new ListView<AssessmentSetup>("scos", gradebookSetup.getAssessments()) {
+        boolean hasGradebookInSite = gradebookExternalAssessmentService.isGradebookDefined(getContext());
+        final boolean hasGradebookItem = gradebookExternalAssessmentService.isAssignmentDefined(getContext(), getItemTitle(contentPackage, getContext()));
 
-            private static final long serialVersionUID = 965550162166385688L;
+        final WebMarkupContainer gradebookSettingsVerifyMessageContainer = new WebMarkupContainer("gradebook-verify-message");
+        gradebookSettingsVerifyMessageContainer.setOutputMarkupId(true);
+        gradebookSettingsVerifyMessageContainer.setOutputMarkupPlaceholderTag(true);
+        gradebookSettingsVerifyMessageContainer.setMarkupId("gradebook-verify-message");
+        gradebookSettingsVerifyMessageContainer.setVisible(false);
+        form.add(gradebookSettingsVerifyMessageContainer);
+
+        final WebMarkupContainer gradebookSettingsCheckboxContainer = new WebMarkupContainer("gradebook-checkbox-sync");
+        gradebookSettingsCheckboxContainer.setOutputMarkupId(true);
+        gradebookSettingsCheckboxContainer.setOutputMarkupPlaceholderTag(true);
+        gradebookSettingsCheckboxContainer.setMarkupId("gradebook-checkbox-sync");
+        gradebookSettingsCheckboxContainer.setVisible(hasGradebookInSite);
+        form.add(gradebookSettingsCheckboxContainer);
+
+        final WebMarkupContainer gradebookSettingsTitleContainer = new WebMarkupContainer("gradebook-text-title");
+        gradebookSettingsTitleContainer.setOutputMarkupId(true);
+        gradebookSettingsTitleContainer.setOutputMarkupPlaceholderTag(true);
+        gradebookSettingsTitleContainer.setMarkupId("gradebook-text-title");
+        gradebookSettingsTitleContainer.setVisible(hasGradebookItem);
+        form.add(gradebookSettingsTitleContainer);
+
+        final TextField<?> gradebookSettingsTitle = new TextField<Object>("gradebook-input-text-title", new PropertyModel<Object>(contentPackage, "title"));
+        gradebookSettingsTitle.setOutputMarkupId(true);
+        gradebookSettingsTitle.setMarkupId("gradebook-input-text-title");
+        gradebookSettingsTitleContainer.add(gradebookSettingsTitle);
+
+        AjaxCheckBox gradebookCheckboxSync = new AjaxCheckBox("gradebook-input-checkbox-sync", new Model<Boolean>(hasGradebookItem)) {
+            private static final long serialVersionUID = 1L;
 
             @Override
-            protected void populateItem(final ListItem item) {
-                Label label = new Label("itemTitle", new PropertyModel(item.getModelObject(), "itemTitle"));
-                item.add(label);
-                final WebMarkupContainer verifySyncWithGradebook = new WebMarkupContainer("verifySyncWithGradebook");
-                verifySyncWithGradebook.setOutputMarkupId(true);
-                verifySyncWithGradebook.setOutputMarkupPlaceholderTag(true);
-                verifySyncWithGradebook.setVisible(false);
-                item.add(verifySyncWithGradebook);
-
-                AjaxCheckBox synchronizeSCOWithGradebook = new AjaxCheckBox("synchronizeWithGradebook", new PropertyModel(item.getModelObject(), "synchronizeWithGradebook")) {
-                    private static final long serialVersionUID = 1L;
-
-                    @Override
-                    protected void onUpdate(AjaxRequestTarget target) {
-                        AssessmentSetup as = (AssessmentSetup) item.getModelObject();
-                        String assessmentExternalId = getAssessmentExternalId(gradebookSetup, as);
-                        boolean hasGradebookSync = gradebookExternalAssessmentService.isExternalAssignmentDefined(getContext(), assessmentExternalId);
-                        boolean isChecked = this.getModelObject();
-                        verifySyncWithGradebook.setVisible(hasGradebookSync && !isChecked);
-                        target.addComponent(verifySyncWithGradebook);
-                    }
-                };
-
-                item.add(synchronizeSCOWithGradebook);
+            protected void onUpdate(AjaxRequestTarget target) {
+                boolean isChecked = this.getConvertedInput();
+                gradebookSettingsVerifyMessageContainer.setVisible(hasGradebookItem && !isChecked);
+                target.addComponent(gradebookSettingsVerifyMessageContainer);
+                gradebookSettingsTitleContainer.setVisible(isChecked);
+                target.addComponent(gradebookSettingsTitleContainer);
             }
-        });
+        };
+        gradebookCheckboxSync.setOutputMarkupId(true);
+        gradebookCheckboxSync.setMarkupId("gradebook-input-checkbox-sync");
+        gradebookSettingsCheckboxContainer.add(gradebookCheckboxSync);
 
-        //scos.setVisible(gradebookSetup.isGradebookDefined() && !gradebookSetup.getAssessments().isEmpty());
-        scos.setVisible(true);
         form.add(new CancelButton("cancel", (params.getBoolean("no-toolbar")) ? DisplayDesignatedPackage.class : PackageListPage.class));
 
         add(form);
     }
 
-    private GradebookSetup getAssessmentSetup(ContentPackage contentPackage) {
-        final GradebookSetup gradebookSetup = new GradebookSetup();
-        String context = getContext();
-        boolean isGradebookDefined = gradebookExternalAssessmentService.isGradebookDefined(context);
-        gradebookSetup.setGradebookDefined(isGradebookDefined);
-        gradebookSetup.setContentPackage(contentPackage);
+    protected String getItemTitle(ContentPackage contentPackage, String context) {
+        String fixedTitle = contentPackage.getTitle();
+        int count = 1;
 
-        if (isGradebookDefined) {
-            List<AssessmentSetup> assessments = gradebookSetup.getAssessments();
-            for (AssessmentSetup as : assessments) {
-                String assessmentExternalId = getAssessmentExternalId(gradebookSetup, as);
-                boolean has = gradebookExternalAssessmentService.isExternalAssignmentDefined(getContext(), assessmentExternalId);
-                as.setsynchronizeWithGradebook(has);
-            }
+        while (gradebookExternalAssessmentService.isAssignmentDefined(context, fixedTitle)) {
+            fixedTitle = contentPackage.getTitle() + " (" + count++ + ")";
         }
-
-        return gradebookSetup;
+  
+        return fixedTitle;
     }
 
     protected String getContext() {
@@ -217,62 +200,6 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
         return PAGE_ICON;
     }
 
-    private static String getAssessmentExternalId(final GradebookSetup gradebook, AssessmentSetup assessment) {
-        return gradebook.getContentPackageId() + ":" + assessment.getLaunchData().getItemIdentifier();
-    }
-
-    /*
-     * Inner classes
-     */
-
-    public static class AssessmentSetup implements Serializable {
-        private static final long serialVersionUID = 1L;
-
-        private LaunchData launchData;
-        private Double numberOfPoints = CONFIGURATION_DEFAULT_POINTS;
-        boolean synchronizeWithGradebook;
-
-        public AssessmentSetup() {
-            super();
-        }
-
-        public AssessmentSetup(LaunchData launchData) {
-            super();
-            this.launchData = launchData;
-        }
-
-        public String getItemIdentifier() {
-            return launchData.getItemIdentifier();
-        }
-        public String getItemTitle() {
-            return launchData.getItemTitle();
-        }
-
-        public LaunchData getLaunchData() {
-            return launchData;
-        }
-
-        public Double getNumberOfPoints() {
-            return numberOfPoints;
-        }
-
-        public boolean issynchronizeWithGradebook() {
-            return synchronizeWithGradebook;
-        }
-
-        public void setLaunchData(LaunchData launchData) {
-            this.launchData = launchData;
-        }
-
-        public void setNumberOfPoints(Double numberOffPoints) {
-            this.numberOfPoints = numberOffPoints;
-        }
-
-        public void setsynchronizeWithGradebook(boolean synchronizeWithGradebook) {
-            this.synchronizeWithGradebook = synchronizeWithGradebook;
-        }
-    }
-
     public class DisplayNamePropertyModel extends DecoratedPropertyModel implements Serializable {
         private static final long serialVersionUID = 1L;
 
@@ -285,43 +212,6 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
             String userId = String.valueOf(object);
 
             return lms.getLearnerName(userId);
-        }
-    }
-
-    public static class GradebookSetup implements Serializable {
-        private static final long serialVersionUID = 1L;
-
-        List<AssessmentSetup> assessments = new ArrayList<ArticulateTCPackageConfigurationPage.AssessmentSetup>();
-        boolean isGradebookDefined;
-        ContentPackage contentPackage;
-
-        public ContentPackage getContentPackage() {
-            return contentPackage;
-        }
-
-        public void setContentPackage(ContentPackage contentPackage) {
-            this.contentPackage = contentPackage;
-        }
-
-        public List<AssessmentSetup> getAssessments() {
-            return assessments;
-        }
-
-        public String getContentPackageId() {
-            return Long.toString(contentPackage.getContentPackageId());
-        }
-
-        public boolean isGradebookDefined() {
-            return isGradebookDefined;
-        }
-
-        protected AssessmentSetup buildAssessmentSetup(LaunchData launchData) {
-            AssessmentSetup assessment = new AssessmentSetup(launchData);
-            return assessment;
-        }
-
-        public void setGradebookDefined(boolean isGradebookDefined) {
-            this.isGradebookDefined = isGradebookDefined;
         }
     }
 
