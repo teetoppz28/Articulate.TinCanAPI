@@ -23,16 +23,14 @@
 <beans>
 
     <bean id="articulateTCImporter" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCImporterImpl">
-        <!-- Service beans -->
-        <lookup-method name="resourceService" bean="org.sakaiproject.scorm.service.api.ScormResourceService" />
-
-        <property name="contentHostingService" ref="org.sakaiproject.content.api.ContentHostingService" />
-        <property name="developerHelperService" ref="org.sakaiproject.entitybroker.DeveloperHelperService" />
-        <property name="articulateTCDocumentUtils" ref="articulateTCDocumentUtils" />
+        
         <property name="articulateTCContentEntityUtils" ref="articulateTCContentEntityUtils" />
-
-        <!-- Data Access Objects -->
+        <property name="articulateTCContentPackageSettingsDao" ref="articulateTCContentPackageSettingsDao" />
+        <property name="articulateTCDocumentUtils" ref="articulateTCDocumentUtils" />
+        <property name="contentHostingService" ref="org.sakaiproject.content.api.ContentHostingService" />
         <lookup-method name="contentPackageDao" bean="org.sakaiproject.scorm.dao.api.ContentPackageDao" />
+        <property name="developerHelperService" ref="org.sakaiproject.entitybroker.DeveloperHelperService" />
+        <lookup-method name="resourceService" bean="org.sakaiproject.scorm.service.api.ScormResourceService" />
     </bean>
 
     <bean id="articulateTCDocumentUtils" class="org.sakaiproject.articulate.tincan.util.ArticulateTCDocumentUtils">

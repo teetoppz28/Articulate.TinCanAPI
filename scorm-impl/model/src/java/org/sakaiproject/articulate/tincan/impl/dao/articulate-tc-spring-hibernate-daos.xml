@@ -40,4 +40,20 @@
         </property>
     </bean>
 
+    <bean id="articulateTCContentPackageSettingsDao" class="org.sakaiproject.articulate.tincan.impl.dao.ArticulateTCContentPackageSettingsDaoImpl">
+        <property name="sessionFactory">
+            <ref bean="org.sakaiproject.springframework.orm.hibernate.GlobalSessionFactory" />
+        </property>
+    </bean>
+
+    <bean id="org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageSettingsDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager" ref="org.sakaiproject.springframework.orm.hibernate.GlobalTransactionManager" />
+        <property name="target" ref="articulateTCContentPackageSettingsDao" />
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
 </beans>

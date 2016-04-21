@@ -57,4 +57,12 @@ public interface ArticulateTCConstants extends ScormConstants {
     public final static String HTML_HEADSCRIPTS = "/library/js/headscripts.js";
     public final static String HTML_BODY_ONLOAD_ADDTL="setMainFrameHeight(window.name)";
 
+    /*
+     * Configuration page
+     */
+    public final static Double CONFIGURATION_DEFAULT_POINTS = 100d;
+    public final static int CONFIGURATION_DEFAULT_ATTEMPTS = 10;
+    public final static boolean CONFIGURATION_DEFAULT_IS_GRADED = false;
+    public final static String CONFIGURATION_DEFAULT_GRADEBOOK_EXTERNAL_APP = "Articulate TinCanAPI player";
+
 }

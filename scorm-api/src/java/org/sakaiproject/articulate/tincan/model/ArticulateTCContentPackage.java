@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.apache.commons.lang.StringUtils;
+import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackageSettings;
 import org.sakaiproject.scorm.model.api.ContentPackage;
 
 public class ArticulateTCContentPackage implements Serializable {
@@ -11,9 +12,11 @@ public class ArticulateTCContentPackage implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private ContentPackage contentPackage;
+    private ArticulateTCContentPackageSettings articulateTCContentPackageSettings;
 
     public ArticulateTCContentPackage() {
         contentPackage = new ContentPackage();
+        articulateTCContentPackageSettings = new ArticulateTCContentPackageSettings();
     }
 
     public ArticulateTCContentPackage(ArticulateTCMeta articulateTCMeta) {
@@ -28,7 +31,6 @@ public class ArticulateTCContentPackage implements Serializable {
             contentPackage.setCreatedBy(articulateTCMeta.getCreatedBy());
             contentPackage.setModifiedOn(new Date());
             contentPackage.setModifiedBy(articulateTCMeta.getCreatedBy());
-            contentPackage.setTinCanAPI(true);
         }
     }
 
@@ -39,6 +41,15 @@ public class ArticulateTCContentPackage implements Serializable {
 
     public ContentPackage getContentPackage() {
         return contentPackage;
+    }
+
+    public ArticulateTCContentPackageSettings getArticulateTCContentPackageSettings() {
+        return articulateTCContentPackageSettings;
+    }
+
+    public void synchronizePackageSettings() {
+        articulateTCContentPackageSettings.setPackageId(contentPackage.getContentPackageId());
+        articulateTCContentPackageSettings.setGradebookItemTitle(contentPackage.getTitle());
     }
 
     public boolean isValid() {

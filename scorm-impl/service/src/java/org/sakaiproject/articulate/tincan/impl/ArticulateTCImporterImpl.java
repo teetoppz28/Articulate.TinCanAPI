@@ -10,6 +10,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCImporter;
+import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageSettingsDao;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.model.ArticulateTCContentPackage;
 import org.sakaiproject.articulate.tincan.model.ArticulateTCMeta;
@@ -33,13 +34,19 @@ public abstract class ArticulateTCImporterImpl implements ArticulateTCImporter, 
     private Log log = LogFactory.getLog(ArticulateTCImporterImpl.class);
 
     @Setter
-    private ContentHostingService contentHostingService;
+    private ArticulateTCContentEntityUtils articulateTCContentEntityUtils;
+
     @Setter
-    private DeveloperHelperService developerHelperService;
+    private ArticulateTCContentPackageSettingsDao articulateTCContentPackageSettingsDao;
+
     @Setter
     private ArticulateTCDocumentUtils articulateTCDocumentUtils;
+
     @Setter
-    private ArticulateTCContentEntityUtils articulateTCContentEntityUtils;
+    private ContentHostingService contentHostingService;
+
+    @Setter
+    private DeveloperHelperService developerHelperService;
 
     protected abstract ContentPackageDao contentPackageDao();
     protected abstract ScormResourceService resourceService();
@@ -139,8 +146,17 @@ public abstract class ArticulateTCImporterImpl implements ArticulateTCImporter, 
             return false;
         }
 
+        // set the title
+        articulateTCContentPackage.getContentPackage().setTitle(getDuplicateTitle());
+
         // save the content package to the database
         contentPackageDao().save(articulateTCContentPackage.getContentPackage());
+
+        // synchronize any content package and articulate package settings
+        articulateTCContentPackage.synchronizePackageSettings();
+
+        // save the Articulate package settings to the database
+        articulateTCContentPackageSettingsDao.save(articulateTCContentPackage.getArticulateTCContentPackageSettings());
 
         return true;
     }
@@ -311,11 +327,28 @@ public abstract class ArticulateTCImporterImpl implements ArticulateTCImporter, 
         newCollectionEdit = (ContentCollectionEdit) articulateTCContentEntityUtils.addProperties(
             newCollectionEdit,
             new String[] {ResourceProperties.PROP_DISPLAY_NAME},
-            new String[] {getPackageCollectionId(false)}
+            new String[] {getDuplicateTitle()}
         );
         contentHostingService.commitCollection(newCollectionEdit);
 
         return true;
+    }
+
+    /**
+     * Checks to see if a package with this name already exists, if so, append a numerical suffix
+     * 
+     * @return the name of the package with any necessary suffix
+     */
+    private String getDuplicateTitle() {
+        String title = articulateTCContentPackage.getContentPackage().getTitle();
+        int count = contentPackageDao().countContentPackages(getCurrentContext(), title);
+
+        // count return from method is 1, even if there are no rows with this title in the site
+        if (count > 1) {
+            title += " (" + --count + ")";
+        }
+
+        return title;
     }
 
     /**
