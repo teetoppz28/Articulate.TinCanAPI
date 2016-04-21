@@ -86,19 +86,23 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
 
             @Override
             protected void onSubmit() {
-                boolean on = true;
                 String assessmentExternalId = buildExternalId(contentPackage);
                 String context = getContext();
-                boolean has = gradebookExternalAssessmentService.isExternalAssignmentDefined(context, assessmentExternalId);
+                boolean hasExternalAssessmentDefined = gradebookExternalAssessmentService.isExternalAssignmentDefined(context, assessmentExternalId);
+                boolean gradebookChecked = articulateTCContentPackageSettings.isGraded();
                 String fixedTitle = getItemTitle(articulateTCContentPackageSettings, context);
                 Double points = articulateTCContentPackageSettings.getPoints();
 
-                if (has && on) {
-                    gradebookExternalAssessmentService.updateExternalAssessment(context, assessmentExternalId, null, fixedTitle, points, contentPackage.getDueOn(), false);
-                } else if (!has && on) {
+                if (hasExternalAssessmentDefined && gradebookChecked) {
+                    gradebookExternalAssessmentService.updateExternalAssessment(context, assessmentExternalId, null, articulateTCContentPackageSettings.getGradebookItemTitle(), points, contentPackage.getDueOn(), false);
+                } else if (!hasExternalAssessmentDefined && gradebookChecked) {
                     gradebookExternalAssessmentService.addExternalAssessment(context, assessmentExternalId, null, fixedTitle, points, contentPackage.getDueOn(), CONFIGURATION_DEFAULT_GRADEBOOK_EXTERNAL_APP, false);
-                } else if (has && !on) {
+                } else if (hasExternalAssessmentDefined && !gradebookChecked) {
                     gradebookExternalAssessmentService.removeExternalAssessment(context, assessmentExternalId);
+                    // reset gradebook item title to package title
+                    articulateTCContentPackageSettings.setGradebookItemTitle(contentPackage.getTitle());
+                    // reset gradebook item points to default
+                    articulateTCContentPackageSettings.setPoints(CONFIGURATION_DEFAULT_POINTS);
                 }
 
                 contentService.updateContentPackage(contentPackage);
@@ -165,7 +169,15 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
         gradebookSettingsTitle.setOutputMarkupId(true);
         gradebookSettingsTitle.setOutputMarkupPlaceholderTag(true);
         gradebookSettingsTitle.setMarkupId("gradebook-input-text-title");
+        gradebookSettingsTitle.setVisible(!hasGradebookItem); // only editable on first load
         gradebookSettingsTitleContainer.add(gradebookSettingsTitle);
+
+        final Label gradebookSettingsTitleLabel = new Label("gradebook-input-text-title-label", new PropertyModel<String>(articulateTCContentPackageSettings, "gradebookItemTitle"));
+        gradebookSettingsTitleLabel.setOutputMarkupId(true);
+        gradebookSettingsTitleLabel.setOutputMarkupPlaceholderTag(true);
+        gradebookSettingsTitleLabel.setMarkupId("gradebook-input-text-title-label");
+        gradebookSettingsTitleLabel.setVisible(hasGradebookItem); // only editable on first load
+        gradebookSettingsTitleContainer.add(gradebookSettingsTitleLabel);
 
         final WebMarkupContainer gradebookSettingsPointsContainer = new WebMarkupContainer("gradebook-text-points");
         gradebookSettingsPointsContainer.setOutputMarkupId(true);
@@ -186,7 +198,7 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
             @Override
             protected void onUpdate(AjaxRequestTarget target) {
                 boolean isChecked = this.getConvertedInput();
-                gradebookSettingsVerifyMessageContainer.setVisible(this.getModelObject() && !isChecked);
+                gradebookSettingsVerifyMessageContainer.setVisible(hasGradebookItem && !isChecked);
                 target.addComponent(gradebookSettingsVerifyMessageContainer);
                 gradebookSettingsTitleContainer.setVisible(isChecked);
                 target.addComponent(gradebookSettingsTitleContainer);
