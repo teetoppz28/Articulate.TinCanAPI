@@ -53,4 +53,9 @@ public interface ArticulateTCEntityProviderService {
      */
     void sendStatementToLRS(String statementJson);
 
+    /**
+     * Process the result statement to gradebook
+     */
+    void processGradebookData(String statementJson, String payload);
+
 }

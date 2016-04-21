@@ -43,6 +43,8 @@
 
     <bean id="articulateTCEntityProviderService" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCEntityProviderServiceImpl" init-method="init">
         <property name="articulateTCActivityStateDao" ref="articulateTCActivityStateDao" />
+        <property name="articulateTCContentPackageSettingsDao" ref="articulateTCContentPackageSettingsDao" />
+        <property name="developerHelperService" ref="org.sakaiproject.entitybroker.DeveloperHelperService" />
     </bean>
 
     <bean id="articulateTCLaunchService" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCLaunchServiceImpl" init-method="init">

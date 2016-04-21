@@ -10,6 +10,7 @@ public class ArticulateTCContentPackageSettings implements Serializable, Articul
     private static final long serialVersionUID = 1L;
 
     private long id;
+    private Long gradebookItemId;
     private String gradebookItemTitle;
     private boolean graded;
     private Long packageId;
@@ -19,13 +20,6 @@ public class ArticulateTCContentPackageSettings implements Serializable, Articul
     public ArticulateTCContentPackageSettings() {
         this.graded = CONFIGURATION_DEFAULT_IS_GRADED;
         this.points = CONFIGURATION_DEFAULT_POINTS;
-    }
-
-    public ArticulateTCContentPackageSettings(String gradebookItemTitle, boolean graded, long packageId, Double points) {
-        this.gradebookItemTitle = gradebookItemTitle;
-        this.graded = graded;
-        this.packageId = packageId;
-        this.points = points;
     }
 
     public long getId() {
@@ -38,6 +32,14 @@ public class ArticulateTCContentPackageSettings implements Serializable, Articul
 
     public boolean isGraded() {
         return graded;
+    }
+
+    public Long getGradebookItemId() {
+        return gradebookItemId;
+    }
+
+    public void setGradebookItemId(Long gradebookItemId) {
+        this.gradebookItemId = gradebookItemId;
     }
 
     public String getGradebookItemTitle() {

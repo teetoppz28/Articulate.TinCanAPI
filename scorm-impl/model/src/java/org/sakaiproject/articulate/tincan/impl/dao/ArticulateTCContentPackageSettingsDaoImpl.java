@@ -89,6 +89,11 @@ public class ArticulateTCContentPackageSettingsDaoImpl extends HibernateDaoSuppo
     }
 
     @Override
+    public ArticulateTCContentPackageSettings findOneByPackageId(String packageId) {
+        return findOneByPackageId(Long.parseLong(packageId));
+    }
+
+    @Override
     public boolean isArticulateContentPackage(long packageId) {
         ArticulateTCContentPackageSettings articulateTCContentPackageSettings = findOneByPackageId(packageId);
 

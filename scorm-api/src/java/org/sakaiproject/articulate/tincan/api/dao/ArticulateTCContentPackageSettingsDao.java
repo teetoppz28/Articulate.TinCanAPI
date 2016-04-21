@@ -37,6 +37,14 @@ public interface ArticulateTCContentPackageSettingsDao {
     public ArticulateTCContentPackageSettings findOneByPackageId(long packageId);
 
     /**
+     * Finds the row with the given package ID
+     * 
+     * @param packageId
+     * @return
+     */
+    public ArticulateTCContentPackageSettings findOneByPackageId(String packageId);
+
+    /**
      * Softly delete the data row in the db
      * 
      * @param id the id of the row

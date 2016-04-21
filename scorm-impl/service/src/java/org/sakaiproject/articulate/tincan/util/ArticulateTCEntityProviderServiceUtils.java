@@ -74,8 +74,7 @@ public class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConst
             throw new IllegalArgumentException("Payload string cannot be blank");
         }
 
-        String decodedPayload = decodeString(str);
-        ArticulateTCRequestPayload stateData = new ArticulateTCRequestPayload(decodedPayload);
+        ArticulateTCRequestPayload stateData = getPayloadObject(str);
 
         if (StringUtils.isBlank(stateData.getContent())) {
             // should not get here... there must not be a "content" portion in the payload
@@ -83,6 +82,18 @@ public class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConst
         }
 
         return stateData.getContent();
+    }
+
+    /**
+     * Retrieves the payload as an object
+     * 
+     * @param str
+     * @return
+     */
+    public static ArticulateTCRequestPayload getPayloadObject(String str) {
+        String decodedPayload = decodeString(str);
+
+        return new ArticulateTCRequestPayload(decodedPayload);
     }
 
     /**

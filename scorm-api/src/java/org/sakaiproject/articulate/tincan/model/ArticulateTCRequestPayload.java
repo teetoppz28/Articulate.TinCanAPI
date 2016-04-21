@@ -1,8 +1,5 @@
 package org.sakaiproject.articulate.tincan.model;
 
-import java.io.Serializable;
-import java.lang.reflect.Field;
-
 import org.apache.commons.lang.StringUtils;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 

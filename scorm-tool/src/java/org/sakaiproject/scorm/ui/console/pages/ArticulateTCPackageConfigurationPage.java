@@ -42,7 +42,8 @@ import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPac
 import org.sakaiproject.scorm.model.api.ContentPackage;
 import org.sakaiproject.scorm.service.api.LearningManagementSystem;
 import org.sakaiproject.scorm.service.api.ScormContentService;
-import org.sakaiproject.service.gradebook.shared.GradebookExternalAssessmentService;
+import org.sakaiproject.service.gradebook.shared.Assignment;
+import org.sakaiproject.service.gradebook.shared.GradebookService;
 import org.sakaiproject.tool.api.Placement;
 import org.sakaiproject.tool.api.ToolManager;
 import org.sakaiproject.wicket.markup.html.form.CancelButton;
@@ -65,8 +66,8 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
     @SpringBean(name="org.sakaiproject.scorm.service.api.ScormContentService")
     ScormContentService contentService;
 
-    @SpringBean(name = "org.sakaiproject.service.gradebook.GradebookExternalAssessmentService")
-    GradebookExternalAssessmentService gradebookExternalAssessmentService;
+    @SpringBean(name="org.sakaiproject.service.gradebook.GradebookService")
+    GradebookService gradebookService;
 
     private String unlimitedMessage;
     private boolean hasGradebookInSite;
@@ -86,23 +87,41 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
 
             @Override
             protected void onSubmit() {
-                String assessmentExternalId = buildExternalId(contentPackage);
+                List<Assignment> gbAssignments = gradebookService.getAssignments(getContext());
+                Assignment assignment = null;
+                for (Assignment gbAssignment : gbAssignments) {
+                    if (gbAssignment.getId() == articulateTCContentPackageSettings.getGradebookItemId()) {
+                        assignment = gbAssignment;
+                    }
+                }
+
                 String context = getContext();
-                boolean hasExternalAssessmentDefined = gradebookExternalAssessmentService.isExternalAssignmentDefined(context, assessmentExternalId);
+                boolean hasAssessmentDefined = assignment != null;
                 boolean gradebookChecked = articulateTCContentPackageSettings.isGraded();
                 String fixedTitle = getItemTitle(articulateTCContentPackageSettings, context);
                 Double points = articulateTCContentPackageSettings.getPoints();
 
-                if (hasExternalAssessmentDefined && gradebookChecked) {
-                    gradebookExternalAssessmentService.updateExternalAssessment(context, assessmentExternalId, null, articulateTCContentPackageSettings.getGradebookItemTitle(), points, contentPackage.getDueOn(), false);
-                } else if (!hasExternalAssessmentDefined && gradebookChecked) {
-                    gradebookExternalAssessmentService.addExternalAssessment(context, assessmentExternalId, null, fixedTitle, points, contentPackage.getDueOn(), CONFIGURATION_DEFAULT_GRADEBOOK_EXTERNAL_APP, false);
-                } else if (hasExternalAssessmentDefined && !gradebookChecked) {
-                    gradebookExternalAssessmentService.removeExternalAssessment(context, assessmentExternalId);
+                if (hasAssessmentDefined && gradebookChecked) {
+                    assignment.setDueDate(contentPackage.getDueOn());
+                    assignment.setPoints(points);
+                    gradebookService.updateAssignment(getContext(), assignment.getName(), assignment);
+                } else if (!hasAssessmentDefined && gradebookChecked) {
+                    assignment = new Assignment();
+                    assignment.setName(fixedTitle);
+                    assignment.setDueDate(contentPackage.getDueOn());
+                    assignment.setPoints(points);
+                    gradebookService.addAssignment(getContext(), assignment);
+                    // sync the assignment IDs
+                    assignment = gradebookService.getAssignment(getContext(), assignment.getName());
+                    articulateTCContentPackageSettings.setGradebookItemId(assignment.getId());
+                } else if (hasAssessmentDefined && !gradebookChecked) {
+                    gradebookService.removeAssignment(assignment.getId());
                     // reset gradebook item title to package title
                     articulateTCContentPackageSettings.setGradebookItemTitle(contentPackage.getTitle());
                     // reset gradebook item points to default
                     articulateTCContentPackageSettings.setPoints(CONFIGURATION_DEFAULT_POINTS);
+                    // reset the assignment ID
+                    articulateTCContentPackageSettings.setGradebookItemId(null);
                 }
 
                 contentService.updateContentPackage(contentPackage);
@@ -141,8 +160,8 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
         form.add(new Label("modifiedBy", new DisplayNamePropertyModel(contentPackage, "modifiedBy")));
         form.add(new Label("modifiedOn", new SimpleDateFormatPropertyModel(contentPackage, "modifiedOn")));
 
-        hasGradebookInSite = gradebookExternalAssessmentService.isGradebookDefined(getContext());
-        hasGradebookItem = gradebookExternalAssessmentService.isAssignmentDefined(getContext(), articulateTCContentPackageSettings.getGradebookItemTitle());
+        hasGradebookInSite = gradebookService.isGradebookDefined(getContext());
+        hasGradebookItem = gradebookService.isAssignmentDefined(getContext(), articulateTCContentPackageSettings.getGradebookItemTitle());
 
         final WebMarkupContainer gradebookSettingsVerifyMessageContainer = new WebMarkupContainer("gradebook-verify-message");
         gradebookSettingsVerifyMessageContainer.setOutputMarkupId(true);
@@ -220,7 +239,7 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
         String fixedTitle = articulateTCContentPackageSettings.getGradebookItemTitle();
         int count = 1;
 
-        while (gradebookExternalAssessmentService.isAssignmentDefined(context, fixedTitle)) {
+        while (gradebookService.isAssignmentDefined(context, fixedTitle)) {
             fixedTitle = articulateTCContentPackageSettings.getGradebookItemTitle() + " (" + count++ + ")";
         }
   
