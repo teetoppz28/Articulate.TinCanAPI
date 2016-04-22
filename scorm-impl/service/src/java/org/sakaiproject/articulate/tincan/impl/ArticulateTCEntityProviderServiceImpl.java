@@ -1,6 +1,5 @@
 package org.sakaiproject.articulate.tincan.impl;
 
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -55,11 +54,11 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
 
         sendStatementToLRS(statementJson);
 
-        developerHelperService.setCurrentUser(DeveloperHelperService.ADMIN_USER_REF);
         try {
+            developerHelperService.setCurrentUser(DeveloperHelperService.ADMIN_USER_REF);
             processGradebookData(statementJson, payload);
         } catch (Exception e) {
-            log.error("Error send grade to gradebook.", e);
+            log.error("Error sending grade to gradebook.", e);
         } finally {
             developerHelperService.restoreCurrentUser();
         }
@@ -145,59 +144,61 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
         ArticulateTCContentPackageSettings articulateTCContentPackageSettings = articulateTCContentPackageSettingsDao.findOneByPackageId(articulateTCRequestPayload.getPackageId());
 
         if (articulateTCContentPackageSettings == null) {
+            // no content package settings
             return;
         }
 
         if (!articulateTCContentPackageSettings.isGraded()) {
+            // is not set to be graded
             return;
         }
 
         boolean isGradebookDefined = gradebookService.isGradebookDefined(articulateTCRequestPayload.getSiteId());
         if (!isGradebookDefined) {
+            // no gradebook defined in the site
             return;
         }
 
-        List<Assignment> gbAssignments = gradebookService.getAssignments(articulateTCRequestPayload.getSiteId());
-        Assignment assignment = null;
-        for (Assignment gbAssignment : gbAssignments) {
-            if (gbAssignment.getId() == articulateTCContentPackageSettings.getGradebookItemId()) {
-                assignment = gbAssignment;
-            }
-        }
-
-        boolean isGradebookItemDefined = assignment != null;
-
-        if (!isGradebookItemDefined) {
+        Assignment assignment = gradebookService.getAssignment(articulateTCRequestPayload.getSiteId(), articulateTCContentPackageSettings.getGradebookItemId());
+        if (assignment == null) {
+            // assignment is not defined in gradebook
             return;
         }
 
         Map<String, Object> statement = (Map<String, Object>) ArticulateTCJsonUtils.parseFromJsonObject(statementJson);
-
         if (statement.isEmpty()) {
+            // no JSON object
             return;
         }
 
         Map<String, Object> result = (Map<String, Object>) statement.get("result");
-
         if (result == null) {
+            // no result in content
+            return;
+        }
+
+        Boolean completion = (Boolean) result.get("completion");
+        if (completion == null || !completion) {
+            // activity is not completed
             return;
         }
 
         Map<String, Object> score = (Map<String, Object>) result.get("score");
-
         if (score == null) {
+            // no score sent
             return;
         }
 
         Double scaled = (Double) score.get("scaled");
-
         if (scaled == null) {
+            // no scale sent, default to 0 (zero)
             scaled = 0d;
         }
 
         Double assignmentPoints = assignment.getPoints();
-        Double studentPoints = assignmentPoints * scaled;
+        Double studentPoints = (assignmentPoints != null) ? assignmentPoints * scaled : 0d;
 
+        // set the score on the assignment for the user
         gradebookService.setAssignmentScoreString(
             articulateTCRequestPayload.getSiteId(),
             assignment.getName(),
@@ -205,10 +206,6 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
             Double.toString(studentPoints),
             CONFIGURATION_DEFAULT_GRADEBOOK_EXTERNAL_APP
         );
-    }
-
-    protected String buildExternalId(String siteId, String packageId) {
-        return siteId + STATE_DATA_ID_SEPARATOR + packageId;
     }
 
 }
