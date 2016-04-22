@@ -31,8 +31,6 @@
             <property name="registration" column="REGISTRATION" />
             <property name="packageId" column="CONTENT_PACKAGE_ID" />
         </properties>
-        <property name="activityId" column="ACTIVITY_ID" type="text" />
-        <property name="agent" column="AGENT" type="text" />
         <property name="content" column="CONTENT" type="text" />
         <property name="stateId" column="STATE_ID" />
         <property name="deleted" column="DELETED" />

@@ -29,10 +29,7 @@
         <properties name="activity_state_unique" unique="true">
             <property name="packageId" column="CONTENT_PACKAGE_ID" />
         </properties>
-        <property name="points" column="POINTS" />
-        <property name="graded" column="GRADED" />
         <property name="gradebookItemId" column="GRADEBOOK_ITEM_ID" />
-        <property name="gradebookItemTitle" column="GRADEBOOK_ITEM_TITLE" />
         <property name="modified" column="MODIFIED" />
     </class>
 

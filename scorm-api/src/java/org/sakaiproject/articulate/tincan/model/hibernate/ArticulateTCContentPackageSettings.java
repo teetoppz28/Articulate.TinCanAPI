@@ -34,6 +34,10 @@ public class ArticulateTCContentPackageSettings implements Serializable, Articul
         return graded;
     }
 
+    public void setGraded(boolean graded) {
+        this.graded = graded;
+    }
+
     public Long getGradebookItemId() {
         return gradebookItemId;
     }
@@ -48,10 +52,6 @@ public class ArticulateTCContentPackageSettings implements Serializable, Articul
 
     public void setGradebookItemTitle(String gradebookItemTitle) {
         this.gradebookItemTitle = gradebookItemTitle;
-    }
-
-    public void setGraded(boolean graded) {
-        this.graded = graded;
     }
 
     public Long getPackageId() {
