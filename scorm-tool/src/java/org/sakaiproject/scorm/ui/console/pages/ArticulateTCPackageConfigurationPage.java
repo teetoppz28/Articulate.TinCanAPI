@@ -109,6 +109,7 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
                     assignment.setName(fixedTitle);
                     assignment.setDueDate(contentPackage.getDueOn());
                     assignment.setPoints(points);
+                    assignment.setCounted(true);
                     gradebookService.addAssignment(getContext(), assignment);
                     // sync the assignment IDs
                     assignment = gradebookService.getAssignment(getContext(), assignment.getName());

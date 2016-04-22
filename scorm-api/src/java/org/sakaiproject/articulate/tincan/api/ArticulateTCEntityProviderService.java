@@ -55,7 +55,8 @@ public interface ArticulateTCEntityProviderService {
 
     /**
      * Process the result statement to gradebook
+     * @throws Exception 
      */
-    void processGradebookData(String statementJson, String payload);
+    void processGradebookData(String statementJson, String payload) throws Exception;
 
 }

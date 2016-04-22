@@ -31,7 +31,7 @@ public class ArticulateTCContentPackageSettings implements Serializable, Articul
     }
 
     public boolean isGraded() {
-        return graded;
+        return graded || gradebookItemId != null;
     }
 
     public void setGraded(boolean graded) {

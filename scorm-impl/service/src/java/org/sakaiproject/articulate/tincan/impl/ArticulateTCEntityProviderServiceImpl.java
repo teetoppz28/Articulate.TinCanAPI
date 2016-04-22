@@ -55,7 +55,14 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
 
         sendStatementToLRS(statementJson);
 
-        processGradebookData(statementJson, payload);
+        developerHelperService.setCurrentUser(DeveloperHelperService.ADMIN_USER_REF);
+        try {
+            processGradebookData(statementJson, payload);
+        } catch (Exception e) {
+            log.error("Error send grade to gradebook.", e);
+        } finally {
+            developerHelperService.restoreCurrentUser();
+        }
     }
 
     @Override
@@ -133,7 +140,7 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
 
     @SuppressWarnings("unchecked")
     @Override
-    public void processGradebookData(String statementJson, String payload) {
+    public void processGradebookData(String statementJson, String payload) throws Exception {
         ArticulateTCRequestPayload articulateTCRequestPayload = ArticulateTCEntityProviderServiceUtils.getPayloadObject(payload);
         ArticulateTCContentPackageSettings articulateTCContentPackageSettings = articulateTCContentPackageSettingsDao.findOneByPackageId(articulateTCRequestPayload.getPackageId());
 
@@ -150,9 +157,7 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
             return;
         }
 
-        developerHelperService.setCurrentUser(DeveloperHelperService.ADMIN_USER_REF);
         List<Assignment> gbAssignments = gradebookService.getAssignments(articulateTCRequestPayload.getSiteId());
-        developerHelperService.restoreCurrentUser();
         Assignment assignment = null;
         for (Assignment gbAssignment : gbAssignments) {
             if (gbAssignment.getId() == articulateTCContentPackageSettings.getGradebookItemId()) {
@@ -193,7 +198,13 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
         Double assignmentPoints = assignment.getPoints();
         Double studentPoints = assignmentPoints * scaled;
 
-        gradebookService.setAssignmentScoreString(articulateTCRequestPayload.getSiteId(), assignment.getName(), articulateTCRequestPayload.getUserId(), Double.toString(studentPoints), CONFIGURATION_DEFAULT_GRADEBOOK_EXTERNAL_APP);
+        gradebookService.setAssignmentScoreString(
+            articulateTCRequestPayload.getSiteId(),
+            assignment.getName(),
+            articulateTCRequestPayload.getUserId(),
+            Double.toString(studentPoints),
+            CONFIGURATION_DEFAULT_GRADEBOOK_EXTERNAL_APP
+        );
     }
 
     protected String buildExternalId(String siteId, String packageId) {
