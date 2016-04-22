@@ -77,7 +77,7 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
     private boolean hasGradebookItem = false;
     private static ResourceReference PAGE_ICON = new ResourceReference(ArticulateTCPackageConfigurationPage.class, "res/table_edit.png");
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public ArticulateTCPackageConfigurationPage(final PageParameters params) {
         super(params);
         long contentPackageId = params.getLong("contentPackageId");

@@ -31,7 +31,7 @@ public class ArticulateTCContentPackageSettings implements Serializable, Articul
     }
 
     public boolean isGraded() {
-        return graded || gradebookItemId != null;
+        return graded;
     }
 
     public void setGraded(boolean graded) {
@@ -44,6 +44,8 @@ public class ArticulateTCContentPackageSettings implements Serializable, Articul
 
     public void setGradebookItemId(Long gradebookItemId) {
         this.gradebookItemId = gradebookItemId;
+
+        this.graded = gradebookItemId != null;
     }
 
     public String getGradebookItemTitle() {
