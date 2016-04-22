@@ -59,4 +59,12 @@ public interface ArticulateTCEntityProviderService {
      */
     void processGradebookData(String statementJson, String payload) throws Exception;
 
+    /**
+     * Mark the attempt complete in the database
+     * 
+     * @param contentPackageId
+     * @param userId
+     */
+    void completeAttempt(long contentPackageId, String userId);
+
 }

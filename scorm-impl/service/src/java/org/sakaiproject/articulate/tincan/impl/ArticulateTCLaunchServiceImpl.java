@@ -2,6 +2,7 @@ package org.sakaiproject.articulate.tincan.impl;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Date;
 
 import lombok.Setter;
 
@@ -11,10 +12,12 @@ import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCLaunchService;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.entitybroker.EntityView;
+import org.sakaiproject.scorm.dao.api.AttemptDao;
+import org.sakaiproject.scorm.model.api.Attempt;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserDirectoryService;
 
-public class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService, ArticulateTCConstants {
+public abstract class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService, ArticulateTCConstants {
 
     private Log log = LogFactory.getLog(ArticulateTCLaunchServiceImpl.class);
 
@@ -23,9 +26,9 @@ public class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService,
     @Setter
     private UserDirectoryService userDirectoryService;
 
+    protected abstract AttemptDao attemptDao();
+
     public void init() {
-        /*developerHelperService = (DeveloperHelperService) ComponentManager.get("org.sakaiproject.entitybroker.DeveloperHelperService");
-        userDirectoryService = (UserDirectoryService) ComponentManager.get("org.sakaiproject.user.api.UserDirectoryService");*/
     }
 
     @Override
@@ -100,6 +103,28 @@ public class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService,
         }
 
         return "";
+    }
+
+    @Override
+    public void addAttempt(String packageId) {
+        String siteId = developerHelperService.getCurrentLocationId();
+        User user = userDirectoryService.getCurrentUser();
+        String userId = user.getId();
+        String displayName = user.getDisplayName();
+        Long contentPackageId = Long.parseLong(packageId);
+        Attempt newestAttempt = attemptDao().lookupNewest(contentPackageId, userId);
+
+        if (newestAttempt == null || !newestAttempt.getNotExited()) {
+            Attempt newAttempt = new Attempt();
+            newAttempt.setContentPackageId(contentPackageId);
+            newAttempt.setCourseId(siteId);
+            newAttempt.setLearnerId(userId);
+            newAttempt.setLearnerName(displayName);
+            newAttempt.setBeginDate(new Date());
+            newAttempt.setAttemptNumber(newestAttempt == null ? 1 : newestAttempt.getAttemptNumber() + 1);
+
+            attemptDao().save(newAttempt);
+        }
     }
 
 }

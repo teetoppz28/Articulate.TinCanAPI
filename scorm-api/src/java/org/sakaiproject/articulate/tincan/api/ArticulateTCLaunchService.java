@@ -44,4 +44,12 @@ public interface ArticulateTCLaunchService {
      * @return the URL encoded statement URL
      */
     public String calculateEndPoint();
+
+    /**
+     * Persists a new attempt when the content package is launched
+     * 
+     * @param contentPackageId
+     */
+    public void addAttempt(String contentPackageId);
+
 }

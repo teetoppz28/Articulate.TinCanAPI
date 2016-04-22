@@ -40,6 +40,11 @@ public class ArticulateTCPlayerPage extends BaseToolPage implements ArticulateTC
     public ArticulateTCPlayerPage(final PageParameters pageParams) {
         super();
 
+        final String packageId = pageParams.getString("contentPackageId");
+
+        // record the attempt
+        articulateTCLaunchService.addAttempt(packageId);
+
         /**
          * iFrame that holds the Articulate TinCanAPI content player
          */
@@ -50,7 +55,6 @@ public class ArticulateTCPlayerPage extends BaseToolPage implements ArticulateTC
             protected CharSequence getURL() {
 
                 String baseUrl = pageParams.getString("url");
-                String packageId = pageParams.getString("contentPackageId");
                 String launchUrl = baseUrl;
 
                 launchUrl += articulateTCLaunchService.calculateLaunchParams(packageId);

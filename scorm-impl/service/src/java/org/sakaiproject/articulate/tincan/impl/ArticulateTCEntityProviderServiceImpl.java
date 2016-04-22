@@ -21,10 +21,12 @@ import org.sakaiproject.articulate.tincan.util.ArticulateTCJsonUtils;
 import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.event.api.LearningResourceStoreService;
+import org.sakaiproject.scorm.dao.api.AttemptDao;
+import org.sakaiproject.scorm.model.api.Attempt;
 import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.service.gradebook.shared.GradebookService;
 
-public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntityProviderService, ArticulateTCConstants {
+public abstract class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntityProviderService, ArticulateTCConstants {
 
     private Log log = LogFactory.getLog(ArticulateTCEntityProviderServiceImpl.class);
 
@@ -34,6 +36,8 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
     private ArticulateTCContentPackageSettingsDao articulateTCContentPackageSettingsDao;
     @Setter
     private DeveloperHelperService developerHelperService;
+
+    protected abstract AttemptDao attemptDao();
 
     private GradebookService gradebookService;
     private LearningResourceStoreService learningResourceStoreService;
@@ -206,6 +210,22 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
             Double.toString(studentPoints),
             CONFIGURATION_DEFAULT_GRADEBOOK_EXTERNAL_APP
         );
+
+        completeAttempt(articulateTCContentPackageSettings.getPackageId(), articulateTCRequestPayload.getUserId());
+    }
+
+    @Override
+    public void completeAttempt(long contentPackageId, String userId) {
+        Attempt newestAttempt = attemptDao().lookupNewest(contentPackageId, userId);
+
+        if (newestAttempt == null) {
+            // should not get here, since the attempt should have been recorded on launch
+            return;
+        }
+
+        newestAttempt.setNotExited(false);
+
+        attemptDao().save(newestAttempt);
     }
 
 }
