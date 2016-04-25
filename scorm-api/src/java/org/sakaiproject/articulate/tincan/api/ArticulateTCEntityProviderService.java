@@ -67,4 +67,13 @@ public interface ArticulateTCEntityProviderService {
      */
     void completeAttempt(long contentPackageId, String userId);
 
+    /**
+     * Is this attempt allowed to store its grade in the database?
+     * 
+     * @param contentPackageId
+     * @param userId
+     * @return true, if the attempt number is less than or equal to the configured max attempt count
+     */
+    boolean allowedToPostAttemptGrade(long contentPackageId, String userId);
+
 }

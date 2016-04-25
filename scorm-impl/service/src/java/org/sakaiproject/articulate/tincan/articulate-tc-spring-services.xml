@@ -44,6 +44,7 @@
         <property name="articulateTCActivityStateDao" ref="articulateTCActivityStateDao" />
         <property name="articulateTCContentPackageSettingsDao" ref="articulateTCContentPackageSettingsDao" />
         <lookup-method name="attemptDao" bean="org.sakaiproject.scorm.dao.api.AttemptDao" />
+        <lookup-method name="contentPackageDao" bean="org.sakaiproject.scorm.dao.api.ContentPackageDao" />
         <property name="developerHelperService" ref="org.sakaiproject.entitybroker.DeveloperHelperService" />
     </bean>
 

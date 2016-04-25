@@ -22,7 +22,9 @@ import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.event.api.LearningResourceStoreService;
 import org.sakaiproject.scorm.dao.api.AttemptDao;
+import org.sakaiproject.scorm.dao.api.ContentPackageDao;
 import org.sakaiproject.scorm.model.api.Attempt;
+import org.sakaiproject.scorm.model.api.ContentPackage;
 import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.service.gradebook.shared.GradebookService;
 
@@ -38,6 +40,7 @@ public abstract class ArticulateTCEntityProviderServiceImpl implements Articulat
     private DeveloperHelperService developerHelperService;
 
     protected abstract AttemptDao attemptDao();
+    protected abstract ContentPackageDao contentPackageDao();
 
     private GradebookService gradebookService;
     private LearningResourceStoreService learningResourceStoreService;
@@ -152,6 +155,11 @@ public abstract class ArticulateTCEntityProviderServiceImpl implements Articulat
             return;
         }
 
+        if (!allowedToPostAttemptGrade(articulateTCContentPackageSettings.getPackageId(), articulateTCRequestPayload.getUserId())) {
+            // this attempt is greater than the allowed max attempt number
+            return;
+        }
+
         if (!articulateTCContentPackageSettings.isGraded()) {
             // is not set to be graded
             return;
@@ -228,4 +236,19 @@ public abstract class ArticulateTCEntityProviderServiceImpl implements Articulat
         attemptDao().save(newestAttempt);
     }
 
+    @Override
+    public boolean allowedToPostAttemptGrade(long contentPackageId, String userId) {
+        Attempt newestAttempt = attemptDao().lookupNewest(contentPackageId, userId);
+
+        if (newestAttempt == null) {
+            return true;
+        }
+
+        long attemptCount = newestAttempt.getAttemptNumber();
+
+        ContentPackage contentPackage = contentPackageDao().load(contentPackageId);
+        long maxAttempts = contentPackage.getNumberOfTries();
+
+        return attemptCount <= maxAttempts;
+    }
 }
