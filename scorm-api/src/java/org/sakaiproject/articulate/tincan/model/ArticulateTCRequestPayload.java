@@ -69,7 +69,7 @@ public class ArticulateTCRequestPayload implements ArticulateTCConstants {
     }
 
     public void setSiteId(String siteId) {
-        this.siteId = getValue(siteId);
+        this.siteId = siteId;
     }
 
     public String getUserId() {
@@ -77,7 +77,7 @@ public class ArticulateTCRequestPayload implements ArticulateTCConstants {
     }
 
     public void setUserId(String userId) {
-        this.userId = getValue(userId);
+        this.userId = userId;
     }
 
     /**

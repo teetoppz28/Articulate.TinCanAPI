@@ -25,8 +25,9 @@ import org.apache.wicket.markup.html.link.InlineFrame;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCLaunchService;
+import org.sakaiproject.scorm.ui.console.pages.ConsoleBasePage;
 
-public class ArticulateTCPlayerPage extends BaseToolPage implements ArticulateTCConstants {
+public class ArticulateTCPlayerPage extends ConsoleBasePage implements ArticulateTCConstants {
 
     private static final long serialVersionUID = 1L;
 
@@ -53,13 +54,7 @@ public class ArticulateTCPlayerPage extends BaseToolPage implements ArticulateTC
 
             @Override
             protected CharSequence getURL() {
-
-                String baseUrl = pageParams.getString("url");
-                String launchUrl = baseUrl;
-
-                launchUrl += articulateTCLaunchService.calculateLaunchParams(packageId);
-
-                return launchUrl;
+                return pageParams.getString("url") + articulateTCLaunchService.calculateLaunchParams(packageId);
             }
         };
 

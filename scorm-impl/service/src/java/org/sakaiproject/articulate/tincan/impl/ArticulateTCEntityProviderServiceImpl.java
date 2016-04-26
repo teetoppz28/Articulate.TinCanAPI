@@ -63,14 +63,7 @@ public abstract class ArticulateTCEntityProviderServiceImpl implements Articulat
 
         sendStatementToLRS(statementJson);
 
-        try {
-            developerHelperService.setCurrentUser(DeveloperHelperService.ADMIN_USER_REF);
-            processGradebookData(statementJson, payload);
-        } catch (Exception e) {
-            log.error("Error sending grade to gradebook.", e);
-        } finally {
-            developerHelperService.restoreCurrentUser();
-        }
+        processGradebookData(statementJson, payload);
     }
 
     @Override
@@ -79,8 +72,7 @@ public abstract class ArticulateTCEntityProviderServiceImpl implements Articulat
             throw new IllegalArgumentException("Request cannot be null");
         }
 
-        String payload  = articulateTCEntityProviderServiceUtils.getRequestPayload(request);
-        ArticulateTCRequestPayload articulateTCRequestPayload = articulateTCEntityProviderServiceUtils.getStateDataFromPayload(payload);
+        ArticulateTCRequestPayload articulateTCRequestPayload = articulateTCEntityProviderServiceUtils.getPayloadObject(request);
         ArticulateTCActivityState articulateTCActivityState = articulateTCActivityStateDao.findOne(articulateTCRequestPayload);
 
         if (articulateTCActivityState == null) {
@@ -100,17 +92,14 @@ public abstract class ArticulateTCEntityProviderServiceImpl implements Articulat
             throw new IllegalArgumentException("Request cannot be null");
         }
 
-        String stateData = null;
-
-        String payload  = articulateTCEntityProviderServiceUtils.getRequestPayload(request);
-        ArticulateTCRequestPayload articulateTCRequestPayload = articulateTCEntityProviderServiceUtils.getStateDataFromPayload(payload);
+        ArticulateTCRequestPayload articulateTCRequestPayload = articulateTCEntityProviderServiceUtils.getPayloadObject(request);
         ArticulateTCActivityState articulateTCActivityState = articulateTCActivityStateDao.findOne(articulateTCRequestPayload);
 
         if (articulateTCActivityState != null) {
-            stateData = articulateTCActivityState.getContent();
+            return articulateTCActivityState.getContent();
         }
 
-        return stateData;
+        return null;
     }
 
     @Override
@@ -121,7 +110,7 @@ public abstract class ArticulateTCEntityProviderServiceImpl implements Articulat
 
 
         String payload  = articulateTCEntityProviderServiceUtils.getRequestPayload(request);
-        ArticulateTCRequestPayload articulateTCRequestPayload = articulateTCEntityProviderServiceUtils.getStateDataFromPayload(payload);
+        ArticulateTCRequestPayload articulateTCRequestPayload = articulateTCEntityProviderServiceUtils.getPayloadObject(payload);
         ArticulateTCActivityState articulateTCActivityState = articulateTCActivityStateDao.findOne(articulateTCRequestPayload);
 
         // no row to delete
@@ -148,93 +137,106 @@ public abstract class ArticulateTCEntityProviderServiceImpl implements Articulat
 
     @SuppressWarnings("unchecked")
     @Override
-    public void processGradebookData(String statementJson, String payload) throws Exception {
-        ArticulateTCRequestPayload articulateTCRequestPayload = articulateTCEntityProviderServiceUtils.getPayloadObject(payload);
-        ArticulateTCContentPackageSettings articulateTCContentPackageSettings = articulateTCContentPackageSettingsDao.findOneByPackageId(articulateTCRequestPayload.getPackageId());
+    public void processGradebookData(String statementJson, String payload) {
+        try {
+            ArticulateTCRequestPayload articulateTCRequestPayload = articulateTCEntityProviderServiceUtils.getPayloadObject(payload);
+            ArticulateTCContentPackageSettings articulateTCContentPackageSettings = articulateTCContentPackageSettingsDao.findOneByPackageId(articulateTCRequestPayload.getPackageId());
 
-        if (articulateTCContentPackageSettings == null) {
-            // no content package settings
-            return;
+            developerHelperService.setCurrentUser(DeveloperHelperService.ADMIN_USER_REF);
+
+            if (articulateTCContentPackageSettings == null) {
+                // no content package settings
+                return;
+            }
+
+            if (!allowedToPostAttemptGrade(articulateTCContentPackageSettings.getPackageId(), articulateTCRequestPayload.getUserId())) {
+                // this attempt is greater than the allowed max attempt number
+                return;
+            }
+
+            if (!articulateTCContentPackageSettings.isGraded()) {
+                // is not set to be graded
+                return;
+            }
+
+            boolean isGradebookDefined = gradebookService.isGradebookDefined(articulateTCRequestPayload.getSiteId());
+            if (!isGradebookDefined) {
+                // no gradebook defined in the site
+                return;
+            }
+
+            Assignment assignment = gradebookService.getAssignment(articulateTCRequestPayload.getSiteId(), articulateTCContentPackageSettings.getGradebookItemId());
+            if (assignment == null) {
+                // assignment is not defined in gradebook
+                return;
+            }
+
+            Map<String, Object> statement = (Map<String, Object>) ArticulateTCJsonUtils.parseFromJsonObject(statementJson);
+            if (statement.isEmpty()) {
+                // no JSON object
+                return;
+            }
+
+            Map<String, Object> result = (Map<String, Object>) statement.get("result");
+            if (result == null) {
+                // no result in content
+                return;
+            }
+
+            Boolean completion = (Boolean) result.get("completion");
+            if (completion == null || !completion) {
+                // activity is not completed
+                return;
+            }
+
+            Map<String, Object> score = (Map<String, Object>) result.get("score");
+            if (score == null) {
+                // no score sent
+                return;
+            }
+
+            Double scaled = (Double) score.get("scaled");
+            if (scaled == null) {
+                // no scale sent, default to 0 (zero)
+                scaled = 0d;
+            }
+
+            Double assignmentPoints = assignment.getPoints();
+            Double studentPoints = (assignmentPoints != null) ? assignmentPoints * scaled : 0d;
+
+            // set the score on the assignment for the user
+            gradebookService.setAssignmentScoreString(
+                articulateTCRequestPayload.getSiteId(),
+                assignment.getName(),
+                articulateTCRequestPayload.getUserId(),
+                Double.toString(studentPoints),
+                CONFIGURATION_DEFAULT_GRADEBOOK_EXTERNAL_APP
+            );
+        } catch (Exception e) {
+            log.error("Error sending grade to gradebook.", e);
+        } finally {
+            developerHelperService.restoreCurrentUser();
         }
-
-        if (!allowedToPostAttemptGrade(articulateTCContentPackageSettings.getPackageId(), articulateTCRequestPayload.getUserId())) {
-            // this attempt is greater than the allowed max attempt number
-            return;
-        }
-
-        if (!articulateTCContentPackageSettings.isGraded()) {
-            // is not set to be graded
-            return;
-        }
-
-        boolean isGradebookDefined = gradebookService.isGradebookDefined(articulateTCRequestPayload.getSiteId());
-        if (!isGradebookDefined) {
-            // no gradebook defined in the site
-            return;
-        }
-
-        Assignment assignment = gradebookService.getAssignment(articulateTCRequestPayload.getSiteId(), articulateTCContentPackageSettings.getGradebookItemId());
-        if (assignment == null) {
-            // assignment is not defined in gradebook
-            return;
-        }
-
-        Map<String, Object> statement = (Map<String, Object>) ArticulateTCJsonUtils.parseFromJsonObject(statementJson);
-        if (statement.isEmpty()) {
-            // no JSON object
-            return;
-        }
-
-        Map<String, Object> result = (Map<String, Object>) statement.get("result");
-        if (result == null) {
-            // no result in content
-            return;
-        }
-
-        Boolean completion = (Boolean) result.get("completion");
-        if (completion == null || !completion) {
-            // activity is not completed
-            return;
-        }
-
-        Map<String, Object> score = (Map<String, Object>) result.get("score");
-        if (score == null) {
-            // no score sent
-            return;
-        }
-
-        Double scaled = (Double) score.get("scaled");
-        if (scaled == null) {
-            // no scale sent, default to 0 (zero)
-            scaled = 0d;
-        }
-
-        Double assignmentPoints = assignment.getPoints();
-        Double studentPoints = (assignmentPoints != null) ? assignmentPoints * scaled : 0d;
-
-        // set the score on the assignment for the user
-        gradebookService.setAssignmentScoreString(
-            articulateTCRequestPayload.getSiteId(),
-            assignment.getName(),
-            articulateTCRequestPayload.getUserId(),
-            Double.toString(studentPoints),
-            CONFIGURATION_DEFAULT_GRADEBOOK_EXTERNAL_APP
-        );
     }
 
     @Override
     public boolean allowedToPostAttemptGrade(long contentPackageId, String userId) {
-        Attempt newestAttempt = attemptDao().lookupNewest(contentPackageId, userId);
-
-        if (newestAttempt == null) {
-            return true;
-        }
-
-        long attemptCount = newestAttempt.getAttemptNumber();
-
         ContentPackage contentPackage = contentPackageDao().load(contentPackageId);
         long maxAttempts = contentPackage.getNumberOfTries();
 
-        return attemptCount <= maxAttempts;
+        if (maxAttempts == -1) {
+            // unlimited attempts allowed
+            return true;
+        }
+
+        Attempt newestAttempt = attemptDao().lookupNewest(contentPackageId, userId);
+
+        if (newestAttempt == null) {
+            // no prior attempts
+            return true;
+        }
+
+        return newestAttempt.getAttemptNumber() <= maxAttempts;
     }
+
 }

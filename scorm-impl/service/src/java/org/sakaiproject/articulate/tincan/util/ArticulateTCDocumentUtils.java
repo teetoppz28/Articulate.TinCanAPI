@@ -45,7 +45,7 @@ public class ArticulateTCDocumentUtils {
 
         try {
             factory = DocumentBuilderFactory.newInstance();
-              builder = factory.newDocumentBuilder();
+            builder = factory.newDocumentBuilder();
         } catch (Exception e) {
             log.error("Error setting document builder object.", e);
         }
@@ -58,4 +58,5 @@ public class ArticulateTCDocumentUtils {
 
         return document;
     }
+
 }
