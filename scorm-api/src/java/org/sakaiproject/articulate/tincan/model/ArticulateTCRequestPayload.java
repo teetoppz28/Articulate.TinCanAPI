@@ -1,8 +1,5 @@
 package org.sakaiproject.articulate.tincan.model;
 
-import java.io.Serializable;
-import java.lang.reflect.Field;
-
 import org.apache.commons.lang.StringUtils;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 
@@ -25,16 +22,6 @@ public class ArticulateTCRequestPayload implements ArticulateTCConstants {
 
     public ArticulateTCRequestPayload(String[] parameters) {
         populateFields(parameters);
-    }
-
-    public ArticulateTCRequestPayload(String activityId, String agent, String content, String packageId, String stateId, String siteId, String userId) {
-        this.activityId = activityId;
-        this.agent = agent;
-        this.content = content;
-        this.packageId = packageId;
-        this.stateId = stateId;
-        this.siteId = siteId;
-        this.userId = userId;
     }
 
     public String getActivityId() {
@@ -144,14 +131,6 @@ public class ArticulateTCRequestPayload implements ArticulateTCConstants {
             }
             if (StringUtils.startsWith(s, STATE_DATA_KEY_STATE_ID)) {
                 setStateId(s);
-                continue;
-            }
-            if (StringUtils.startsWith(s, STATE_DATA_KEY_SITE_ID)) {
-                setSiteId(s);
-                continue;
-            }
-            if (StringUtils.startsWith(s, STATE_DATA_KEY_USER_ID)) {
-                setUserId(s);
                 continue;
             }
             if (StringUtils.startsWith(s, STATE_DATA_KEY_PACKAGE_ID)) {

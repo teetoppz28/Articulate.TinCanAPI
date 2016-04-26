@@ -23,7 +23,6 @@
 <beans>
 
     <bean id="articulateTCImporter" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCImporterImpl">
-        
         <property name="articulateTCContentEntityUtils" ref="articulateTCContentEntityUtils" />
         <property name="articulateTCContentPackageSettingsDao" ref="articulateTCContentPackageSettingsDao" />
         <property name="articulateTCDocumentUtils" ref="articulateTCDocumentUtils" />
@@ -43,9 +42,20 @@
 
     <bean id="articulateTCEntityProviderService" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCEntityProviderServiceImpl" init-method="init">
         <property name="articulateTCActivityStateDao" ref="articulateTCActivityStateDao" />
+        <property name="articulateTCContentPackageSettingsDao" ref="articulateTCContentPackageSettingsDao" />
+        <property name="articulateTCEntityProviderServiceUtils" ref="articulateTCEntityProviderServiceUtils" />
+        <lookup-method name="attemptDao" bean="org.sakaiproject.scorm.dao.api.AttemptDao" />
+        <lookup-method name="contentPackageDao" bean="org.sakaiproject.scorm.dao.api.ContentPackageDao" />
+        <property name="developerHelperService" ref="org.sakaiproject.entitybroker.DeveloperHelperService" />
     </bean>
 
-    <bean id="articulateTCLaunchService" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCLaunchServiceImpl" init-method="init">
+    <bean id="articulateTCEntityProviderServiceUtils" class="org.sakaiproject.articulate.tincan.util.ArticulateTCEntityProviderServiceUtils">
+        <lookup-method name="contentPackageDao" bean="org.sakaiproject.scorm.dao.api.ContentPackageDao" />
+        <property name="developerHelperService" ref="org.sakaiproject.entitybroker.DeveloperHelperService" />
+    </bean>
+
+    <bean id="articulateTCLaunchService" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCLaunchServiceImpl">
+        <lookup-method name="attemptDao" bean="org.sakaiproject.scorm.dao.api.AttemptDao" />
         <property name="developerHelperService" ref="org.sakaiproject.entitybroker.DeveloperHelperService" />
         <property name="userDirectoryService" ref="org.sakaiproject.user.api.UserDirectoryService" />
     </bean>

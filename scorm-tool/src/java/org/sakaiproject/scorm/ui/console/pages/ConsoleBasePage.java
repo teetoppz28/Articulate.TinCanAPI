@@ -89,7 +89,9 @@ public class ConsoleBasePage extends SakaiPortletWebPage implements IHeaderContr
         
         WebMarkupContainer listContainer = new WebMarkupContainer( "listContainer" );
         WebMarkupContainer uploadContainer = new WebMarkupContainer( "uploadContainer" );
+        uploadContainer.setVisible(canUpload);
         WebMarkupContainer articulateTCUploadContainer = new WebMarkupContainer( "articulate-tc-upload-container" );
+        articulateTCUploadContainer.setVisible(canUpload);
         listContainer.add( listLink );
         uploadContainer.add( uploadLink );
         articulateTCUploadContainer.add(articulateTCUploadLink);
@@ -110,9 +112,9 @@ public class ConsoleBasePage extends SakaiPortletWebPage implements IHeaderContr
             articulateTCUploadLink.add(className);
         }
 
-        listLink.setVisible(canUpload || canValidate);
-        uploadLink.setVisible(canUpload);
-        
+        // listLink.setVisible(canUpload || canValidate);
+        //uploadLink.setVisible(canUpload);
+
         // SCO-107 - hide the validate link (interface is currently unimplemented)
         //validateLink.setVisible(canValidate);
         //validateLink.setVisibilityAllowed(false);

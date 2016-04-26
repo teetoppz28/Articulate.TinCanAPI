@@ -39,11 +39,12 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageSettingsDao;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackageSettings;
+import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.scorm.model.api.ContentPackage;
 import org.sakaiproject.scorm.service.api.LearningManagementSystem;
 import org.sakaiproject.scorm.service.api.ScormContentService;
-import org.sakaiproject.service.gradebook.shared.GradebookExternalAssessmentService;
-import org.sakaiproject.tool.api.Placement;
+import org.sakaiproject.service.gradebook.shared.Assignment;
+import org.sakaiproject.service.gradebook.shared.GradebookService;
 import org.sakaiproject.tool.api.ToolManager;
 import org.sakaiproject.wicket.markup.html.form.CancelButton;
 import org.sakaiproject.wicket.model.DecoratedPropertyModel;
@@ -60,20 +61,23 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
     private ArticulateTCContentPackageSettingsDao articulateTCContentPackageSettingsDao;
 
     @SpringBean
-    LearningManagementSystem lms;
+    private LearningManagementSystem lms;
 
     @SpringBean(name="org.sakaiproject.scorm.service.api.ScormContentService")
-    ScormContentService contentService;
+    private ScormContentService contentService;
 
-    @SpringBean(name = "org.sakaiproject.service.gradebook.GradebookExternalAssessmentService")
-    GradebookExternalAssessmentService gradebookExternalAssessmentService;
+    @SpringBean(name="org.sakaiproject.service.gradebook.GradebookService")
+    private GradebookService gradebookService;
+
+    @SpringBean(name="org.sakaiproject.entitybroker.DeveloperHelperService")
+    private DeveloperHelperService developerHelperService;
 
     private String unlimitedMessage;
-    private boolean hasGradebookInSite;
-    private boolean hasGradebookItem;
+    private boolean hasGradebookInSite = false;
+    private boolean hasGradebookItem = false;
     private static ResourceReference PAGE_ICON = new ResourceReference(ArticulateTCPackageConfigurationPage.class, "res/table_edit.png");
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public ArticulateTCPackageConfigurationPage(final PageParameters params) {
         super(params);
         long contentPackageId = params.getLong("contentPackageId");
@@ -86,23 +90,38 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
 
             @Override
             protected void onSubmit() {
-                String assessmentExternalId = buildExternalId(contentPackage);
-                String context = getContext();
-                boolean hasExternalAssessmentDefined = gradebookExternalAssessmentService.isExternalAssignmentDefined(context, assessmentExternalId);
+                Assignment assignment = null;
+                if (articulateTCContentPackageSettings.getGradebookItemId() != null) {
+                    assignment = gradebookService.getAssignment(getContext(), articulateTCContentPackageSettings.getGradebookItemId());
+                }
+
+                boolean hasAssignmentDefined = assignment != null;
                 boolean gradebookChecked = articulateTCContentPackageSettings.isGraded();
-                String fixedTitle = getItemTitle(articulateTCContentPackageSettings, context);
+                String fixedTitle = getItemTitle(articulateTCContentPackageSettings, getContext());
                 Double points = articulateTCContentPackageSettings.getPoints();
 
-                if (hasExternalAssessmentDefined && gradebookChecked) {
-                    gradebookExternalAssessmentService.updateExternalAssessment(context, assessmentExternalId, null, articulateTCContentPackageSettings.getGradebookItemTitle(), points, contentPackage.getDueOn(), false);
-                } else if (!hasExternalAssessmentDefined && gradebookChecked) {
-                    gradebookExternalAssessmentService.addExternalAssessment(context, assessmentExternalId, null, fixedTitle, points, contentPackage.getDueOn(), CONFIGURATION_DEFAULT_GRADEBOOK_EXTERNAL_APP, false);
-                } else if (hasExternalAssessmentDefined && !gradebookChecked) {
-                    gradebookExternalAssessmentService.removeExternalAssessment(context, assessmentExternalId);
+                if (hasAssignmentDefined && gradebookChecked) {
+                    assignment.setDueDate(contentPackage.getDueOn());
+                    assignment.setPoints(points);
+                    gradebookService.updateAssignment(getContext(), assignment.getName(), assignment);
+                } else if (!hasAssignmentDefined && gradebookChecked) {
+                    assignment = new Assignment();
+                    assignment.setName(fixedTitle);
+                    assignment.setDueDate(contentPackage.getDueOn());
+                    assignment.setPoints(points);
+                    assignment.setCounted(true);
+                    gradebookService.addAssignment(getContext(), assignment);
+                    // sync the assignment IDs
+                    assignment = gradebookService.getAssignment(getContext(), assignment.getName());
+                    articulateTCContentPackageSettings.setGradebookItemId(assignment.getId());
+                } else if (hasAssignmentDefined && !gradebookChecked) {
+                    gradebookService.removeAssignment(assignment.getId());
                     // reset gradebook item title to package title
                     articulateTCContentPackageSettings.setGradebookItemTitle(contentPackage.getTitle());
                     // reset gradebook item points to default
                     articulateTCContentPackageSettings.setPoints(CONFIGURATION_DEFAULT_POINTS);
+                    // reset the assignment ID
+                    articulateTCContentPackageSettings.setGradebookItemId(null);
                 }
 
                 contentService.updateContentPackage(contentPackage);
@@ -141,9 +160,25 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
         form.add(new Label("modifiedBy", new DisplayNamePropertyModel(contentPackage, "modifiedBy")));
         form.add(new Label("modifiedOn", new SimpleDateFormatPropertyModel(contentPackage, "modifiedOn")));
 
-        hasGradebookInSite = gradebookExternalAssessmentService.isGradebookDefined(getContext());
-        hasGradebookItem = gradebookExternalAssessmentService.isAssignmentDefined(getContext(), articulateTCContentPackageSettings.getGradebookItemTitle());
+        hasGradebookInSite = gradebookService.isGradebookDefined(getContext());
 
+        // get the current gradebook item, if it exists
+        Assignment assignment = null;
+        if (hasGradebookInSite && articulateTCContentPackageSettings.getGradebookItemId() != null) {
+            assignment = gradebookService.getAssignment(getContext(), articulateTCContentPackageSettings.getGradebookItemId());
+            hasGradebookItem = assignment != null;
+        }
+
+        // set if this item is already in the gradebook
+        articulateTCContentPackageSettings.setGraded(hasGradebookItem);
+        // set default gb title to content package
+        articulateTCContentPackageSettings.setGradebookItemTitle(hasGradebookItem ? assignment.getName() : contentPackage.getTitle());
+        // set default points
+        articulateTCContentPackageSettings.setPoints(hasGradebookItem ? assignment.getPoints() : CONFIGURATION_DEFAULT_POINTS);
+
+        /**
+         * Verification message
+         */
         final WebMarkupContainer gradebookSettingsVerifyMessageContainer = new WebMarkupContainer("gradebook-verify-message");
         gradebookSettingsVerifyMessageContainer.setOutputMarkupId(true);
         gradebookSettingsVerifyMessageContainer.setOutputMarkupPlaceholderTag(true);
@@ -151,6 +186,9 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
         gradebookSettingsVerifyMessageContainer.setVisible(false);
         form.add(gradebookSettingsVerifyMessageContainer);
 
+        /**
+         * GB Sync checkbox container
+         */
         final WebMarkupContainer gradebookSettingsCheckboxContainer = new WebMarkupContainer("gradebook-checkbox-sync");
         gradebookSettingsCheckboxContainer.setOutputMarkupId(true);
         gradebookSettingsCheckboxContainer.setOutputMarkupPlaceholderTag(true);
@@ -158,6 +196,9 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
         gradebookSettingsCheckboxContainer.setVisible(hasGradebookInSite);
         form.add(gradebookSettingsCheckboxContainer);
 
+        /**
+         * GB Title container
+         */
         final WebMarkupContainer gradebookSettingsTitleContainer = new WebMarkupContainer("gradebook-text-title");
         gradebookSettingsTitleContainer.setOutputMarkupId(true);
         gradebookSettingsTitleContainer.setOutputMarkupPlaceholderTag(true);
@@ -165,6 +206,9 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
         gradebookSettingsTitleContainer.setVisible(hasGradebookInSite && hasGradebookItem);
         form.add(gradebookSettingsTitleContainer);
 
+        /**
+         * GB Title input
+         */
         final TextField<?> gradebookSettingsTitle = new TextField<String>("gradebook-input-text-title", new PropertyModel<String>(articulateTCContentPackageSettings, "gradebookItemTitle"));
         gradebookSettingsTitle.setOutputMarkupId(true);
         gradebookSettingsTitle.setOutputMarkupPlaceholderTag(true);
@@ -172,13 +216,19 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
         gradebookSettingsTitle.setVisible(!hasGradebookItem); // only editable on first load
         gradebookSettingsTitleContainer.add(gradebookSettingsTitle);
 
+        /*
+         * GB Title non-editable text
+         */
         final Label gradebookSettingsTitleLabel = new Label("gradebook-input-text-title-label", new PropertyModel<String>(articulateTCContentPackageSettings, "gradebookItemTitle"));
         gradebookSettingsTitleLabel.setOutputMarkupId(true);
         gradebookSettingsTitleLabel.setOutputMarkupPlaceholderTag(true);
         gradebookSettingsTitleLabel.setMarkupId("gradebook-input-text-title-label");
-        gradebookSettingsTitleLabel.setVisible(hasGradebookItem); // only editable on first load
+        gradebookSettingsTitleLabel.setVisible(hasGradebookItem);
         gradebookSettingsTitleContainer.add(gradebookSettingsTitleLabel);
 
+        /**
+         * GB Points container
+         */
         final WebMarkupContainer gradebookSettingsPointsContainer = new WebMarkupContainer("gradebook-text-points");
         gradebookSettingsPointsContainer.setOutputMarkupId(true);
         gradebookSettingsPointsContainer.setOutputMarkupPlaceholderTag(true);
@@ -186,22 +236,31 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
         gradebookSettingsPointsContainer.setVisible(hasGradebookInSite && hasGradebookItem);
         form.add(gradebookSettingsPointsContainer);
 
+        /**
+         * GB Points input
+         */
         final TextField<?> gradebookSettingsPoints = new TextField<Double>("gradebook-input-text-points", new PropertyModel<Double>(articulateTCContentPackageSettings, "points"));
         gradebookSettingsPoints.setOutputMarkupId(true);
         gradebookSettingsPoints.setOutputMarkupPlaceholderTag(true);
         gradebookSettingsPoints.setMarkupId("gradebook-input-text-points");
         gradebookSettingsPointsContainer.add(gradebookSettingsPoints);
 
+        /**
+         * GB checkbox input
+         */
         AjaxCheckBox gradebookCheckboxSync = new AjaxCheckBox("gradebook-input-checkbox-sync", new PropertyModel<Boolean>(articulateTCContentPackageSettings, "graded")) {
             private static final long serialVersionUID = 1L;
 
             @Override
             protected void onUpdate(AjaxRequestTarget target) {
                 boolean isChecked = this.getConvertedInput();
+                // delete verification message
                 gradebookSettingsVerifyMessageContainer.setVisible(hasGradebookItem && !isChecked);
                 target.addComponent(gradebookSettingsVerifyMessageContainer);
+                // title row
                 gradebookSettingsTitleContainer.setVisible(isChecked);
                 target.addComponent(gradebookSettingsTitleContainer);
+                // points row
                 gradebookSettingsPointsContainer.setVisible(isChecked);
                 target.addComponent(gradebookSettingsPointsContainer);
             }
@@ -216,26 +275,31 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
         add(form);
     }
 
-    protected String getItemTitle(ArticulateTCContentPackageSettings articulateTCContentPackageSettings, String context) {
+    /**
+     * Generates the gradebook item title, not allowing duplicates
+     * 
+     * @param articulateTCContentPackageSettings
+     * @param context
+     * @return
+     */
+    private String getItemTitle(ArticulateTCContentPackageSettings articulateTCContentPackageSettings, String context) {
         String fixedTitle = articulateTCContentPackageSettings.getGradebookItemTitle();
         int count = 1;
 
-        while (gradebookExternalAssessmentService.isAssignmentDefined(context, fixedTitle)) {
+        while (gradebookService.isAssignmentDefined(context, fixedTitle)) {
             fixedTitle = articulateTCContentPackageSettings.getGradebookItemTitle() + " (" + count++ + ")";
         }
   
         return fixedTitle;
     }
 
-    protected String buildExternalId(ContentPackage contentPackage) {
-        return getContext() + STATE_DATA_ID_SEPARATOR + contentPackage.getContentPackageId();
-    }
-
+    /**
+     * Get the current site ID
+     * 
+     * @return
+     */
     protected String getContext() {
-        Placement placement = toolManager.getCurrentPlacement();
-        String context = placement.getContext();
-
-        return context;
+        return developerHelperService.getCurrentLocationId();
     }
 
     @Override

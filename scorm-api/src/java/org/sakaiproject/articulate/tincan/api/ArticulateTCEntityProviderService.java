@@ -53,4 +53,19 @@ public interface ArticulateTCEntityProviderService {
      */
     void sendStatementToLRS(String statementJson);
 
+    /**
+     * Process the result statement to gradebook
+     * @throws Exception 
+     */
+    void processGradebookData(String statementJson, String payload) throws Exception;
+
+    /**
+     * Is this attempt allowed to store its grade in the database?
+     * 
+     * @param contentPackageId
+     * @param userId
+     * @return true, if the attempt number is less than or equal to the configured max attempt count
+     */
+    boolean allowedToPostAttemptGrade(long contentPackageId, String userId);
+
 }

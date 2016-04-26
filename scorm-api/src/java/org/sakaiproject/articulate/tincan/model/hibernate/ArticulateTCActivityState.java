@@ -10,8 +10,6 @@ public class ArticulateTCActivityState implements Serializable, ArticulateTCCons
 
     private static final long serialVersionUID = 1L;
 
-    private String activityId;
-    private String agent;
     private String content;
     private long id;
     private String packageId;
@@ -19,36 +17,17 @@ public class ArticulateTCActivityState implements Serializable, ArticulateTCCons
     private String stateId;
     private String userId;
     private boolean deleted = false;
-    private Date created;
     private Date modified;
 
     public ArticulateTCActivityState() {
     }
 
     public ArticulateTCActivityState(ArticulateTCRequestPayload articulateTCRequestPayload) {
-        this.activityId = articulateTCRequestPayload.getActivityId();
-        this.agent = articulateTCRequestPayload.getAgent();
         this.content = articulateTCRequestPayload.getContent();
         this.packageId = articulateTCRequestPayload.getPackageId();
         this.registration = articulateTCRequestPayload.getSiteId();
         this.stateId = articulateTCRequestPayload.getStateId();
         this.userId = articulateTCRequestPayload.getUserId();
-    }
-
-    public String getActivityId() {
-        return activityId;
-    }
-
-    public void setActivityId(String activityId) {
-        this.activityId = activityId;
-    }
-
-    public String getAgent() {
-        return agent;
-    }
-
-    public void setAgent(String agent) {
-        this.agent = agent;
     }
 
     public String getContent() {
@@ -104,14 +83,6 @@ public class ArticulateTCActivityState implements Serializable, ArticulateTCCons
 
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
-    }
-
-    public Date getCreated() {
-        return created;
-    }
-
-    public void setCreated(Date created) {
-        this.created = created;
     }
 
     public Date getModified() {
