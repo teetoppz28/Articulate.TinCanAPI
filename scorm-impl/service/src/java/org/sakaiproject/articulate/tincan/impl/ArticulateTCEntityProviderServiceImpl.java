@@ -37,6 +37,8 @@ public abstract class ArticulateTCEntityProviderServiceImpl implements Articulat
     @Setter
     private ArticulateTCContentPackageSettingsDao articulateTCContentPackageSettingsDao;
     @Setter
+    private ArticulateTCEntityProviderServiceUtils articulateTCEntityProviderServiceUtils;
+    @Setter
     private DeveloperHelperService developerHelperService;
 
     protected abstract AttemptDao attemptDao();
@@ -56,8 +58,8 @@ public abstract class ArticulateTCEntityProviderServiceImpl implements Articulat
             throw new IllegalArgumentException("Request cannot be null");
         }
 
-        String payload = ArticulateTCEntityProviderServiceUtils.getRequestPayload(request);
-        String statementJson = ArticulateTCEntityProviderServiceUtils.getContentDataFromPayload(payload);
+        String payload = articulateTCEntityProviderServiceUtils.getRequestPayload(request);
+        String statementJson = articulateTCEntityProviderServiceUtils.getContentDataFromPayload(payload);
 
         sendStatementToLRS(statementJson);
 
@@ -77,8 +79,8 @@ public abstract class ArticulateTCEntityProviderServiceImpl implements Articulat
             throw new IllegalArgumentException("Request cannot be null");
         }
 
-        String payload  = ArticulateTCEntityProviderServiceUtils.getRequestPayload(request);
-        ArticulateTCRequestPayload articulateTCRequestPayload = ArticulateTCEntityProviderServiceUtils.getStateDataFromPayload(payload);
+        String payload  = articulateTCEntityProviderServiceUtils.getRequestPayload(request);
+        ArticulateTCRequestPayload articulateTCRequestPayload = articulateTCEntityProviderServiceUtils.getStateDataFromPayload(payload);
         ArticulateTCActivityState articulateTCActivityState = articulateTCActivityStateDao.findOne(articulateTCRequestPayload);
 
         if (articulateTCActivityState == null) {
@@ -100,8 +102,8 @@ public abstract class ArticulateTCEntityProviderServiceImpl implements Articulat
 
         String stateData = null;
 
-        String payload  = ArticulateTCEntityProviderServiceUtils.getRequestPayload(request);
-        ArticulateTCRequestPayload articulateTCRequestPayload = ArticulateTCEntityProviderServiceUtils.getStateDataFromPayload(payload);
+        String payload  = articulateTCEntityProviderServiceUtils.getRequestPayload(request);
+        ArticulateTCRequestPayload articulateTCRequestPayload = articulateTCEntityProviderServiceUtils.getStateDataFromPayload(payload);
         ArticulateTCActivityState articulateTCActivityState = articulateTCActivityStateDao.findOne(articulateTCRequestPayload);
 
         if (articulateTCActivityState != null) {
@@ -118,8 +120,8 @@ public abstract class ArticulateTCEntityProviderServiceImpl implements Articulat
         }
 
 
-        String payload  = ArticulateTCEntityProviderServiceUtils.getRequestPayload(request);
-        ArticulateTCRequestPayload articulateTCRequestPayload = ArticulateTCEntityProviderServiceUtils.getStateDataFromPayload(payload);
+        String payload  = articulateTCEntityProviderServiceUtils.getRequestPayload(request);
+        ArticulateTCRequestPayload articulateTCRequestPayload = articulateTCEntityProviderServiceUtils.getStateDataFromPayload(payload);
         ArticulateTCActivityState articulateTCActivityState = articulateTCActivityStateDao.findOne(articulateTCRequestPayload);
 
         // no row to delete
@@ -147,7 +149,7 @@ public abstract class ArticulateTCEntityProviderServiceImpl implements Articulat
     @SuppressWarnings("unchecked")
     @Override
     public void processGradebookData(String statementJson, String payload) throws Exception {
-        ArticulateTCRequestPayload articulateTCRequestPayload = ArticulateTCEntityProviderServiceUtils.getPayloadObject(payload);
+        ArticulateTCRequestPayload articulateTCRequestPayload = articulateTCEntityProviderServiceUtils.getPayloadObject(payload);
         ArticulateTCContentPackageSettings articulateTCContentPackageSettings = articulateTCContentPackageSettingsDao.findOneByPackageId(articulateTCRequestPayload.getPackageId());
 
         if (articulateTCContentPackageSettings == null) {
@@ -218,22 +220,6 @@ public abstract class ArticulateTCEntityProviderServiceImpl implements Articulat
             Double.toString(studentPoints),
             CONFIGURATION_DEFAULT_GRADEBOOK_EXTERNAL_APP
         );
-
-        completeAttempt(articulateTCContentPackageSettings.getPackageId(), articulateTCRequestPayload.getUserId());
-    }
-
-    @Override
-    public void completeAttempt(long contentPackageId, String userId) {
-        Attempt newestAttempt = attemptDao().lookupNewest(contentPackageId, userId);
-
-        if (newestAttempt == null) {
-            // should not get here, since the attempt should have been recorded on launch
-            return;
-        }
-
-        newestAttempt.setNotExited(false);
-
-        attemptDao().save(newestAttempt);
     }
 
     @Override

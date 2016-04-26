@@ -7,15 +7,28 @@ import java.net.URLDecoder;
 
 import javax.servlet.http.HttpServletRequest;
 
+import lombok.Setter;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.model.ArticulateTCRequestPayload;
+import org.sakaiproject.entitybroker.DeveloperHelperService;
+import org.sakaiproject.scorm.dao.api.ContentPackageDao;
+import org.sakaiproject.scorm.model.api.ContentPackage;
+import org.sakaiproject.site.api.SiteService;
 
-public class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConstants {
+public abstract class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConstants {
 
     private static Log log = LogFactory.getLog(ArticulateTCEntityProviderServiceUtils.class);
+
+    @Setter
+    private DeveloperHelperService developerHelperService;
+    @Setter
+    private SiteService siteService;
+
+    protected abstract ContentPackageDao contentPackageDao();
 
     /**
      * Decodes the URL-encoded string
@@ -23,7 +36,7 @@ public class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConst
      * @param str
      * @return
      */
-    public static String decodeString(String str) {
+    public String decodeString(String str) {
         if (StringUtils.isBlank(str)) {
             return str;
         }
@@ -43,7 +56,7 @@ public class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConst
      * @param request
      * @return
      */
-    public static String getRequestPayload(HttpServletRequest request) {
+    public String getRequestPayload(HttpServletRequest request) {
         String content = "";
 
         try {
@@ -69,19 +82,14 @@ public class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConst
      * @param str the payload string from the request
      * @return
      */
-    public static String getContentDataFromPayload(String str) {
-        if (StringUtils.isBlank(str)) {
-            throw new IllegalArgumentException("Payload string cannot be blank");
-        }
+    public String getContentDataFromPayload(String str) {        ArticulateTCRequestPayload articulateTCRequestPayload = getPayloadObject(str);
 
-        ArticulateTCRequestPayload stateData = getPayloadObject(str);
-
-        if (StringUtils.isBlank(stateData.getContent())) {
+        if (StringUtils.isBlank(articulateTCRequestPayload.getContent())) {
             // should not get here... there must not be a "content" portion in the payload
             throw new IllegalArgumentException("Request payload does not contain a valid content statement string.");
         }
 
-        return stateData.getContent();
+        return articulateTCRequestPayload.getContent();
     }
 
     /**
@@ -90,10 +98,18 @@ public class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConst
      * @param str
      * @return
      */
-    public static ArticulateTCRequestPayload getPayloadObject(String str) {
+    public ArticulateTCRequestPayload getPayloadObject(String str) {
+        if (StringUtils.isBlank(str)) {
+            throw new IllegalArgumentException("Payload string cannot be blank");
+        }
+
         String decodedPayload = decodeString(str);
 
-        return new ArticulateTCRequestPayload(decodedPayload);
+        ArticulateTCRequestPayload articulateTCRequestPayload = new ArticulateTCRequestPayload(decodedPayload);
+        articulateTCRequestPayload.setUserId(populateCurrentUser());
+        articulateTCRequestPayload.setSiteId(populateCurrentSite(articulateTCRequestPayload.getPackageId()));
+
+        return articulateTCRequestPayload;
     }
 
     /**
@@ -102,20 +118,42 @@ public class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConst
      * @param str the payload string from the request
      * @return
      */
-    public static ArticulateTCRequestPayload getStateDataFromPayload(String str) {
-        if (StringUtils.isBlank(str)) {
-            throw new IllegalArgumentException("Payload string cannot be blank");
-        }
+    public ArticulateTCRequestPayload getStateDataFromPayload(String str) {
+        ArticulateTCRequestPayload articulateTCRequestPayload = getPayloadObject(str);
 
-        String decodedPayload = decodeString(str);
-        ArticulateTCRequestPayload stateData = new ArticulateTCRequestPayload(decodedPayload);
-
-        if (!stateData.isValid()) {
+        if (!articulateTCRequestPayload.isValid()) {
             // should not get here... there must not be a "content" portion in the payload
             throw new IllegalArgumentException("Request payload does not contain a valid activity state string.");
         }
 
-        return stateData;
+        return articulateTCRequestPayload;
+    }
+
+    private String populateCurrentUser() {
+        String userId = developerHelperService.getCurrentUserId();
+
+        if (StringUtils.isBlank(userId)) {
+            throw new SecurityException("Error: no current user is defined.");
+        }
+
+        return userId;
+    }
+
+    private String populateCurrentSite(String packageId) {
+        ContentPackage contentPackage = contentPackageDao().load(Long.parseLong(packageId));
+
+        if (contentPackage == null) {
+            throw new IllegalArgumentException("Error finding content package with id: " + packageId);
+        }
+
+        String siteId = contentPackage.getContext();
+        boolean allowedInSite = siteService.isCurrentUserMemberOfSite(siteId);
+
+        if (!allowedInSite) {
+            throw new SecurityException("Current user not allowed in site: " + siteId);
+        }
+
+        return siteId;
     }
 
 }

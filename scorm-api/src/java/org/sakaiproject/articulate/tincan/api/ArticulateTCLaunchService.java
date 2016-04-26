@@ -7,13 +7,12 @@ public interface ArticulateTCLaunchService {
      * 1. endpoint
      * 2. auth
      * 3. actor
-     * 4. site ID
-     * 5. user ID
      * 
      * @param packageId the ID of the content package row
+     * 
      * @return the URL encoded query string
      */
-    public String calculateLaunchParams(String packageId);
+    String calculateLaunchParams(String packageId);
 
     /**
      * Creates the actor definition
@@ -21,21 +20,7 @@ public interface ArticulateTCLaunchService {
      * 
      * @return the URL encoded actor string
      */
-    public String calculateActor();
-
-    /**
-     * Gets the current site
-     * 
-     * @return the URL encoded site ID
-     */
-    public String calculateCurrentSite();
-
-    /**
-     * Gets the current user
-     * 
-     * @return the URL encoded user ID
-     */
-    public String calculateCurrentUserId();
+    String calculateActor();
 
     /**
      * Creates the endpoint URL for LRS statements
@@ -43,13 +28,13 @@ public interface ArticulateTCLaunchService {
      * 
      * @return the URL encoded statement URL
      */
-    public String calculateEndPoint();
+    String calculateEndPoint();
 
     /**
      * Persists a new attempt when the content package is launched
      * 
      * @param contentPackageId
      */
-    public void addAttempt(String contentPackageId);
+    void addAttempt(String contentPackageId);
 
 }

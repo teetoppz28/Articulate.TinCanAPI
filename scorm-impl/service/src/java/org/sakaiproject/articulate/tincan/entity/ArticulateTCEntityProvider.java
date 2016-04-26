@@ -8,9 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 import lombok.Setter;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCEntityProviderService;
+import org.sakaiproject.articulate.tincan.util.ArticulateTCSecurityUtils;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.entitybroker.EntityReference;
 import org.sakaiproject.entitybroker.EntityView;
@@ -25,12 +24,13 @@ import org.sakaiproject.entitybroker.util.AbstractEntityProvider;
 
 public class ArticulateTCEntityProvider extends AbstractEntityProvider implements RESTful, RequestAware, ArticulateTCConstants {
 
-    private Log log = LogFactory.getLog(ArticulateTCEntityProvider.class);
-
     private RequestGetter requestGetter;
 
     @Setter
     private ArticulateTCEntityProviderService articulateTCEntityProviderService;
+
+    @Setter
+    private ArticulateTCSecurityUtils articulateTCSecurityUtils;
 
     public void init() {
     }
@@ -62,8 +62,9 @@ public class ArticulateTCEntityProvider extends AbstractEntityProvider implement
      */
     @EntityCustomAction(action = PATH_STATEMENTS, viewKey = "")
     public ActionReturn actionStatements(EntityView view, Map<String, Object> params) {
+        articulateTCSecurityUtils.securityCheck();
         HttpServletRequest request = requestGetter.getRequest();
-        log.debug("Path: " + request.getPathInfo() + " called. Method: " + view.getMethod());
+
         String retVal = "";
 
         articulateTCEntityProviderService.postStatementPayload(request);
@@ -81,8 +82,9 @@ public class ArticulateTCEntityProvider extends AbstractEntityProvider implement
      */
     @EntityCustomAction(action = PATH_ACTIVITIES, viewKey = "")
     public ActionReturn actionActivitiesState(EntityView view, Map<String, Object> params) {
+        articulateTCSecurityUtils.securityCheck();
         HttpServletRequest request = requestGetter.getRequest();
-        log.debug("Path: " + request.getPathInfo() + " called. Method: " + view.getMethod());
+
         String retVal = "";
 
         // {PREFIX}/activities/{path2}

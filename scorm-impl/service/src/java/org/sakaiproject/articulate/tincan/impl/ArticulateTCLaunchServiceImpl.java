@@ -33,17 +33,13 @@ public abstract class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunc
 
     @Override
     public String calculateLaunchParams(String packageId) {
-        String userId = calculateCurrentUserId();
         String actor = calculateActor();
-        String siteId = calculateCurrentSite();
         String endPoint = calculateEndPoint();
 
         StringBuilder sb = new StringBuilder("?");
         sb.append(STATE_DATA_KEY_ENDPOINT + "=" + endPoint);
         sb.append("&auth=");
         sb.append("&" + STATE_DATA_KEY_ACTOR + "=" + actor);
-        sb.append("&" + STATE_DATA_KEY_SITE_ID + "=" + siteId);
-        sb.append("&" + STATE_DATA_KEY_USER_ID + "=" + userId);
         sb.append("&" + STATE_DATA_KEY_PACKAGE_ID + "=" + packageId);
 
         return sb.toString();
@@ -61,32 +57,6 @@ public abstract class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunc
             return URLEncoder.encode(actor, DEFAULT_ENCODING);
         } catch (UnsupportedEncodingException e) {
             log.error("Error URL encoding actor.", e);
-        }
-
-        return "";
-    }
-
-    @Override
-    public String calculateCurrentSite() {
-        String siteId = developerHelperService.getCurrentLocationId();
-
-        try {
-            return URLEncoder.encode(siteId, DEFAULT_ENCODING);
-        } catch (UnsupportedEncodingException e) {
-            log.error("Error URL encoding site ID.", e);
-        }
-
-        return "";
-    }
-
-    @Override
-    public String calculateCurrentUserId() {
-        String userId = developerHelperService.getCurrentUserId();
-
-        try {
-            return URLEncoder.encode(userId, DEFAULT_ENCODING);
-        } catch (UnsupportedEncodingException e) {
-            log.error("Error URL encoding user ID.", e);
         }
 
         return "";
@@ -112,19 +82,17 @@ public abstract class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunc
         String userId = user.getId();
         String displayName = user.getDisplayName();
         Long contentPackageId = Long.parseLong(packageId);
-        Attempt newestAttempt = attemptDao().lookupNewest(contentPackageId, userId);
+        Attempt latestAttempt = attemptDao().lookupNewest(contentPackageId, userId);
 
-        if (newestAttempt == null || !newestAttempt.getNotExited()) {
-            Attempt newAttempt = new Attempt();
-            newAttempt.setContentPackageId(contentPackageId);
-            newAttempt.setCourseId(siteId);
-            newAttempt.setLearnerId(userId);
-            newAttempt.setLearnerName(displayName);
-            newAttempt.setBeginDate(new Date());
-            newAttempt.setAttemptNumber(newestAttempt == null ? 1 : newestAttempt.getAttemptNumber() + 1);
+        Attempt newAttempt = new Attempt();
+        newAttempt.setContentPackageId(contentPackageId);
+        newAttempt.setCourseId(siteId);
+        newAttempt.setLearnerId(userId);
+        newAttempt.setLearnerName(displayName);
+        newAttempt.setBeginDate(new Date());
+        newAttempt.setAttemptNumber(latestAttempt == null ? 1 :latestAttempt.getAttemptNumber() + 1);
 
-            attemptDao().save(newAttempt);
-        }
+        attemptDao().save(newAttempt);
     }
 
 }
