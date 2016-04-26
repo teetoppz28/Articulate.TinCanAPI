@@ -29,6 +29,7 @@
             <list>
                 <value>org/sakaiproject/articulate/tincan/model/hbm/ArticulateTCActivityState.hbm.xml</value>
                 <value>org/sakaiproject/articulate/tincan/model/hbm/ArticulateTCContentPackageSettings.hbm.xml</value>
+                <value>org/sakaiproject/articulate/tincan/model/hbm/ArticulateTCAttemptResult.hbm.xml</value>
             </list>
         </constructor-arg>
     </bean>

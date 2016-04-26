@@ -43,6 +43,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.lang.PropertyResolver;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageSettingsDao;
 import org.sakaiproject.scorm.api.ScormConstants;
+import org.sakaiproject.scorm.dao.api.AttemptDao;
 import org.sakaiproject.scorm.model.api.ContentPackage;
 import org.sakaiproject.scorm.service.api.LearningManagementSystem;
 import org.sakaiproject.scorm.service.api.ScormContentService;
@@ -69,6 +70,9 @@ public class PackageListPage extends ConsoleBasePage implements ScormConstants {
 
     @SpringBean(name="articulateTCContentPackageSettingsDao")
     private ArticulateTCContentPackageSettingsDao articulateTCContentPackageSettingsDao;
+
+    @SpringBean(name="org.sakaiproject.scorm.dao.api.AttemptDao")
+    private AttemptDao attemptDao;
 
 	@SpringBean
 	LearningManagementSystem lms;
@@ -152,12 +156,32 @@ public class PackageListPage extends ConsoleBasePage implements ScormConstants {
                 }
             );
         }
-		if (canGrade) {
-			actionColumn.addAction(new Action(new StringResourceModel("column.action.grade.label", this, null), ResultsListPage.class, paramPropertyExpressions));
-		}
-		else if (canViewResults) {
-			actionColumn.addAction(new Action(new StringResourceModel("column.action.grade.label", this, null), LearnerResultsPage.class, paramPropertyExpressions));
-		}
+
+        Action resultsAction = new Action(new ResourceModel("column.action.grade.label"), paramPropertyExpressions) {
+            private static final long serialVersionUID = 1L;
+            @Override
+            public Component newLink(String id, Object bean) {
+                ContentPackage contentPackage = (ContentPackage) bean;
+                boolean isArticulate = articulateTCContentPackageSettingsDao.isArticulateContentPackage(contentPackage.getContentPackageId());
+
+                if (canGrade) {
+                    pageClass = ResultsListPage.class;
+                } else if (canViewResults) {
+                    pageClass = LearnerResultsPage.class;
+                } else {
+                    pageClass = getClass();
+                }
+
+                PageParameters params = buildPageParameters(paramPropertyExpressions, bean);
+                Link link = new BookmarkablePageLabeledLink(id, new ResourceModel("column.action.grade.label"), pageClass, params);
+                link.setVisibilityAllowed(!isArticulate);
+                link.setVisible(!isArticulate);
+
+                return link;
+            }
+        };
+
+        actionColumn.addAction(resultsAction);
 
 		columns.add(actionColumn);
 
@@ -166,6 +190,14 @@ public class PackageListPage extends ConsoleBasePage implements ScormConstants {
 		columns.add(new DecoratedDatePropertyColumn(new StringResourceModel("column.header.releaseOn", this, null), "releaseOn", "releaseOn"));
 
 		columns.add(new DecoratedDatePropertyColumn(new StringResourceModel("column.header.dueOn", this, null), "dueOn", "dueOn"));
+
+        if (!canConfigure) {
+            columns.add(new TriesColumn(new StringResourceModel("column.header.attempts", this, null), "numberOfTries"));
+        }
+
+        if (canConfigure) {
+            columns.add(new TypeColumn(new StringResourceModel("column.header.type", this, null), "type"));
+        }
 
 		if (canDelete)
 		{
@@ -218,6 +250,69 @@ public class PackageListPage extends ConsoleBasePage implements ScormConstants {
 			return new ResourceModel(resourceId);
 		}
 	}
+
+    public class TriesColumn extends AbstractColumn<ContentPackage> {
+
+        private static final long serialVersionUID = 1L;
+
+        public TriesColumn(IModel<String> displayModel, String sortProperty) {
+            super(displayModel, sortProperty);
+        }
+
+        public void populateItem(Item<ICellPopulator<ContentPackage>> item, String componentId, IModel<ContentPackage> model) {
+            item.add(new Label(componentId, createLabelModel(model)));
+        }
+
+        protected String createLabelModel(IModel<ContentPackage> embeddedModel) {
+            Object target = embeddedModel.getObject();
+
+            if (target instanceof ContentPackage) {
+                ContentPackage contentPackage = (ContentPackage) target;
+
+                String userId = lms.currentLearnerId();
+                int attemptsCount = attemptDao.count(contentPackage.getContentPackageId(), userId);
+                int maxAttempts = contentPackage.getNumberOfTries();
+                String tries = Integer.toString(attemptsCount) + " / ";
+
+                if (maxAttempts == -1) {
+                    return tries + "unlimited";
+                }
+
+                return  tries + Integer.toString(maxAttempts);
+            }
+
+            return "";
+        }
+    }
+
+    public class TypeColumn extends AbstractColumn<ContentPackage> {
+
+        private static final long serialVersionUID = 1L;
+
+        public TypeColumn(IModel<String> displayModel, String sortProperty) {
+            super(displayModel, sortProperty);
+        }
+
+        public void populateItem(Item<ICellPopulator<ContentPackage>> item, String componentId, IModel<ContentPackage> model) {
+            item.add(new Label(componentId, createLabelModel(model)));
+        }
+
+        protected String createLabelModel(IModel<ContentPackage> embeddedModel) {
+            Object target = embeddedModel.getObject();
+
+            if (target instanceof ContentPackage) {
+                ContentPackage contentPackage = (ContentPackage) target;
+
+                if (articulateTCContentPackageSettingsDao.isArticulateContentPackage(contentPackage.getContentPackageId())) {
+                    return "Articulate TinCanAPI";
+                } else {
+                    return "SCORM 2004 v3";
+                }
+            }
+
+            return "unknown";
+        }
+    }
 
 	@Override
 	protected ResourceReference getPageIconReference() {
