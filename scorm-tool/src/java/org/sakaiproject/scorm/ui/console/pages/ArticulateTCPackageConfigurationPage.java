@@ -80,8 +80,8 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     public ArticulateTCPackageConfigurationPage(final PageParameters params) {
         super(params);
-        long contentPackageId = params.getLong("contentPackageId");
 
+        long contentPackageId = params.getLong("contentPackageId");
         final ContentPackage contentPackage = contentService.getContentPackage(contentPackageId);
         final ArticulateTCContentPackageSettings articulateTCContentPackageSettings = articulateTCContentPackageSettingsDao.findOneByPackageId(contentPackageId);
 
@@ -128,11 +128,7 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
 
                 articulateTCContentPackageSettingsDao.save(articulateTCContentPackageSettings);
 
-                if(params.getBoolean("no-toolbar")) {
-                    setResponsePage(DisplayDesignatedPackage.class);
-                } else {
-                    setResponsePage(PackageListPage.class);
-                }
+                setResponsePage(params.getBoolean("no-toolbar") ? DisplayDesignatedPackage.class : PackageListPage.class);
             }
         };
 

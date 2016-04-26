@@ -41,7 +41,7 @@ public abstract class ArticulateTCEntityProviderServiceUtils implements Articula
         try {
             return URLDecoder.decode(str, DEFAULT_ENCODING);
         } catch (UnsupportedEncodingException e) {
-            log.error("Error unencoding the string.", e);
+            log.error("Error unencoding the string", e);
         }
 
         return str;
@@ -71,7 +71,7 @@ public abstract class ArticulateTCEntityProviderServiceUtils implements Articula
 
             content = sb.toString();
         } catch (IOException e) {
-            log.error("Error retrieving the request payload.", e);
+            log.error("Error retrieving the request payload", e);
         }
 
         return content;
@@ -88,14 +88,28 @@ public abstract class ArticulateTCEntityProviderServiceUtils implements Articula
 
         if (StringUtils.isBlank(articulateTCRequestPayload.getContent())) {
             // should not get here... there must not be a "content" portion in the payload
-            throw new IllegalArgumentException("Request payload does not contain a valid content statement string.");
+            throw new IllegalArgumentException("Request payload does not contain a valid content statement string");
         }
 
         return articulateTCRequestPayload.getContent();
     }
 
     /**
-     * Retrieves the payload as an object
+     * Retrieves the payload as an object from the request
+     * 
+     * @param request
+     * @return
+     */
+    public ArticulateTCRequestPayload getPayloadObject(HttpServletRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Request object cannot be null");
+        }
+
+        return getPayloadObject(getRequestPayload(request));
+    }
+
+    /**
+     * Retrieves the payload as an object from the payload string
      * 
      * @param str
      * @return
@@ -117,23 +131,6 @@ public abstract class ArticulateTCEntityProviderServiceUtils implements Articula
     }
 
     /**
-     * Gets a mapping of payload data
-     * 
-     * @param str the payload string from the request
-     * @return
-     */
-    public ArticulateTCRequestPayload getStateDataFromPayload(String str) {
-        ArticulateTCRequestPayload articulateTCRequestPayload = getPayloadObject(str);
-
-        if (!articulateTCRequestPayload.isValid()) {
-            // should not get here... there must not be a "content" portion in the payload
-            throw new IllegalArgumentException("Request payload does not contain a valid activity state string.");
-        }
-
-        return articulateTCRequestPayload;
-    }
-
-    /**
      * Gets the user ID from the user associated with the current session
      * 
      * @return
@@ -142,7 +139,7 @@ public abstract class ArticulateTCEntityProviderServiceUtils implements Articula
         String userId = developerHelperService.getCurrentUserId();
 
         if (StringUtils.isBlank(userId)) {
-            throw new SecurityException("Error: no current user is defined.");
+            throw new SecurityException("Error: no current user is defined");
         }
 
         return userId;

@@ -50,6 +50,8 @@ public class ArticulateTCContentEntityUtils {
         try {
             return addResource(resourcePath);
         } catch (IdUsedException e) {
+            // id exists, edit the resource instead
+            log.debug("Resource exists. Getting the EDIT resource object instead for path: " + resourcePath);
             return editResource(resourcePath);
         } catch (Exception e) {
             log.error("Error getting the add resource object.", e);

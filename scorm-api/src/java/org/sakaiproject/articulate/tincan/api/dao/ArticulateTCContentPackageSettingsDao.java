@@ -31,15 +31,16 @@ public interface ArticulateTCContentPackageSettingsDao {
     /**
      * Finds the row with the given package ID
      * 
-     * @param packageId
+     * @param packageId long version of the package ID
      * @return
      */
     public ArticulateTCContentPackageSettings findOneByPackageId(long packageId);
 
     /**
      * Finds the row with the given package ID
+     * Convenience method
      * 
-     * @param packageId
+     * @param packageId string version of the package ID
      * @return
      */
     public ArticulateTCContentPackageSettings findOneByPackageId(String packageId);

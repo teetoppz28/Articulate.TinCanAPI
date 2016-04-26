@@ -57,6 +57,7 @@ public class ArticulateTCActivityStateDaoImpl extends HibernateDaoSupport implem
         try {
             articulateTCActivityState = (ArticulateTCActivityState) getHibernateTemplate().load(ArticulateTCActivityState.class, id);
         } catch (DataAccessException e) {
+            // cannot load object, use get() instead
             articulateTCActivityState = get(id);
         }
 

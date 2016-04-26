@@ -56,6 +56,8 @@ public interface ArticulateTCConstants extends ScormConstants {
     public final static String HTML_ARTICULATE_TC_CSS = "styles/articulatetc.css";
     public final static String HTML_HEADSCRIPTS = "/library/js/headscripts.js";
     public final static String HTML_BODY_ONLOAD_ADDTL="setMainFrameHeight(window.name)";
+    public final static String TOOLBASE_CSS = "/library/skin/tool_base.css";
+    public final static String TOOL_CSS = "/library/skin/default/tool.css";
 
     /*
      * Configuration page
