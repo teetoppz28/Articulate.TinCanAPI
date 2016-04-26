@@ -53,6 +53,7 @@ import org.sakaiproject.scorm.ui.player.pages.ArticulateTCPlayerPage;
 import org.sakaiproject.scorm.ui.reporting.pages.LearnerResultsPage;
 import org.sakaiproject.scorm.ui.reporting.pages.ResultsListPage;
 import org.sakaiproject.wicket.markup.html.link.BookmarkablePageLabeledLink;
+import org.sakaiproject.wicket.markup.html.link.IconLink;
 import org.sakaiproject.wicket.markup.html.repeater.data.table.Action;
 import org.sakaiproject.wicket.markup.html.repeater.data.table.ActionColumn;
 import org.sakaiproject.wicket.markup.html.repeater.data.table.BasicDataTable;
@@ -94,7 +95,7 @@ public class PackageListPage extends ConsoleBasePage implements ScormConstants {
 
 		ActionColumn actionColumn = new ActionColumn(new StringResourceModel("column.header.content.package.name", this, null), "title", "title");
 
-		String[] paramPropertyExpressions = {"contentPackageId", "resourceId", "title", "url"};
+		final String[] paramPropertyExpressions = {"contentPackageId", "resourceId", "title", "url"};
 
 		Action launchAction = new Action("title", paramPropertyExpressions){
 			private static final long serialVersionUID = 1L;
@@ -199,10 +200,27 @@ public class PackageListPage extends ConsoleBasePage implements ScormConstants {
             columns.add(new TypeColumn(new StringResourceModel("column.header.type", this, null), "type"));
         }
 
-		if (canDelete)
-		{
-			columns.add(new ImageLinkColumn(new Model("Remove"), PackageRemovePage.class, paramPropertyExpressions, DELETE_ICON, "delete"));
-		}
+        if (canDelete) {
+            ImageLinkColumn deleteLink = new ImageLinkColumn(new Model<String>("Remove"), null, paramPropertyExpressions, DELETE_ICON, "delete") {
+                private static final long serialVersionUID = 1L;
+                @SuppressWarnings("rawtypes")
+                @Override
+                public void populateItem(Item cellItem, String componentId, IModel model) {
+                    ContentPackage contentPackage = (ContentPackage) model.getObject();
+                    boolean isArticulate = articulateTCContentPackageSettingsDao.isArticulateContentPackage(contentPackage.getContentPackageId());
+                    Class<?> pageClass = (isArticulate) ? ArticulateTCPackageRemovePage.class : PackageRemovePage.class;
+                    PageParameters params = buildPageParameters(paramPropertyExpressions, model);
+
+                    if (iconProperty != null) {
+                        String iconPropertyValue = String.valueOf(PropertyResolver.getValue(iconProperty, model));
+                        iconReference = getIconPropertyReference(iconPropertyValue);
+                    }
+
+                    cellItem.add(new IconLink("cell", pageClass, params, iconReference, popupWindowName));
+                };
+            };
+            columns.add(deleteLink);
+        }
 
 		BasicDataTable table = new BasicDataTable("cpTable", columns, contentPackages);
 
