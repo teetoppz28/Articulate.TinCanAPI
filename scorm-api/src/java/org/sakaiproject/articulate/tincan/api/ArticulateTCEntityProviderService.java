@@ -68,4 +68,9 @@ public interface ArticulateTCEntityProviderService {
      */
     boolean allowedToPostAttemptGrade(long contentPackageId, String userId);
 
+    /**
+     * Persist the attempt score
+     */
+    void saveAttemptResult(long contentPackageId, String userId, Double score);
+
 }

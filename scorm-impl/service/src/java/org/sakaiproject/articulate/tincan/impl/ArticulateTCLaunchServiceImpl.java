@@ -10,6 +10,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCLaunchService;
+import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCAttemptResultDao;
+import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttemptResult;
 import org.sakaiproject.entitybroker.EntityView;
 import org.sakaiproject.scorm.dao.api.AttemptDao;
 import org.sakaiproject.scorm.dao.api.ContentPackageDao;
@@ -21,6 +23,9 @@ import org.sakaiproject.user.api.UserDirectoryService;
 public abstract class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService, ArticulateTCConstants {
 
     private Log log = LogFactory.getLog(ArticulateTCLaunchServiceImpl.class);
+
+    @Setter
+    private ArticulateTCAttemptResultDao articulateTCAttemptResultDao;
 
     @Setter
     private UserDirectoryService userDirectoryService;
@@ -96,6 +101,25 @@ public abstract class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunc
         newAttempt.setAttemptNumber(latestAttempt == null ? 1 :latestAttempt.getAttemptNumber() + 1);
 
         attemptDao().save(newAttempt);
+
+        addAttemptResult(newAttempt.getId());
+    }
+
+    @Override
+    public void addAttemptResult(Long attemptId) {
+        if (attemptId == null) {
+            /*
+             * attempt object ID is null (probably not persisted to the db yet),
+             * we'll create this result object later
+             */
+            log.error("Error: the attempt ID is null.");
+            return;
+        }
+
+        ArticulateTCAttemptResult articulateTCAttemptResult = new ArticulateTCAttemptResult();
+        articulateTCAttemptResult.setAttemptId(attemptId);
+
+        articulateTCAttemptResultDao.save(articulateTCAttemptResult);
     }
 
 }

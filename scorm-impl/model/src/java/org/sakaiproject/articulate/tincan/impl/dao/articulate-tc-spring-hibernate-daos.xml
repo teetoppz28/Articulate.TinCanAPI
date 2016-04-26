@@ -56,4 +56,20 @@
         </property>
     </bean>
 
+    <bean id="articulateTCAttemptResultDao" class="org.sakaiproject.articulate.tincan.impl.dao.ArticulateTCAttemptResultDaoImpl">
+        <property name="sessionFactory">
+            <ref bean="org.sakaiproject.springframework.orm.hibernate.GlobalSessionFactory" />
+        </property>
+    </bean>
+
+    <bean id="org.sakaiproject.articulate.tincan.api.dao.ArticulateTCAttemptResultDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager" ref="org.sakaiproject.springframework.orm.hibernate.GlobalTransactionManager" />
+        <property name="target" ref="articulateTCAttemptResultDao" />
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
 </beans>

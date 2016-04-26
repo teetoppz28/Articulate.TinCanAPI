@@ -45,6 +45,7 @@
     <!--  Launch service -->
 
     <bean id="articulateTCLaunchService" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCLaunchServiceImpl">
+        <property name="articulateTCAttemptResultDao" ref="articulateTCAttemptResultDao" />
         <lookup-method name="attemptDao" bean="org.sakaiproject.scorm.dao.api.AttemptDao" />
         <lookup-method name="contentPackageDao" bean="org.sakaiproject.scorm.dao.api.ContentPackageDao" />
         <property name="userDirectoryService" ref="org.sakaiproject.user.api.UserDirectoryService" />
@@ -58,6 +59,7 @@
 
     <bean id="articulateTCEntityProviderService" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCEntityProviderServiceImpl" init-method="init">
         <property name="articulateTCActivityStateDao" ref="articulateTCActivityStateDao" />
+        <property name="articulateTCAttemptResultDao" ref="articulateTCAttemptResultDao" />
         <property name="articulateTCContentPackageSettingsDao" ref="articulateTCContentPackageSettingsDao" />
         <property name="articulateTCEntityProviderServiceUtils" ref="articulateTCEntityProviderServiceUtils" />
         <lookup-method name="attemptDao" bean="org.sakaiproject.scorm.dao.api.AttemptDao" />

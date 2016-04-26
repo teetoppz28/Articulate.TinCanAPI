@@ -1,5 +1,6 @@
 package org.sakaiproject.articulate.tincan.impl;
 
+import java.util.Date;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,9 +13,11 @@ import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCEntityProviderService;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCActivityStateDao;
+import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCAttemptResultDao;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageSettingsDao;
 import org.sakaiproject.articulate.tincan.model.ArticulateTCRequestPayload;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCActivityState;
+import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttemptResult;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackageSettings;
 import org.sakaiproject.articulate.tincan.util.ArticulateTCEntityProviderServiceUtils;
 import org.sakaiproject.articulate.tincan.util.ArticulateTCJsonUtils;
@@ -34,10 +37,16 @@ public abstract class ArticulateTCEntityProviderServiceImpl implements Articulat
 
     @Setter
     private ArticulateTCActivityStateDao articulateTCActivityStateDao;
+
+    @Setter
+    private ArticulateTCAttemptResultDao articulateTCAttemptResultDao;
+
     @Setter
     private ArticulateTCContentPackageSettingsDao articulateTCContentPackageSettingsDao;
+
     @Setter
     private ArticulateTCEntityProviderServiceUtils articulateTCEntityProviderServiceUtils;
+
     @Setter
     private DeveloperHelperService developerHelperService;
 
@@ -149,11 +158,6 @@ public abstract class ArticulateTCEntityProviderServiceImpl implements Articulat
                 return;
             }
 
-            if (!allowedToPostAttemptGrade(articulateTCContentPackageSettings.getPackageId(), articulateTCRequestPayload.getUserId())) {
-                // this attempt is greater than the allowed max attempt number
-                return;
-            }
-
             if (!articulateTCContentPackageSettings.isGraded()) {
                 // is not set to be graded
                 return;
@@ -204,6 +208,13 @@ public abstract class ArticulateTCEntityProviderServiceImpl implements Articulat
             Double assignmentPoints = assignment.getPoints();
             Double studentPoints = (assignmentPoints != null) ? assignmentPoints * scaled : 0d;
 
+            saveAttemptResult(articulateTCContentPackageSettings.getPackageId(), articulateTCRequestPayload.getUserId(), studentPoints);
+
+            if (!allowedToPostAttemptGrade(articulateTCContentPackageSettings.getPackageId(), articulateTCRequestPayload.getUserId())) {
+                // this attempt is greater than the allowed max attempt number
+                return;
+            }
+
             // set the score on the assignment for the user
             gradebookService.setAssignmentScoreString(
                 articulateTCRequestPayload.getSiteId(),
@@ -237,6 +248,28 @@ public abstract class ArticulateTCEntityProviderServiceImpl implements Articulat
         }
 
         return newestAttempt.getAttemptNumber() <= maxAttempts;
+    }
+
+    @Override
+    public void saveAttemptResult(long contentPackageId, String userId, Double score) {
+        Attempt newestAttempt = attemptDao().lookupNewest(contentPackageId, userId);
+  
+        if (newestAttempt == null) {
+            // should not be here, as an attempt was created on launch
+            log.error("Error: no attempt found for content package id: " + contentPackageId + " and user ID: " + userId);
+            return;
+        }
+ 
+        ArticulateTCAttemptResult articulateTCAttemptResult = articulateTCAttemptResultDao.findByAttemptId(newestAttempt.getId());
+
+        if (articulateTCAttemptResult == null) {
+            articulateTCAttemptResult = new ArticulateTCAttemptResult();
+            articulateTCAttemptResult.setAttemptId(newestAttempt.getId());
+        }
+
+        articulateTCAttemptResult.setScore(score);
+        articulateTCAttemptResult.setDateCompleted(new Date());
+        articulateTCAttemptResultDao.save(articulateTCAttemptResult);
     }
 
 }
