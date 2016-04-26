@@ -21,6 +21,7 @@ public class ArticulateTCContentPackage implements Serializable {
 
     public ArticulateTCContentPackage(ArticulateTCMeta articulateTCMeta) {
         this();
+
         if (articulateTCMeta != null) {
             contentPackage.setContext(articulateTCMeta.getCourseId());
             contentPackage.setTitle(articulateTCMeta.getTitle());

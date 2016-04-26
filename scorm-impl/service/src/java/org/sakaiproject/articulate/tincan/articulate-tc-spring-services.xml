@@ -40,10 +40,6 @@
         <property name="contentHostingService" ref="org.sakaiproject.content.api.ContentHostingService" />
     </bean>
 
-    <bean id="articulateTCSecurityUtils" class="org.sakaiproject.articulate.tincan.util.ArticulateTCSecurityUtils">
-        <property name="sessionManager" ref="org.sakaiproject.tool.api.SessionManager" />
-    </bean>
-
     <bean id="articulateTCEntityProviderService" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCEntityProviderServiceImpl" init-method="init">
         <property name="articulateTCActivityStateDao" ref="articulateTCActivityStateDao" />
         <property name="articulateTCContentPackageSettingsDao" ref="articulateTCContentPackageSettingsDao" />
@@ -56,7 +52,6 @@
     <bean id="articulateTCEntityProviderServiceUtils" class="org.sakaiproject.articulate.tincan.util.ArticulateTCEntityProviderServiceUtils">
         <lookup-method name="contentPackageDao" bean="org.sakaiproject.scorm.dao.api.ContentPackageDao" />
         <property name="developerHelperService" ref="org.sakaiproject.entitybroker.DeveloperHelperService" />
-        <property name="siteService" ref="org.sakaiproject.site.api.SiteService" />
     </bean>
 
     <bean id="articulateTCLaunchService" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCLaunchServiceImpl">
@@ -68,7 +63,6 @@
     <!--  Entity Provider -->
     <bean parent="org.sakaiproject.entitybroker.entityprovider.AbstractEntityProvider" class="org.sakaiproject.articulate.tincan.entity.ArticulateTCEntityProvider">
         <property name="articulateTCEntityProviderService" ref="articulateTCEntityProviderService" />
-        <property name="articulateTCSecurityUtils" ref="articulateTCSecurityUtils" />
     </bean>
 
 </beans>

@@ -17,7 +17,6 @@ import org.sakaiproject.articulate.tincan.model.ArticulateTCRequestPayload;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.scorm.dao.api.ContentPackageDao;
 import org.sakaiproject.scorm.model.api.ContentPackage;
-import org.sakaiproject.site.api.SiteService;
 
 public abstract class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConstants {
 
@@ -25,15 +24,13 @@ public abstract class ArticulateTCEntityProviderServiceUtils implements Articula
 
     @Setter
     private DeveloperHelperService developerHelperService;
-    @Setter
-    private SiteService siteService;
 
     protected abstract ContentPackageDao contentPackageDao();
 
     /**
      * Decodes the URL-encoded string
      * 
-     * @param str
+     * @param str the string to decode
      * @return
      */
     public String decodeString(String str) {
@@ -54,9 +51,13 @@ public abstract class ArticulateTCEntityProviderServiceUtils implements Articula
      * Gets the payload from the {@link HttpServletRequest} object
      * 
      * @param request
-     * @return
+     * @return the payload string
      */
     public String getRequestPayload(HttpServletRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("HttpServletRequest cannot be null");
+        }
+
         String content = "";
 
         try {
@@ -80,9 +81,10 @@ public abstract class ArticulateTCEntityProviderServiceUtils implements Articula
      * Gets the JSON string from the content variable in the payload
      * 
      * @param str the payload string from the request
-     * @return
+     * @return the content data
      */
-    public String getContentDataFromPayload(String str) {        ArticulateTCRequestPayload articulateTCRequestPayload = getPayloadObject(str);
+    public String getContentDataFromPayload(String str) {
+        ArticulateTCRequestPayload articulateTCRequestPayload = getPayloadObject(str);
 
         if (StringUtils.isBlank(articulateTCRequestPayload.getContent())) {
             // should not get here... there must not be a "content" portion in the payload
@@ -106,7 +108,9 @@ public abstract class ArticulateTCEntityProviderServiceUtils implements Articula
         String decodedPayload = decodeString(str);
 
         ArticulateTCRequestPayload articulateTCRequestPayload = new ArticulateTCRequestPayload(decodedPayload);
+        // get the user ID from the current session
         articulateTCRequestPayload.setUserId(populateCurrentUser());
+        // get the site ID from the content package data
         articulateTCRequestPayload.setSiteId(populateCurrentSite(articulateTCRequestPayload.getPackageId()));
 
         return articulateTCRequestPayload;
@@ -129,6 +133,11 @@ public abstract class ArticulateTCEntityProviderServiceUtils implements Articula
         return articulateTCRequestPayload;
     }
 
+    /**
+     * Gets the user ID from the user associated with the current session
+     * 
+     * @return
+     */
     private String populateCurrentUser() {
         String userId = developerHelperService.getCurrentUserId();
 
@@ -139,6 +148,13 @@ public abstract class ArticulateTCEntityProviderServiceUtils implements Articula
         return userId;
     }
 
+    /**
+     * Gets the site ID associated with the given package ID
+     * Ensures the current user is allowed to access the site
+     * 
+     * @param packageId
+     * @return
+     */
     private String populateCurrentSite(String packageId) {
         ContentPackage contentPackage = contentPackageDao().load(Long.parseLong(packageId));
 
@@ -147,7 +163,7 @@ public abstract class ArticulateTCEntityProviderServiceUtils implements Articula
         }
 
         String siteId = contentPackage.getContext();
-        boolean allowedInSite = siteService.isCurrentUserMemberOfSite(siteId);
+        boolean allowedInSite = ArticulateTCSecurityUtils.currentUserAllowedAccessToSite(siteId);
 
         if (!allowedInSite) {
             throw new SecurityException("Current user not allowed in site: " + siteId);

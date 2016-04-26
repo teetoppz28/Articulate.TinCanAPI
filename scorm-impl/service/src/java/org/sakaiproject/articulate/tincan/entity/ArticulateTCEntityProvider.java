@@ -29,9 +29,6 @@ public class ArticulateTCEntityProvider extends AbstractEntityProvider implement
     @Setter
     private ArticulateTCEntityProviderService articulateTCEntityProviderService;
 
-    @Setter
-    private ArticulateTCSecurityUtils articulateTCSecurityUtils;
-
     public void init() {
     }
 
@@ -62,7 +59,7 @@ public class ArticulateTCEntityProvider extends AbstractEntityProvider implement
      */
     @EntityCustomAction(action = PATH_STATEMENTS, viewKey = "")
     public ActionReturn actionStatements(EntityView view, Map<String, Object> params) {
-        articulateTCSecurityUtils.securityCheck();
+        ArticulateTCSecurityUtils.securityCheck();
         HttpServletRequest request = requestGetter.getRequest();
 
         String retVal = "";
@@ -82,7 +79,7 @@ public class ArticulateTCEntityProvider extends AbstractEntityProvider implement
      */
     @EntityCustomAction(action = PATH_ACTIVITIES, viewKey = "")
     public ActionReturn actionActivitiesState(EntityView view, Map<String, Object> params) {
-        articulateTCSecurityUtils.securityCheck();
+        ArticulateTCSecurityUtils.securityCheck();
         HttpServletRequest request = requestGetter.getRequest();
 
         String retVal = "";
@@ -113,18 +110,18 @@ public class ArticulateTCEntityProvider extends AbstractEntityProvider implement
     }
 
     /*
-     * Inherited methods (not used)
+     * Inherited methods (not implemented)
      */
 
     public String createEntity(EntityReference ref, Object entity, Map<String, Object> params) {
-        return null;
+        return "Not implemented.";
     }
 
     public void updateEntity(EntityReference ref, Object entity, Map<String, Object> params) {
     }
 
     public Object getEntity(EntityReference ref) {
-        return null;
+        return "Not implemented.";
     }
 
     public void deleteEntity(EntityReference ref, Map<String, Object> params) {

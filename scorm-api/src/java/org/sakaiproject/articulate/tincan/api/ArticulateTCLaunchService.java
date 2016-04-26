@@ -9,7 +9,6 @@ public interface ArticulateTCLaunchService {
      * 3. actor
      * 
      * @param packageId the ID of the content package row
-     * 
      * @return the URL encoded query string
      */
     String calculateLaunchParams(String packageId);
