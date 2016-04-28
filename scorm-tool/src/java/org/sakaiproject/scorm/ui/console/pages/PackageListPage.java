@@ -32,6 +32,8 @@ import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulato
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.image.Image;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.link.PopupSettings;
 import org.apache.wicket.markup.repeater.Item;
@@ -69,6 +71,8 @@ public class PackageListPage extends ConsoleBasePage implements ScormConstants {
 	private static final ResourceReference PAGE_ICON = new ResourceReference(PackageListPage.class, "res/table.png");
 	private static final ResourceReference DELETE_ICON = new ResourceReference(PackageListPage.class, "res/delete.png");
 
+    private boolean isArticulate;
+
     @SpringBean(name="articulateTCContentPackageSettingsDao")
     private ArticulateTCContentPackageSettingsDao articulateTCContentPackageSettingsDao;
 
@@ -95,14 +99,14 @@ public class PackageListPage extends ConsoleBasePage implements ScormConstants {
 
 		ActionColumn actionColumn = new ActionColumn(new StringResourceModel("column.header.content.package.name", this, null), "title", "title");
 
-		final String[] paramPropertyExpressions = {"contentPackageId", "resourceId", "title", "url"};
+		String[] paramPropertyExpressions = {"contentPackageId", "resourceId", "title", "url"};
 
 		Action launchAction = new Action("title", paramPropertyExpressions){
 			private static final long serialVersionUID = 1L;
 			@Override
 			public Component newLink(String id, Object bean) {
                 ContentPackage contentPackage = (ContentPackage) bean;
-                boolean isArticulate = articulateTCContentPackageSettingsDao.isArticulateContentPackage(contentPackage.getContentPackageId());
+                isArticulate = articulateTCContentPackageSettingsDao.isArticulateContentPackage(contentPackage.getContentPackageId());
                 pageClass = (isArticulate) ? ArticulateTCPlayerPage.class : PlayerPage.class;
 
                 if (lms.canLaunchNewWindow()) {
@@ -147,7 +151,7 @@ public class PackageListPage extends ConsoleBasePage implements ScormConstants {
                     @Override
                     public Component newLink(String id, Object bean) {
                         ContentPackage contentPackage = (ContentPackage) bean;
-                        boolean isArticulate = articulateTCContentPackageSettingsDao.isArticulateContentPackage(contentPackage.getContentPackageId());
+                        isArticulate = articulateTCContentPackageSettingsDao.isArticulateContentPackage(contentPackage.getContentPackageId());
                         pageClass = (isArticulate) ? ArticulateTCPackageConfigurationPage.class : PackageConfigurationPage.class;
                         PageParameters params = buildPageParameters(paramPropertyExpressions, bean);
                         Link link = new BookmarkablePageLabeledLink(id, new ResourceModel("column.action.edit.label"), pageClass, params);
@@ -163,7 +167,7 @@ public class PackageListPage extends ConsoleBasePage implements ScormConstants {
             @Override
             public Component newLink(String id, Object bean) {
                 ContentPackage contentPackage = (ContentPackage) bean;
-                boolean isArticulate = articulateTCContentPackageSettingsDao.isArticulateContentPackage(contentPackage.getContentPackageId());
+                isArticulate = articulateTCContentPackageSettingsDao.isArticulateContentPackage(contentPackage.getContentPackageId());
 
                 if (canGrade) {
                     pageClass = ResultsListPage.class;
@@ -201,25 +205,28 @@ public class PackageListPage extends ConsoleBasePage implements ScormConstants {
         }
 
         if (canDelete) {
-            ImageLinkColumn deleteLink = new ImageLinkColumn(new Model<String>("Remove"), null, paramPropertyExpressions, DELETE_ICON, "delete") {
+            ImageLinkColumn link = new ImageLinkColumn(new Model("Remove"), PackageRemovePage.class, paramPropertyExpressions, DELETE_ICON, "delete") {
                 private static final long serialVersionUID = 1L;
-                @SuppressWarnings("rawtypes")
+
                 @Override
                 public void populateItem(Item cellItem, String componentId, IModel model) {
-                    ContentPackage contentPackage = (ContentPackage) model.getObject();
+                    Object bean = model.getObject();
+
+                    final PageParameters params = buildPageParameters(paramPropertyExpressions, bean);
+
+                    ContentPackage contentPackage = (ContentPackage) bean;
                     boolean isArticulate = articulateTCContentPackageSettingsDao.isArticulateContentPackage(contentPackage.getContentPackageId());
                     Class<?> pageClass = (isArticulate) ? ArticulateTCPackageRemovePage.class : PackageRemovePage.class;
-                    PageParameters params = buildPageParameters(paramPropertyExpressions, model);
 
                     if (iconProperty != null) {
-                        String iconPropertyValue = String.valueOf(PropertyResolver.getValue(iconProperty, model));
+                        String iconPropertyValue = String.valueOf(PropertyResolver.getValue(iconProperty, bean));
                         iconReference = getIconPropertyReference(iconPropertyValue);
                     }
 
                     cellItem.add(new IconLink("cell", pageClass, params, iconReference, popupWindowName));
-                };
+                }
             };
-            columns.add(deleteLink);
+            columns.add(link);
         }
 
 		BasicDataTable table = new BasicDataTable("cpTable", columns, contentPackages);

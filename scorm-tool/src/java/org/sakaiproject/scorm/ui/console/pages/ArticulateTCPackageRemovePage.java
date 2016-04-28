@@ -35,167 +35,119 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColu
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.repeater.data.ListDataProvider;
-import org.apache.wicket.model.CompoundPropertyModel;
-import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.sakaiproject.scorm.dao.api.ContentPackageManifestDao;
-import org.sakaiproject.scorm.exceptions.ResourceNotDeletedException;
+import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageSettingsDao;
+import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackageSettings;
+import org.sakaiproject.articulate.tincan.util.ArticulateTCContentEntityUtils;
+import org.sakaiproject.content.api.ContentCollection;
+import org.sakaiproject.content.api.ContentCollectionEdit;
+import org.sakaiproject.content.api.ContentHostingService;
+import org.sakaiproject.content.api.ContentResourceEdit;
 import org.sakaiproject.scorm.model.api.ContentPackage;
-import org.sakaiproject.scorm.model.api.ContentPackageManifest;
 import org.sakaiproject.scorm.service.api.ScormContentService;
-import org.sakaiproject.scorm.ui.console.pages.PackageConfigurationPage.AssessmentSetup;
-import org.sakaiproject.scorm.ui.console.pages.PackageConfigurationPage.GradebookSetup;
-import org.sakaiproject.service.gradebook.shared.GradebookExternalAssessmentService;
-import org.sakaiproject.tool.api.Placement;
+import org.sakaiproject.service.gradebook.shared.GradebookService;
 import org.sakaiproject.wicket.markup.html.form.CancelButton;
 
 public class ArticulateTCPackageRemovePage extends ConsoleBasePage {
 
-	private static final long serialVersionUID = 1L;
-	private static final Log LOG = LogFactory.getLog(ArticulateTCPackageRemovePage.class);
+    private static final long serialVersionUID = 1L;
+    private static final Log LOG = LogFactory.getLog(ArticulateTCPackageRemovePage.class);
 
-	@SpringBean(name="org.sakaiproject.scorm.service.api.ScormContentService")
-	ScormContentService contentService;
+    @SpringBean(name="articulateTCContentEntityUtils")
+    private ArticulateTCContentEntityUtils articulateTCContentEntityUtils;
 
-	public ArticulateTCPackageRemovePage( final PageParameters params )
-	{
-		// SCO-98 - disable buttons and add spinner on submit
-		add( new FileRemoveForm( "removeForm", params ) );
-	}
+    @SpringBean(name="articulateTCContentPackageSettingsDao")
+    private ArticulateTCContentPackageSettingsDao articulateTCContentPackageSettingsDao;
 
-	/**
-	 * SCO-98 - disable buttons and add spinner on submit
-	 * 
-	 * @author bjones86
-	 */
-	public class FileRemoveForm extends Form
-	{
-		private static final long serialVersionUID = 1L;
+    @SpringBean(name="org.sakaiproject.content.api.ContentHostingService")
+    private ContentHostingService contentHostingService;
 
-		@SpringBean(name = "org.sakaiproject.service.gradebook.GradebookExternalAssessmentService")
-		GradebookExternalAssessmentService gradebookExternalAssessmentService;
+    @SpringBean(name="org.sakaiproject.service.gradebook.GradebookService")
+    private GradebookService gradebookService;
 
-		@SpringBean(name = "org.sakaiproject.scorm.dao.api.ContentPackageManifestDao")
-		ContentPackageManifestDao contentPackageManifestDao;
+    @SpringBean(name="org.sakaiproject.scorm.service.api.ScormContentService")
+    ScormContentService contentService;
 
-		public FileRemoveForm( String id, final PageParameters params )
-		{
-			super( id );
-			IModel model = new CompoundPropertyModel( this );
-			this.setModel( model );
+    public ArticulateTCPackageRemovePage(final PageParameters params) {
+        add(new FileRemoveForm( "removeForm", params));
+    }
 
-			String title = params.getString( "title" );
-			final long contentPackageId = params.getLong( "contentPackageId" );
+    public class FileRemoveForm extends Form<Object> {
+        private static final long serialVersionUID = 1L;
 
-			ContentPackage contentPackage = new ContentPackage( title, contentPackageId );
+        @SuppressWarnings("unchecked")
+        public FileRemoveForm(String id, final PageParameters params) {
+            super(id);
 
-			List<ContentPackage> list = new LinkedList<ContentPackage>();
-			list.add( contentPackage );
+            final long contentPackageId = params.getLong("contentPackageId");
+            final ContentPackage contentPackage = contentService.getContentPackage(contentPackageId);
+            final ArticulateTCContentPackageSettings articulateTCContentPackageSettings = articulateTCContentPackageSettingsDao.findOneByPackageId(contentPackageId);
 
-			List<IColumn> columns = new LinkedList<IColumn>();
-			columns.add( new PropertyColumn( new Model( "Content Package" ), "title", "title" ) );
+            List<ContentPackage> list = new LinkedList<ContentPackage>();
+            list.add(contentPackage);
 
-			DataTable removeTable = new DataTable( "removeTable", columns.toArray( new IColumn[columns.size()] ), 
-					new ListDataProvider( list ), 3 );
+            List<IColumn<Object>> columns = new LinkedList<IColumn<Object>>();
+            columns.add(new PropertyColumn<Object>(new Model<String>("Content Package"), "title", "title"));
 
-			final Label alertLabel = new Label( "alert", new ResourceModel( "verify.remove" ) );
-			final CancelButton btnCancel = new CancelButton( "btnCancel", PackageListPage.class );
-			IndicatingAjaxButton btnSubmit = new IndicatingAjaxButton( "btnSubmit", this )
-			{
-				private static final long serialVersionUID = 1L;
-				
-				@Override
-				protected IAjaxCallDecorator getAjaxCallDecorator()
-				{
-					return new AjaxPostprocessingCallDecorator( super.getAjaxCallDecorator() )
-					{
-						private static final long serialVersionUID = 1L;
-						
-						@Override
-						public CharSequence postDecorateScript( CharSequence script )
-						{
-							// Disable the submit and cancel buttons on click
-							return script + "this.disabled = true; document.getElementsByName( \"btnCancel\" )[0].disabled = true;";
-						}
-					};
-				}
-				
-				@Override
-				protected void onSubmit( AjaxRequestTarget target, Form<?> form )
-				{
-					try
-					{
-						contentService.removeContentPackage( contentPackageId );
+            DataTable<ContentPackage> removeTable = new DataTable<ContentPackage>("removeTable", columns.toArray(new IColumn[columns.size()]), new ListDataProvider<ContentPackage>(list), 3);
 
-						ContentPackage contentPackage = contentService.getContentPackage( contentPackageId );
-						GradebookSetup gradebookSetup = getAssessmentSetup( contentPackage );
-						String context = getContext();
-						if( gradebookSetup.isGradebookDefined() )
-						{
-							for( AssessmentSetup assessmentSetup : gradebookSetup.getAssessments() )
-							{
-								String assessmentExternalID = getAssessmentExternalId( gradebookSetup, assessmentSetup );
-								boolean on = assessmentSetup.issynchronizeSCOWithGradebook();
-								boolean has = gradebookExternalAssessmentService.isExternalAssignmentDefined( context, assessmentExternalID );
-								if( has && on )
-								{
-									gradebookExternalAssessmentService.removeExternalAssessment( context, assessmentExternalID );
-								}
-							}
-						}
+            final Label alertLabel = new Label("alert", new ResourceModel("verify.remove"));
+            final CancelButton btnCancel = new CancelButton("btnCancel", PackageListPage.class);
+            IndicatingAjaxButton btnSubmit = new IndicatingAjaxButton( "btnSubmit", this ) {
+                private static final long serialVersionUID = 1L;
 
-						setResponsePage( PackageListPage.class );
-					}
-					catch( ResourceNotDeletedException rnde )
-					{
-						LOG.warn( "Failed to delete all underlying resources ", rnde );
-						alertLabel.setDefaultModel( new ResourceModel( "exception.remove" ) );
-						target.addComponent( alertLabel );
-						setResponsePage( ArticulateTCPackageRemovePage.class, params );
-					}
-				}
-			};
+                @Override
+                protected IAjaxCallDecorator getAjaxCallDecorator() {
+                    return new AjaxPostprocessingCallDecorator(super.getAjaxCallDecorator()) {
+                        private static final long serialVersionUID = 1L;
 
-			add( alertLabel );
-			add( removeTable );
-			add( btnCancel );
-			add( btnSubmit );
-		}
+                        @Override
+                        public CharSequence postDecorateScript(CharSequence script) {
+                            // Disable the submit and cancel buttons on click
+                            return script + "this.disabled = true; document.getElementsByName( \"btnCancel\" )[0].disabled = true;";
+                        }
+                    };
+                }
 
-		private GradebookSetup getAssessmentSetup( ContentPackage contentPackage )
-		{
-			String context = getContext();
-			final GradebookSetup gradebookSetup = new GradebookSetup();
-			boolean isGradebookDefined = gradebookExternalAssessmentService.isGradebookDefined( context );
-			gradebookSetup.setGradebookDefined( isGradebookDefined );
-			gradebookSetup.setContentPackage( contentPackage );
-			if( isGradebookDefined )
-			{
-				ContentPackageManifest contentPackageManifest = contentPackageManifestDao.load( contentPackage.getManifestId() );
-				gradebookSetup.setContentPackageManifest( contentPackageManifest );
-				List<AssessmentSetup> assessments = gradebookSetup.getAssessments();
-				for( AssessmentSetup as : assessments )
-				{
-					String assessmentExternalId = getAssessmentExternalId( gradebookSetup, as );
-					boolean has = gradebookExternalAssessmentService.isExternalAssignmentDefined( context, assessmentExternalId );
-					as.setsynchronizeSCOWithGradebook( has );
-				}
-			}
+                @Override
+                protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+                    try {
+                        contentService.removeContentPackage(contentPackageId);
+                        ContentPackage contentPackage = contentService.getContentPackage(contentPackageId);
 
-			return gradebookSetup;
-		}
+                        // remove the gradebook items
+                        if (gradebookService.isGradebookDefined(contentPackage.getResourceId())) {
+                            Long assignmentId = articulateTCContentPackageSettings.getGradebookItemId();
+                            if (assignmentId != null) {
+                                gradebookService.removeAssignment(assignmentId);
+                            }
+                        }
 
-		private String getContext()
-		{
-			Placement placement = toolManager.getCurrentPlacement();
-			return placement.getContext();
-		}
+                        // remove the resource files
+                        ContentResourceEdit resourceEdit = articulateTCContentEntityUtils.addOrEditResource(contentPackage.getUrl());
+                        ContentCollection collection = resourceEdit.getContainingCollection();
+                        contentHostingService.cancelResource(resourceEdit);
+                        ContentCollectionEdit collectionEdit = articulateTCContentEntityUtils.addOrEditCollection(collection.getId());
+                        contentHostingService.removeCollection(collectionEdit);
 
-		private String getAssessmentExternalId(final GradebookSetup gradebook, AssessmentSetup assessment) {
-			String assessmentExternalId = "" + gradebook.getContentPackageId() + ":" + assessment.getLaunchData().getItemIdentifier();
-			return assessmentExternalId;
-		}
-	}
+                        setResponsePage(PackageListPage.class);
+                    } catch(Exception e) {
+                        LOG.warn("Failed to delete all underlying resources for content package ID: " + contentPackageId, e);
+                        alertLabel.setDefaultModel(new ResourceModel("exception.remove"));
+                        target.addComponent(alertLabel);
+
+                        setResponsePage(ArticulateTCPackageRemovePage.class, params);
+                    }
+                }
+            };
+
+            add(alertLabel);
+            add(removeTable);
+            add(btnCancel);
+            add(btnSubmit);
+        }
+    }
+
 }
