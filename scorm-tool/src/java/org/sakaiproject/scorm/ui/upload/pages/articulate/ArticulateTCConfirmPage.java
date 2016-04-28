@@ -17,7 +17,7 @@
  * limitations under the License.
  * #L%
  */
-package org.sakaiproject.scorm.ui.upload.pages;
+package org.sakaiproject.scorm.ui.upload.pages.articulate;
 
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.basic.Label;

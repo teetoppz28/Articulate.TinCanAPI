@@ -32,8 +32,6 @@ import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulato
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.image.Image;
-import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.link.PopupSettings;
 import org.apache.wicket.markup.repeater.Item;
@@ -50,8 +48,10 @@ import org.sakaiproject.scorm.model.api.ContentPackage;
 import org.sakaiproject.scorm.service.api.LearningManagementSystem;
 import org.sakaiproject.scorm.service.api.ScormContentService;
 import org.sakaiproject.scorm.ui.console.components.DecoratedDatePropertyColumn;
+import org.sakaiproject.scorm.ui.console.pages.articulate.ArticulateTCPackageConfigurationPage;
+import org.sakaiproject.scorm.ui.console.pages.articulate.ArticulateTCPackageRemovePage;
 import org.sakaiproject.scorm.ui.player.pages.PlayerPage;
-import org.sakaiproject.scorm.ui.player.pages.ArticulateTCPlayerPage;
+import org.sakaiproject.scorm.ui.player.pages.articulate.ArticulateTCPlayerPage;
 import org.sakaiproject.scorm.ui.reporting.pages.LearnerResultsPage;
 import org.sakaiproject.scorm.ui.reporting.pages.ResultsListPage;
 import org.sakaiproject.wicket.markup.html.link.BookmarkablePageLabeledLink;
@@ -70,8 +70,6 @@ public class PackageListPage extends ConsoleBasePage implements ScormConstants {
 
 	private static final ResourceReference PAGE_ICON = new ResourceReference(PackageListPage.class, "res/table.png");
 	private static final ResourceReference DELETE_ICON = new ResourceReference(PackageListPage.class, "res/delete.png");
-
-    private boolean isArticulate;
 
     @SpringBean(name="articulateTCContentPackageSettingsDao")
     private ArticulateTCContentPackageSettingsDao articulateTCContentPackageSettingsDao;
@@ -106,12 +104,11 @@ public class PackageListPage extends ConsoleBasePage implements ScormConstants {
 			@Override
 			public Component newLink(String id, Object bean) {
                 ContentPackage contentPackage = (ContentPackage) bean;
-                isArticulate = articulateTCContentPackageSettingsDao.isArticulateContentPackage(contentPackage.getContentPackageId());
+                boolean isArticulate = articulateTCContentPackageSettingsDao.isArticulateContentPackage(contentPackage.getContentPackageId());
                 pageClass = (isArticulate) ? ArticulateTCPlayerPage.class : PlayerPage.class;
 
                 if (lms.canLaunchNewWindow()) {
-                    String windowName = (isArticulate) ? "ArticulateTinCanAPIPlayer" : "ScormPlayer";
-                    setPopupWindowName(windowName);
+                    setPopupWindowName("ScormPlayer");
                 }
 
 				IModel<String> labelModel;
@@ -151,7 +148,7 @@ public class PackageListPage extends ConsoleBasePage implements ScormConstants {
                     @Override
                     public Component newLink(String id, Object bean) {
                         ContentPackage contentPackage = (ContentPackage) bean;
-                        isArticulate = articulateTCContentPackageSettingsDao.isArticulateContentPackage(contentPackage.getContentPackageId());
+                        boolean isArticulate = articulateTCContentPackageSettingsDao.isArticulateContentPackage(contentPackage.getContentPackageId());
                         pageClass = (isArticulate) ? ArticulateTCPackageConfigurationPage.class : PackageConfigurationPage.class;
                         PageParameters params = buildPageParameters(paramPropertyExpressions, bean);
                         Link link = new BookmarkablePageLabeledLink(id, new ResourceModel("column.action.edit.label"), pageClass, params);
@@ -162,31 +159,12 @@ public class PackageListPage extends ConsoleBasePage implements ScormConstants {
             );
         }
 
-        Action resultsAction = new Action(new ResourceModel("column.action.grade.label"), paramPropertyExpressions) {
-            private static final long serialVersionUID = 1L;
-            @Override
-            public Component newLink(String id, Object bean) {
-                ContentPackage contentPackage = (ContentPackage) bean;
-                isArticulate = articulateTCContentPackageSettingsDao.isArticulateContentPackage(contentPackage.getContentPackageId());
-
-                if (canGrade) {
-                    pageClass = ResultsListPage.class;
-                } else if (canViewResults) {
-                    pageClass = LearnerResultsPage.class;
-                } else {
-                    pageClass = getClass();
-                }
-
-                PageParameters params = buildPageParameters(paramPropertyExpressions, bean);
-                Link link = new BookmarkablePageLabeledLink(id, new ResourceModel("column.action.grade.label"), pageClass, params);
-                link.setVisibilityAllowed(!isArticulate);
-                link.setVisible(!isArticulate);
-
-                return link;
-            }
-        };
-
-        actionColumn.addAction(resultsAction);
+        if (canGrade) {
+            actionColumn.addAction(new Action(new StringResourceModel("column.action.grade.label", this, null), ResultsListPage.class, paramPropertyExpressions));
+        }
+        else if (canViewResults) {
+            actionColumn.addAction(new Action(new StringResourceModel("column.action.grade.label", this, null), LearnerResultsPage.class, paramPropertyExpressions));
+        }
 
 		columns.add(actionColumn);
 

@@ -17,7 +17,7 @@
  * limitations under the License.
  * #L%
  */
-package org.sakaiproject.scorm.ui.upload.pages;
+package org.sakaiproject.scorm.ui.upload.pages.articulate;
 
 import java.util.Arrays;
 

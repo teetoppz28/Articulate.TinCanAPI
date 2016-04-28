@@ -17,7 +17,7 @@
  * limitations under the License.
  * #L%
  */
-package org.sakaiproject.scorm.ui.console.pages;
+package org.sakaiproject.scorm.ui.console.pages.articulate;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -41,6 +41,8 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCDeleteService;
 import org.sakaiproject.scorm.model.api.ContentPackage;
 import org.sakaiproject.scorm.service.api.ScormContentService;
+import org.sakaiproject.scorm.ui.console.pages.ConsoleBasePage;
+import org.sakaiproject.scorm.ui.console.pages.PackageListPage;
 import org.sakaiproject.wicket.markup.html.form.CancelButton;
 
 public class ArticulateTCPackageRemovePage extends ConsoleBasePage {
