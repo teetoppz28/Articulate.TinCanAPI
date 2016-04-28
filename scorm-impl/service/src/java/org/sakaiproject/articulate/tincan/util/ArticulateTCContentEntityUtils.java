@@ -1,11 +1,17 @@
 package org.sakaiproject.articulate.tincan.util;
 
+import java.util.Iterator;
+import java.util.List;
+
 import lombok.Setter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.sakaiproject.content.api.ContentCollection;
 import org.sakaiproject.content.api.ContentCollectionEdit;
+import org.sakaiproject.content.api.ContentEntity;
 import org.sakaiproject.content.api.ContentHostingService;
+import org.sakaiproject.content.api.ContentResource;
 import org.sakaiproject.content.api.ContentResourceEdit;
 import org.sakaiproject.entity.api.Edit;
 import org.sakaiproject.entity.api.ResourcePropertiesEdit;

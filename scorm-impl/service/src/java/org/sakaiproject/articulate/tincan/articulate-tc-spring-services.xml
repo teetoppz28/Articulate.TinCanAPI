@@ -31,7 +31,6 @@
         <property name="contentHostingService" ref="org.sakaiproject.content.api.ContentHostingService" />
         <lookup-method name="contentPackageDao" bean="org.sakaiproject.scorm.dao.api.ContentPackageDao" />
         <property name="developerHelperService" ref="org.sakaiproject.entitybroker.DeveloperHelperService" />
-        <lookup-method name="resourceService" bean="org.sakaiproject.scorm.service.api.ScormResourceService" />
     </bean>
 
     <bean id="articulateTCContentEntityUtils" class="org.sakaiproject.articulate.tincan.util.ArticulateTCContentEntityUtils">
@@ -40,6 +39,17 @@
 
     <bean id="articulateTCDocumentUtils" class="org.sakaiproject.articulate.tincan.util.ArticulateTCDocumentUtils">
         <property name="contentHostingService" ref="org.sakaiproject.content.api.ContentHostingService" />
+    </bean>
+
+    <!-- Package deletion -->
+
+    <bean id="articulateTCDeleteService" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCDeleteServiceImpl">
+        <property name="articulateTCContentEntityUtils" ref="articulateTCContentEntityUtils" />
+        <property name="articulateTCContentPackageSettingsDao" ref="articulateTCContentPackageSettingsDao" />
+        <property name="contentHostingService" ref="org.sakaiproject.content.api.ContentHostingService" />
+        <lookup-method name="contentPackageDao" bean="org.sakaiproject.scorm.dao.api.ContentPackageDao" />
+        <property name="developerHelperService" ref="org.sakaiproject.entitybroker.DeveloperHelperService" />
+        <property name="gradebookService" ref="org.sakaiproject.service.gradebook.GradebookService" />
     </bean>
 
     <!--  Launch service -->

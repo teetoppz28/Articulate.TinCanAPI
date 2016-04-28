@@ -23,7 +23,6 @@ import org.sakaiproject.entity.api.Entity;
 import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.scorm.dao.api.ContentPackageDao;
-import org.sakaiproject.scorm.service.api.ScormResourceService;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -49,7 +48,6 @@ public abstract class ArticulateTCImporterImpl implements ArticulateTCImporter, 
     private DeveloperHelperService developerHelperService;
 
     protected abstract ContentPackageDao contentPackageDao();
-    protected abstract ScormResourceService resourceService();
 
     private String packageName;
     private String zipFileId;
@@ -248,11 +246,11 @@ public abstract class ArticulateTCImporterImpl implements ArticulateTCImporter, 
             }
 
             contentHostingService.commitCollection(contentCollectionEdit);
-
-            developerHelperService.restoreCurrentUser();
         } catch (Exception e) {
             log.error("Error occurred processing the directory.", e);
             return false;
+        } finally {
+            developerHelperService.restoreCurrentUser();
         }
 
         return true;

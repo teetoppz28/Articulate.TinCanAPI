@@ -31,11 +31,11 @@ public class ImageLinkColumn extends AbstractColumn {
 
 	private static final long serialVersionUID = 1L;
 
-	private Class<?> pageClass;
-	private String[] paramPropertyExpressions;
-	private ResourceReference iconReference;
-	private String popupWindowName;
-	private String iconProperty = null;
+    protected Class<?> pageClass;
+    protected String[] paramPropertyExpressions;
+    protected ResourceReference iconReference;
+    protected String popupWindowName;
+    protected String iconProperty = null;
 
 	public ImageLinkColumn(IModel displayModel, Class<?> pageClass, String[] paramPropertyExpressions,
 				ResourceReference iconReference, String sortProperty) {
@@ -74,7 +74,7 @@ public class ImageLinkColumn extends AbstractColumn {
 		return iconReference;
 	}
 
-	private PageParameters buildPageParameters(String[] propertyExpressions, Object object) {
+	protected PageParameters buildPageParameters(String[] propertyExpressions, Object object) {
 		PageParameters params = new PageParameters();
 
 		if (propertyExpressions != null) {
