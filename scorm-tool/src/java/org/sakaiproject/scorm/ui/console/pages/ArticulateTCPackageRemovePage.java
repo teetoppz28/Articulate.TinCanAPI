@@ -96,19 +96,19 @@ public class ArticulateTCPackageRemovePage extends ConsoleBasePage {
 
                 @Override
                 protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
-                    try {
-                        // remove gradebook assignment
-                        articulateTCDeleteService.deleteGradebookItem(contentPackageId);
+                    // remove gradebook assignment
+                    boolean gbSuccess = articulateTCDeleteService.deleteGradebookItem(contentPackageId);
 
-                        // remove the resource files
-                        articulateTCDeleteService.deleteResourceFiles(contentPackageId);
+                    // remove the resource files
+                    boolean resourceSucess = articulateTCDeleteService.deleteResourceFiles(contentPackageId);
 
-                        // remove content package
-                        articulateTCDeleteService.deleteContentPackage(contentPackageId);
+                    // remove content package
+                    boolean cpSuccess = articulateTCDeleteService.deleteContentPackage(contentPackageId);
 
-                        setResponsePage(PackageListPage.class);
-                    } catch(Exception e) {
-                        LOG.warn("Failed to delete all underlying resources for content package ID: " + contentPackageId, e);
+                    setResponsePage(PackageListPage.class);
+
+                    if (!gbSuccess || !resourceSucess || !cpSuccess) {
+                        LOG.warn("Failed to delete all underlying resources for content package ID: " + contentPackageId);
                         alertLabel.setDefaultModel(new ResourceModel("exception.remove"));
                         alertLabel.setOutputMarkupId(true);
                         target.addComponent(alertLabel);

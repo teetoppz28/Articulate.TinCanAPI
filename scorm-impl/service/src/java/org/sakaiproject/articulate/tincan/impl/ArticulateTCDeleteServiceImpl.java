@@ -1,8 +1,5 @@
 package org.sakaiproject.articulate.tincan.impl;
 
-import java.util.Iterator;
-import java.util.List;
-
 import lombok.Setter;
 
 import org.apache.commons.lang.StringUtils;
@@ -14,10 +11,7 @@ import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageSett
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackageSettings;
 import org.sakaiproject.articulate.tincan.util.ArticulateTCContentEntityUtils;
 import org.sakaiproject.content.api.ContentCollection;
-import org.sakaiproject.content.api.ContentCollectionEdit;
-import org.sakaiproject.content.api.ContentEntity;
 import org.sakaiproject.content.api.ContentHostingService;
-import org.sakaiproject.content.api.ContentResource;
 import org.sakaiproject.content.api.ContentResourceEdit;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.scorm.dao.api.ContentPackageDao;
@@ -47,14 +41,14 @@ public abstract class ArticulateTCDeleteServiceImpl implements ArticulateTCDelet
 
     @Override
     public boolean deleteContentPackage(Long contentPackageId) {
-        ContentPackage contentPackage = retrieveContentPackage(contentPackageId);
-
-        if (contentPackage == null) {
-            // no content package, skip deletion
-            return true;
-        }
-
         try {
+            ContentPackage contentPackage = retrieveContentPackage(contentPackageId);
+
+            if (contentPackage == null) {
+                // no content package, skip deletion
+                return true;
+            }
+
             contentPackageDao().remove(contentPackage);
         } catch (Exception e) {
             log.error("Error deleting content package with ID: " + contentPackageId, e);
@@ -70,22 +64,24 @@ public abstract class ArticulateTCDeleteServiceImpl implements ArticulateTCDelet
             throw new IllegalArgumentException("Content package ID cannot be null");
         }
 
-        ArticulateTCContentPackageSettings articulateTCContentPackageSettings = articulateTCContentPackageSettingsDao.findOneByPackageId(contentPackageId);
-
-        if (articulateTCContentPackageSettings == null) {
-            // no package settings data found, skip deletion
-            log.debug("No content package settings found for ID: " + contentPackageId);
-            return true;
-        }
-
-        Long assignmentId = articulateTCContentPackageSettings.getGradebookItemId();
-
-        if (assignmentId == null) {
-            // no assignment exists, skip deletion
-            return true;
-        }
+        Long assignmentId = null;
 
         try {
+            ArticulateTCContentPackageSettings articulateTCContentPackageSettings = articulateTCContentPackageSettingsDao.findOneByPackageId(contentPackageId);
+
+            if (articulateTCContentPackageSettings == null) {
+                // no package settings data found, skip deletion
+                log.debug("No content package settings found for ID: " + contentPackageId);
+                return true;
+            }
+
+            assignmentId = articulateTCContentPackageSettings.getGradebookItemId();
+
+            if (assignmentId == null) {
+                // no assignment exists, skip deletion
+                return true;
+            }
+
             gradebookService.removeAssignment(assignmentId);
         } catch (Exception e) {
             log.error("Error deleting assignment with ID: " + assignmentId, e);
@@ -106,7 +102,6 @@ public abstract class ArticulateTCDeleteServiceImpl implements ArticulateTCDelet
             developerHelperService.setCurrentUser(DeveloperHelperService.ADMIN_USER_REF);
 
             String resourcePath = StringUtils.removeStart(contentPackage.getUrl(), ARCHIVE_DEFAULT_URL_PATH_PREFIX);
-
             ContentResourceEdit resourceEdit = articulateTCContentEntityUtils.editResource(resourcePath);
 
             if (resourceEdit == null) {
@@ -136,7 +131,7 @@ public abstract class ArticulateTCDeleteServiceImpl implements ArticulateTCDelet
      * Retrieves the content package object with the given ID
      * 
      * @param contentPackageId
-     * @return
+     * @return the {@link ContentPackage} with the given ID or null if one doesn't exist
      */
     private ContentPackage retrieveContentPackage(Long contentPackageId) {
         if (contentPackageId == null) {
