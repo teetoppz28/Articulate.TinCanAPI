@@ -10,13 +10,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCLaunchService;
+import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCAttemptDao;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCAttemptResultDao;
+import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
+import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttempt;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttemptResult;
+import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
 import org.sakaiproject.entitybroker.EntityView;
-import org.sakaiproject.scorm.dao.api.AttemptDao;
-import org.sakaiproject.scorm.dao.api.ContentPackageDao;
-import org.sakaiproject.scorm.model.api.Attempt;
-import org.sakaiproject.scorm.model.api.ContentPackage;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserDirectoryService;
 
@@ -25,13 +25,16 @@ public abstract class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunc
     private Log log = LogFactory.getLog(ArticulateTCLaunchServiceImpl.class);
 
     @Setter
+    private ArticulateTCAttemptDao articulateTCAttemptDao;
+
+    @Setter
     private ArticulateTCAttemptResultDao articulateTCAttemptResultDao;
 
     @Setter
-    private UserDirectoryService userDirectoryService;
+    private ArticulateTCContentPackageDao articulateTCContentPackageDao;
 
-    protected abstract AttemptDao attemptDao();
-    protected abstract ContentPackageDao contentPackageDao();
+    @Setter
+    private UserDirectoryService userDirectoryService;
 
     @Override
     public String calculateLaunchParams(String packageId) {
@@ -80,19 +83,19 @@ public abstract class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunc
     @Override
     public void addAttempt(String packageId) {
         Long contentPackageId = Long.parseLong(packageId);
-        ContentPackage contentPackage = contentPackageDao().load(contentPackageId);
+        ArticulateTCContentPackage articulateTCContentPackage = articulateTCContentPackageDao.load(contentPackageId);
 
-        if (contentPackage == null) {
+        if (articulateTCContentPackage == null) {
             throw new IllegalArgumentException("Error:: no content package found with ID: " + packageId);
         }
 
-        String siteId = contentPackage.getContext();
+        String siteId = articulateTCContentPackage.getContext();
         User user = userDirectoryService.getCurrentUser();
         String userId = user.getId();
         String displayName = user.getDisplayName();
-        Attempt latestAttempt = attemptDao().lookupNewest(contentPackageId, userId);
+        ArticulateTCAttempt latestAttempt = articulateTCAttemptDao.lookupNewest(contentPackageId, userId);
 
-        Attempt newAttempt = new Attempt();
+        ArticulateTCAttempt newAttempt = new ArticulateTCAttempt();
         newAttempt.setContentPackageId(contentPackageId);
         newAttempt.setCourseId(siteId);
         newAttempt.setLearnerId(userId);
@@ -100,7 +103,7 @@ public abstract class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunc
         newAttempt.setBeginDate(new Date());
         newAttempt.setAttemptNumber(latestAttempt == null ? 1 :latestAttempt.getAttemptNumber() + 1);
 
-        attemptDao().save(newAttempt);
+        articulateTCAttemptDao.save(newAttempt);
 
         addAttemptResult(newAttempt.getId());
     }

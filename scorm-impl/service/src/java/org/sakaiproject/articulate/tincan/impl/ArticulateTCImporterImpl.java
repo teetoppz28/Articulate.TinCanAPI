@@ -10,10 +10,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCImporter;
-import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageSettingsDao;
+import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
-import org.sakaiproject.articulate.tincan.model.ArticulateTCContentPackage;
 import org.sakaiproject.articulate.tincan.model.ArticulateTCMeta;
+import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
 import org.sakaiproject.articulate.tincan.util.ArticulateTCContentEntityUtils;
 import org.sakaiproject.articulate.tincan.util.ArticulateTCDocumentUtils;
 import org.sakaiproject.content.api.ContentCollectionEdit;
@@ -22,7 +22,6 @@ import org.sakaiproject.content.api.ContentResourceEdit;
 import org.sakaiproject.entity.api.Entity;
 import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
-import org.sakaiproject.scorm.dao.api.ContentPackageDao;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -36,7 +35,7 @@ public abstract class ArticulateTCImporterImpl implements ArticulateTCImporter, 
     private ArticulateTCContentEntityUtils articulateTCContentEntityUtils;
 
     @Setter
-    private ArticulateTCContentPackageSettingsDao articulateTCContentPackageSettingsDao;
+    private ArticulateTCContentPackageDao articulateTCContentPackageDao;
 
     @Setter
     private ArticulateTCDocumentUtils articulateTCDocumentUtils;
@@ -46,8 +45,6 @@ public abstract class ArticulateTCImporterImpl implements ArticulateTCImporter, 
 
     @Setter
     private DeveloperHelperService developerHelperService;
-
-    protected abstract ContentPackageDao contentPackageDao();
 
     private String packageName;
     private String zipFileId;
@@ -145,16 +142,10 @@ public abstract class ArticulateTCImporterImpl implements ArticulateTCImporter, 
         }
 
         // set the title
-        articulateTCContentPackage.getContentPackage().setTitle(getDuplicateTitle());
+        articulateTCContentPackage.setTitle(getDuplicateTitle());
 
         // save the content package to the database
-        contentPackageDao().save(articulateTCContentPackage.getContentPackage());
-
-        // synchronize any content package and articulate package settings
-        articulateTCContentPackage.synchronizePackageSettings();
-
-        // save the Articulate package settings to the database
-        articulateTCContentPackageSettingsDao.save(articulateTCContentPackage.getArticulateTCContentPackageSettings());
+        articulateTCContentPackageDao.save(articulateTCContentPackage);
 
         return true;
     }
@@ -338,8 +329,8 @@ public abstract class ArticulateTCImporterImpl implements ArticulateTCImporter, 
      * @return the name of the package with any necessary suffix
      */
     private String getDuplicateTitle() {
-        String title = articulateTCContentPackage.getContentPackage().getTitle();
-        int count = contentPackageDao().countContentPackages(getCurrentContext(), title);
+        String title = articulateTCContentPackage.getTitle();
+        int count = articulateTCContentPackageDao.countContentPackages(getCurrentContext(), title);
 
         // count return from method is 1, even if there are no rows with this title in the site
         if (count > 1) {

@@ -195,12 +195,12 @@ public class PackageConfigurationPage extends ConsoleBasePage {
 	}
 
 	private static final long serialVersionUID = 1L;
-	private static ResourceReference PAGE_ICON = new ResourceReference(PackageConfigurationPage.class, "res/table_edit.png");
+	protected static ResourceReference PAGE_ICON = new ResourceReference(PackageConfigurationPage.class, "res/table_edit.png");
 	@SpringBean
-	LearningManagementSystem lms;
+	protected LearningManagementSystem lms;
 
 	@SpringBean(name="org.sakaiproject.scorm.service.api.ScormContentService")
-	ScormContentService contentService;
+	protected ScormContentService contentService;
 
 	@SpringBean(name = "org.sakaiproject.service.gradebook.GradebookExternalAssessmentService")
 	GradebookExternalAssessmentService gradebookExternalAssessmentService;
@@ -208,7 +208,7 @@ public class PackageConfigurationPage extends ConsoleBasePage {
 	@SpringBean(name = "org.sakaiproject.scorm.dao.api.ContentPackageManifestDao")
 	ContentPackageManifestDao contentPackageManifestDao;
 
-	private String unlimitedMessage;
+	protected String unlimitedMessage;
 
 	public PackageConfigurationPage(PageParameters params) {
 		super(params);

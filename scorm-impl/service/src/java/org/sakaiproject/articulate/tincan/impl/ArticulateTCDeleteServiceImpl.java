@@ -7,18 +7,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCDeleteService;
-import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageSettingsDao;
-import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackageSettings;
+import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
+import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
 import org.sakaiproject.articulate.tincan.util.ArticulateTCContentEntityUtils;
 import org.sakaiproject.content.api.ContentCollection;
 import org.sakaiproject.content.api.ContentHostingService;
 import org.sakaiproject.content.api.ContentResourceEdit;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
-import org.sakaiproject.scorm.dao.api.ContentPackageDao;
-import org.sakaiproject.scorm.model.api.ContentPackage;
 import org.sakaiproject.service.gradebook.shared.GradebookService;
 
-public abstract class ArticulateTCDeleteServiceImpl implements ArticulateTCDeleteService, ArticulateTCConstants {
+public class ArticulateTCDeleteServiceImpl implements ArticulateTCDeleteService, ArticulateTCConstants {
 
     private Log log = LogFactory.getLog(ArticulateTCDeleteServiceImpl.class);
 
@@ -26,7 +24,7 @@ public abstract class ArticulateTCDeleteServiceImpl implements ArticulateTCDelet
     private ArticulateTCContentEntityUtils articulateTCContentEntityUtils;
 
     @Setter
-    private ArticulateTCContentPackageSettingsDao articulateTCContentPackageSettingsDao;
+    private ArticulateTCContentPackageDao articulateTCContentPackageDao;
 
     @Setter
     private ContentHostingService contentHostingService;
@@ -37,19 +35,17 @@ public abstract class ArticulateTCDeleteServiceImpl implements ArticulateTCDelet
     @Setter
     private GradebookService gradebookService;
 
-    protected abstract ContentPackageDao contentPackageDao();
-
     @Override
     public boolean deleteContentPackage(Long contentPackageId) {
         try {
-            ContentPackage contentPackage = retrieveContentPackage(contentPackageId);
+            ArticulateTCContentPackage articulateTCContentPackage = retrieveContentPackage(contentPackageId);
 
-            if (contentPackage == null) {
+            if (articulateTCContentPackage == null) {
                 // no content package, skip deletion
                 return true;
             }
 
-            contentPackageDao().remove(contentPackage);
+            articulateTCContentPackageDao.remove(articulateTCContentPackage);
         } catch (Exception e) {
             log.error("Error deleting content package with ID: " + contentPackageId, e);
             return false;
@@ -67,15 +63,15 @@ public abstract class ArticulateTCDeleteServiceImpl implements ArticulateTCDelet
         Long assignmentId = null;
 
         try {
-            ArticulateTCContentPackageSettings articulateTCContentPackageSettings = articulateTCContentPackageSettingsDao.findOneByPackageId(contentPackageId);
+            ArticulateTCContentPackage articulateTCContentPackage = articulateTCContentPackageDao.load(contentPackageId);
 
-            if (articulateTCContentPackageSettings == null) {
+            if (articulateTCContentPackage == null) {
                 // no package settings data found, skip deletion
                 log.debug("No content package settings found for ID: " + contentPackageId);
                 return true;
             }
 
-            assignmentId = articulateTCContentPackageSettings.getGradebookItemId();
+            assignmentId = articulateTCContentPackage.getAssignmentId();
 
             if (assignmentId == null) {
                 // no assignment exists, skip deletion
@@ -91,9 +87,9 @@ public abstract class ArticulateTCDeleteServiceImpl implements ArticulateTCDelet
 
     @Override
     public boolean deleteResourceFiles(Long contentPackageId) {
-        ContentPackage contentPackage = retrieveContentPackage(contentPackageId);
+        ArticulateTCContentPackage articulateTCContentPackage = retrieveContentPackage(contentPackageId);
 
-        if (contentPackage == null) {
+        if (articulateTCContentPackage == null) {
             // no content package, skip deletion
             return true;
         }
@@ -101,7 +97,7 @@ public abstract class ArticulateTCDeleteServiceImpl implements ArticulateTCDelet
         try {
             developerHelperService.setCurrentUser(DeveloperHelperService.ADMIN_USER_REF);
 
-            String resourcePath = StringUtils.removeStart(contentPackage.getUrl(), ARCHIVE_DEFAULT_URL_PATH_PREFIX);
+            String resourcePath = StringUtils.removeStart(articulateTCContentPackage.getUrl(), ARCHIVE_DEFAULT_URL_PATH_PREFIX);
             ContentResourceEdit resourceEdit = articulateTCContentEntityUtils.editResource(resourcePath);
 
             if (resourceEdit == null) {
@@ -131,21 +127,21 @@ public abstract class ArticulateTCDeleteServiceImpl implements ArticulateTCDelet
      * Retrieves the content package object with the given ID
      * 
      * @param contentPackageId
-     * @return the {@link ContentPackage} with the given ID or null if one doesn't exist
+     * @return the {@link ArticulateTCContentPackage} with the given ID or null if one doesn't exist
      */
-    private ContentPackage retrieveContentPackage(Long contentPackageId) {
+    private ArticulateTCContentPackage retrieveContentPackage(Long contentPackageId) {
         if (contentPackageId == null) {
             throw new IllegalArgumentException("Content package ID cannot be null");
         }
 
-        ContentPackage contentPackage = contentPackageDao().load(contentPackageId);
+        ArticulateTCContentPackage articulateTCContentPackage = articulateTCContentPackageDao.load(contentPackageId);
 
-        if (contentPackage == null) {
+        if (articulateTCContentPackage == null) {
             // no content package with the given ID
             log.debug("No content package found for ID: " + contentPackageId);
         }
 
-        return contentPackage;
+        return articulateTCContentPackage;
     }
 
 }

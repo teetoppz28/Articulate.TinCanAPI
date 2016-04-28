@@ -26,10 +26,9 @@
 
     <bean id="articulateTCImporter" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCImporterImpl">
         <property name="articulateTCContentEntityUtils" ref="articulateTCContentEntityUtils" />
-        <property name="articulateTCContentPackageSettingsDao" ref="articulateTCContentPackageSettingsDao" />
+        <property name="articulateTCContentPackageDao" ref="articulateTCContentPackageDao" />
         <property name="articulateTCDocumentUtils" ref="articulateTCDocumentUtils" />
         <property name="contentHostingService" ref="org.sakaiproject.content.api.ContentHostingService" />
-        <lookup-method name="contentPackageDao" bean="org.sakaiproject.scorm.dao.api.ContentPackageDao" />
         <property name="developerHelperService" ref="org.sakaiproject.entitybroker.DeveloperHelperService" />
     </bean>
 
@@ -45,9 +44,8 @@
 
     <bean id="articulateTCDeleteService" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCDeleteServiceImpl">
         <property name="articulateTCContentEntityUtils" ref="articulateTCContentEntityUtils" />
-        <property name="articulateTCContentPackageSettingsDao" ref="articulateTCContentPackageSettingsDao" />
+        <property name="articulateTCContentPackageDao" ref="articulateTCContentPackageDao" />
         <property name="contentHostingService" ref="org.sakaiproject.content.api.ContentHostingService" />
-        <lookup-method name="contentPackageDao" bean="org.sakaiproject.scorm.dao.api.ContentPackageDao" />
         <property name="developerHelperService" ref="org.sakaiproject.entitybroker.DeveloperHelperService" />
         <property name="gradebookService" ref="org.sakaiproject.service.gradebook.GradebookService" />
     </bean>
@@ -55,9 +53,9 @@
     <!--  Launch service -->
 
     <bean id="articulateTCLaunchService" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCLaunchServiceImpl">
+        <property name="articulateTCAttemptDao" ref="articulateTCAttemptDao" />
         <property name="articulateTCAttemptResultDao" ref="articulateTCAttemptResultDao" />
-        <lookup-method name="attemptDao" bean="org.sakaiproject.scorm.dao.api.AttemptDao" />
-        <lookup-method name="contentPackageDao" bean="org.sakaiproject.scorm.dao.api.ContentPackageDao" />
+        <property name="articulateTCContentPackageDao" ref="articulateTCContentPackageDao" />
         <property name="userDirectoryService" ref="org.sakaiproject.user.api.UserDirectoryService" />
     </bean>
 
@@ -69,16 +67,15 @@
 
     <bean id="articulateTCEntityProviderService" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCEntityProviderServiceImpl" init-method="init">
         <property name="articulateTCActivityStateDao" ref="articulateTCActivityStateDao" />
+        <property name="articulateTCAttemptDao" ref="articulateTCAttemptDao" />
         <property name="articulateTCAttemptResultDao" ref="articulateTCAttemptResultDao" />
-        <property name="articulateTCContentPackageSettingsDao" ref="articulateTCContentPackageSettingsDao" />
+        <property name="articulateTCContentPackageDao" ref="articulateTCContentPackageDao" />
         <property name="articulateTCEntityProviderServiceUtils" ref="articulateTCEntityProviderServiceUtils" />
-        <lookup-method name="attemptDao" bean="org.sakaiproject.scorm.dao.api.AttemptDao" />
-        <lookup-method name="contentPackageDao" bean="org.sakaiproject.scorm.dao.api.ContentPackageDao" />
         <property name="developerHelperService" ref="org.sakaiproject.entitybroker.DeveloperHelperService" />
     </bean>
 
     <bean id="articulateTCEntityProviderServiceUtils" class="org.sakaiproject.articulate.tincan.util.ArticulateTCEntityProviderServiceUtils">
-        <lookup-method name="contentPackageDao" bean="org.sakaiproject.scorm.dao.api.ContentPackageDao" />
+        <property name="articulateTCContentPackageDao" ref="articulateTCContentPackageDao" />
         <property name="developerHelperService" ref="org.sakaiproject.entitybroker.DeveloperHelperService" />
     </bean>
 

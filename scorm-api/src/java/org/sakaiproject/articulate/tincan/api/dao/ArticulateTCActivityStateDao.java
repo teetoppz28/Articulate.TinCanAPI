@@ -12,7 +12,7 @@ public interface ArticulateTCActivityStateDao {
      * 
      * @param articulateTCActivityState
      */
-    public void save(ArticulateTCActivityState articulateTCActivityState);
+    void save(ArticulateTCActivityState articulateTCActivityState);
 
     /**
      * Get a state row with the given ID
@@ -21,7 +21,7 @@ public interface ArticulateTCActivityStateDao {
      * @param id
      * @return
      */
-    public ArticulateTCActivityState get(long id);
+    ArticulateTCActivityState get(long id);
 
     /**
      * Get a state row with the given ID
@@ -29,7 +29,7 @@ public interface ArticulateTCActivityStateDao {
      * @param id
      * @return
      */
-    public ArticulateTCActivityState load(long id);
+    ArticulateTCActivityState load(long id);
 
     /**
      * Finds activity rows for a given site ID (context)
@@ -38,7 +38,7 @@ public interface ArticulateTCActivityStateDao {
      * @param deleted should we return the deleted rows as well?
      * @return
      */
-    public List<ArticulateTCActivityState> findByContext(String context, boolean deleted);
+    List<ArticulateTCActivityState> findByContext(String context, boolean deleted);
 
     /**
      * Finds the row with the given {@link ArticulateTCRequestPayload} object
@@ -46,7 +46,7 @@ public interface ArticulateTCActivityStateDao {
      * @param articulateTCRequestPayload
      * @return
      */
-    public ArticulateTCActivityState findOne(ArticulateTCRequestPayload articulateTCRequestPayload);
+    ArticulateTCActivityState findOne(ArticulateTCRequestPayload articulateTCRequestPayload);
 
     /**
      * Finds the row with the given unique key (user ID, site ID, package ID)
@@ -56,7 +56,7 @@ public interface ArticulateTCActivityStateDao {
      * @param packageId
      * @return
      */
-    public ArticulateTCActivityState findOneByUniqueKey(String userId, String siteId, String packageId);
+    ArticulateTCActivityState findOneByUniqueKey(String userId, String siteId, String packageId);
 
     /**
      * Softly delete the state row in the db

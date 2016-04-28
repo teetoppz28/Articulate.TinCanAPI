@@ -13,21 +13,19 @@ import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCEntityProviderService;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCActivityStateDao;
+import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCAttemptDao;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCAttemptResultDao;
-import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageSettingsDao;
+import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
 import org.sakaiproject.articulate.tincan.model.ArticulateTCRequestPayload;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCActivityState;
+import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttempt;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttemptResult;
-import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackageSettings;
+import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
 import org.sakaiproject.articulate.tincan.util.ArticulateTCEntityProviderServiceUtils;
 import org.sakaiproject.articulate.tincan.util.ArticulateTCJsonUtils;
 import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.event.api.LearningResourceStoreService;
-import org.sakaiproject.scorm.dao.api.AttemptDao;
-import org.sakaiproject.scorm.dao.api.ContentPackageDao;
-import org.sakaiproject.scorm.model.api.Attempt;
-import org.sakaiproject.scorm.model.api.ContentPackage;
 import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.service.gradebook.shared.GradebookService;
 
@@ -39,19 +37,19 @@ public abstract class ArticulateTCEntityProviderServiceImpl implements Articulat
     private ArticulateTCActivityStateDao articulateTCActivityStateDao;
 
     @Setter
+    private ArticulateTCAttemptDao articulateTCAttemptDao;
+
+    @Setter
     private ArticulateTCAttemptResultDao articulateTCAttemptResultDao;
 
     @Setter
-    private ArticulateTCContentPackageSettingsDao articulateTCContentPackageSettingsDao;
+    private ArticulateTCContentPackageDao articulateTCContentPackageDao;
 
     @Setter
     private ArticulateTCEntityProviderServiceUtils articulateTCEntityProviderServiceUtils;
 
     @Setter
     private DeveloperHelperService developerHelperService;
-
-    protected abstract AttemptDao attemptDao();
-    protected abstract ContentPackageDao contentPackageDao();
 
     private GradebookService gradebookService;
     private LearningResourceStoreService learningResourceStoreService;
@@ -149,16 +147,16 @@ public abstract class ArticulateTCEntityProviderServiceImpl implements Articulat
     public void processGradebookData(String statementJson, String payload) {
         try {
             ArticulateTCRequestPayload articulateTCRequestPayload = articulateTCEntityProviderServiceUtils.getPayloadObject(payload);
-            ArticulateTCContentPackageSettings articulateTCContentPackageSettings = articulateTCContentPackageSettingsDao.findOneByPackageId(articulateTCRequestPayload.getPackageId());
+            ArticulateTCContentPackage articulateTCContentPackage = articulateTCContentPackageDao.load(Long.parseLong(articulateTCRequestPayload.getPackageId()));
 
             developerHelperService.setCurrentUser(DeveloperHelperService.ADMIN_USER_REF);
 
-            if (articulateTCContentPackageSettings == null) {
-                // no content package settings
+            if (articulateTCContentPackage == null) {
+                // no content package
                 return;
             }
 
-            if (!articulateTCContentPackageSettings.isGraded()) {
+            if (!articulateTCContentPackage.isGraded()) {
                 // is not set to be graded
                 return;
             }
@@ -169,7 +167,7 @@ public abstract class ArticulateTCEntityProviderServiceImpl implements Articulat
                 return;
             }
 
-            Assignment assignment = gradebookService.getAssignment(articulateTCRequestPayload.getSiteId(), articulateTCContentPackageSettings.getGradebookItemId());
+            Assignment assignment = gradebookService.getAssignment(articulateTCRequestPayload.getSiteId(), articulateTCContentPackage.getAssignmentId());
             if (assignment == null) {
                 // assignment is not defined in gradebook
                 return;
@@ -208,9 +206,9 @@ public abstract class ArticulateTCEntityProviderServiceImpl implements Articulat
             Double assignmentPoints = assignment.getPoints();
             Double studentPoints = (assignmentPoints != null) ? assignmentPoints * scaled : 0d;
 
-            saveAttemptResult(articulateTCContentPackageSettings.getPackageId(), articulateTCRequestPayload.getUserId(), studentPoints);
+            saveAttemptResult(articulateTCContentPackage.getContentPackageId(), articulateTCRequestPayload.getUserId(), studentPoints);
 
-            if (!allowedToPostAttemptGrade(articulateTCContentPackageSettings.getPackageId(), articulateTCRequestPayload.getUserId())) {
+            if (!allowedToPostAttemptGrade(articulateTCContentPackage.getContentPackageId(), articulateTCRequestPayload.getUserId())) {
                 // this attempt is greater than the allowed max attempt number
                 return;
             }
@@ -221,7 +219,7 @@ public abstract class ArticulateTCEntityProviderServiceImpl implements Articulat
                 assignment.getName(),
                 articulateTCRequestPayload.getUserId(),
                 Double.toString(studentPoints),
-                CONFIGURATION_DEFAULT_GRADEBOOK_EXTERNAL_APP
+                CONFIGURATION_DEFAULT_APP_CONTENT_TYPE
             );
         } catch (Exception e) {
             log.error("Error sending grade to gradebook.", e);
@@ -232,15 +230,15 @@ public abstract class ArticulateTCEntityProviderServiceImpl implements Articulat
 
     @Override
     public boolean allowedToPostAttemptGrade(long contentPackageId, String userId) {
-        ContentPackage contentPackage = contentPackageDao().load(contentPackageId);
-        long maxAttempts = contentPackage.getNumberOfTries();
+        ArticulateTCContentPackage articulateTCContentPackage = articulateTCContentPackageDao.get(contentPackageId);
+        long maxAttempts = articulateTCContentPackage.getNumberOfTries();
 
         if (maxAttempts == -1) {
             // unlimited attempts allowed
             return true;
         }
 
-        Attempt newestAttempt = attemptDao().lookupNewest(contentPackageId, userId);
+        ArticulateTCAttempt newestAttempt = articulateTCAttemptDao.lookupNewest(contentPackageId, userId);
 
         if (newestAttempt == null) {
             // no prior attempts
@@ -252,14 +250,14 @@ public abstract class ArticulateTCEntityProviderServiceImpl implements Articulat
 
     @Override
     public void saveAttemptResult(long contentPackageId, String userId, Double score) {
-        Attempt newestAttempt = attemptDao().lookupNewest(contentPackageId, userId);
-  
+        ArticulateTCAttempt newestAttempt = articulateTCAttemptDao.lookupNewest(contentPackageId, userId);
+
         if (newestAttempt == null) {
             // should not be here, as an attempt was created on launch
             log.error("Error: no attempt found for content package id: " + contentPackageId + " and user ID: " + userId);
             return;
         }
- 
+
         ArticulateTCAttemptResult articulateTCAttemptResult = articulateTCAttemptResultDao.findByAttemptId(newestAttempt.getId());
 
         if (articulateTCAttemptResult == null) {

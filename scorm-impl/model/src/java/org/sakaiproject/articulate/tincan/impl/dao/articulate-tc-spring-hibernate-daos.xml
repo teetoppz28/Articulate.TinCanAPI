@@ -40,15 +40,15 @@
         </property>
     </bean>
 
-    <bean id="articulateTCContentPackageSettingsDao" class="org.sakaiproject.articulate.tincan.impl.dao.ArticulateTCContentPackageSettingsDaoImpl">
+<bean id="articulateTCAttemptDao" class="org.sakaiproject.articulate.tincan.impl.dao.ArticulateTCAttemptDaoImpl">
         <property name="sessionFactory">
             <ref bean="org.sakaiproject.springframework.orm.hibernate.GlobalSessionFactory" />
         </property>
     </bean>
 
-    <bean id="org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageSettingsDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+    <bean id="org.sakaiproject.articulate.tincan.api.dao.ArticulateTCAttemptDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager" ref="org.sakaiproject.springframework.orm.hibernate.GlobalTransactionManager" />
-        <property name="target" ref="articulateTCContentPackageSettingsDao" />
+        <property name="target" ref="articulateTCAttemptDao" />
         <property name="transactionAttributes">
             <props>
                 <prop key="*">PROPAGATION_REQUIRED</prop>
@@ -65,6 +65,22 @@
     <bean id="org.sakaiproject.articulate.tincan.api.dao.ArticulateTCAttemptResultDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager" ref="org.sakaiproject.springframework.orm.hibernate.GlobalTransactionManager" />
         <property name="target" ref="articulateTCAttemptResultDao" />
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="articulateTCContentPackageDao" class="org.sakaiproject.articulate.tincan.impl.dao.ArticulateTCContentPackageDaoImpl">
+        <property name="sessionFactory">
+            <ref bean="org.sakaiproject.springframework.orm.hibernate.GlobalSessionFactory" />
+        </property>
+    </bean>
+
+    <bean id="org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager" ref="org.sakaiproject.springframework.orm.hibernate.GlobalTransactionManager" />
+        <property name="target" ref="articulateTCContentPackageDao" />
         <property name="transactionAttributes">
             <props>
                 <prop key="*">PROPAGATION_REQUIRED</prop>

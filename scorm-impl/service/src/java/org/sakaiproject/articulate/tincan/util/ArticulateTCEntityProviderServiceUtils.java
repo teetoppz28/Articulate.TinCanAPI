@@ -13,19 +13,20 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
+import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
 import org.sakaiproject.articulate.tincan.model.ArticulateTCRequestPayload;
+import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
-import org.sakaiproject.scorm.dao.api.ContentPackageDao;
-import org.sakaiproject.scorm.model.api.ContentPackage;
 
 public abstract class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConstants {
 
     private static Log log = LogFactory.getLog(ArticulateTCEntityProviderServiceUtils.class);
 
     @Setter
-    private DeveloperHelperService developerHelperService;
+    private ArticulateTCContentPackageDao articulateTCContentPackageDao;
 
-    protected abstract ContentPackageDao contentPackageDao();
+    @Setter
+    private DeveloperHelperService developerHelperService;
 
     /**
      * Decodes the URL-encoded string
@@ -153,13 +154,13 @@ public abstract class ArticulateTCEntityProviderServiceUtils implements Articula
      * @return
      */
     private String populateCurrentSite(String packageId) {
-        ContentPackage contentPackage = contentPackageDao().load(Long.parseLong(packageId));
+        ArticulateTCContentPackage articulateTCContentPackage = articulateTCContentPackageDao.load(Long.parseLong(packageId));
 
-        if (contentPackage == null) {
+        if (articulateTCContentPackage == null) {
             throw new IllegalArgumentException("Error finding content package with id: " + packageId);
         }
 
-        String siteId = contentPackage.getContext();
+        String siteId = articulateTCContentPackage.getContext();
         boolean allowedInSite = ArticulateTCSecurityUtils.currentUserAllowedAccessToSite(siteId);
 
         if (!allowedInSite) {

@@ -39,24 +39,25 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCDeleteService;
-import org.sakaiproject.scorm.model.api.ContentPackage;
-import org.sakaiproject.scorm.service.api.ScormContentService;
-import org.sakaiproject.scorm.ui.console.pages.ConsoleBasePage;
+import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
+import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
 import org.sakaiproject.scorm.ui.console.pages.PackageListPage;
+import org.sakaiproject.scorm.ui.console.pages.PackageRemovePage;
 import org.sakaiproject.wicket.markup.html.form.CancelButton;
 
-public class ArticulateTCPackageRemovePage extends ConsoleBasePage {
+public class ArticulateTCPackageRemovePage extends PackageRemovePage {
 
     private static final long serialVersionUID = 1L;
     private static final Log LOG = LogFactory.getLog(ArticulateTCPackageRemovePage.class);
 
+    @SpringBean(name="articulateTCContentPackageDao")
+    private ArticulateTCContentPackageDao articulateTCContentPackageDao;
+
     @SpringBean(name="articulateTCDeleteService")
     private ArticulateTCDeleteService articulateTCDeleteService;
 
-    @SpringBean(name="org.sakaiproject.scorm.service.api.ScormContentService")
-    ScormContentService scormContentService;
-
     public ArticulateTCPackageRemovePage(final PageParameters params) {
+        super(params);
         add(new FileRemoveForm("removeForm", params));
     }
 
@@ -68,15 +69,15 @@ public class ArticulateTCPackageRemovePage extends ConsoleBasePage {
             super(id);
 
             final long contentPackageId = params.getLong("contentPackageId");
-            final ContentPackage contentPackage = scormContentService.getContentPackage(contentPackageId);
+            final ArticulateTCContentPackage articulateTCContentPackage = articulateTCContentPackageDao.load(contentPackageId);
 
-            List<ContentPackage> list = new LinkedList<ContentPackage>();
-            list.add(contentPackage);
+            List<ArticulateTCContentPackage> list = new LinkedList<ArticulateTCContentPackage>();
+            list.add(articulateTCContentPackage);
 
             List<IColumn<Object>> columns = new LinkedList<IColumn<Object>>();
             columns.add(new PropertyColumn<Object>(new Model<String>("Content Package"), "title", "title"));
 
-            DataTable<ContentPackage> removeTable = new DataTable<ContentPackage>("removeTable", columns.toArray(new IColumn[columns.size()]), new ListDataProvider<ContentPackage>(list), 3);
+            DataTable<ArticulateTCContentPackage> removeTable = new DataTable<ArticulateTCContentPackage>("removeTable", columns.toArray(new IColumn[columns.size()]), new ListDataProvider<ArticulateTCContentPackage>(list), 3);
 
             final Label alertLabel = new Label("alert", new ResourceModel("verify.remove"));
             final CancelButton btnCancel = new CancelButton("btnCancel", PackageListPage.class);

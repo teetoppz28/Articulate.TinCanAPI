@@ -24,10 +24,10 @@ import org.sakaiproject.entitybroker.util.AbstractEntityProvider;
 
 public class ArticulateTCEntityProvider extends AbstractEntityProvider implements RESTful, RequestAware, ArticulateTCConstants {
 
-    private RequestGetter requestGetter;
-
     @Setter
     private ArticulateTCEntityProviderService articulateTCEntityProviderService;
+
+    private RequestGetter requestGetter;
 
     public void init() {
     }
