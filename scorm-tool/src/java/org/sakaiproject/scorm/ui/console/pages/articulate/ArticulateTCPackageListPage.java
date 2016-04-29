@@ -26,6 +26,7 @@ import org.apache.commons.collections.ListUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.PageMap;
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.ResourceReference;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -44,6 +45,8 @@ import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCAttemptDao;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
 import org.sakaiproject.scorm.model.api.ContentPackage;
+import org.sakaiproject.scorm.service.api.LearningManagementSystem;
+import org.sakaiproject.scorm.service.api.ScormContentService;
 import org.sakaiproject.scorm.ui.console.components.DecoratedDatePropertyColumn;
 import org.sakaiproject.scorm.ui.console.pages.PackageConfigurationPage;
 import org.sakaiproject.scorm.ui.console.pages.PackageListPage;
@@ -61,25 +64,34 @@ import org.sakaiproject.wicket.markup.html.repeater.data.table.ActionColumn;
 import org.sakaiproject.wicket.markup.html.repeater.data.table.BasicDataTable;
 import org.sakaiproject.wicket.markup.html.repeater.data.table.ImageLinkColumn;
 
-public class ArticulateTCPackageListPage extends PackageListPage implements ArticulateTCConstants {
+public class ArticulateTCPackageListPage extends ArticulateTCConsoleBasePage implements ArticulateTCConstants {
 
     private static final long serialVersionUID = 1L;
-
-    @SpringBean(name="articulateTCContentPackageDao")
-    private ArticulateTCContentPackageDao articulateTCContentPackageDao;
 
     @SpringBean(name="articulateTCAttemptDao")
     private ArticulateTCAttemptDao articulateTCAttemptDao;
 
+    @SpringBean(name="articulateTCContentPackageDao")
+    protected ArticulateTCContentPackageDao articulateTCContentPackageDao;
+
+    @SpringBean(name="org.sakaiproject.scorm.service.api.ScormContentService")
+    private ScormContentService scormContentService;
+
+    @SpringBean
+    private LearningManagementSystem lms;
+
+    private static final ResourceReference DELETE_ICON = new ResourceReference(PackageListPage.class, "res/delete.png");
+
     @SuppressWarnings("unchecked")
     public ArticulateTCPackageListPage(PageParameters params) {
+        super(params);
         final String context = lms.currentContext();
         final boolean canConfigure = lms.canConfigure(context);
         final boolean canGrade = lms.canGrade(context);
         final boolean canViewResults = lms.canViewResults(context);
         final boolean canDelete = lms.canDelete(context);
 
-        List<ContentPackage> contentPackages = contentService.getContentPackages();
+        List<ContentPackage> contentPackages = scormContentService.getContentPackages();
         List<ArticulateTCContentPackage> articulateTCContentPackages = articulateTCContentPackageDao.find(context);
         List<ContentPackage> allPackages = ListUtils.union(articulateTCContentPackages, contentPackages);
 
@@ -221,7 +233,7 @@ public class ArticulateTCPackageListPage extends PackageListPage implements Arti
             if (target instanceof ContentPackage) {
                 ContentPackage contentPackage = (ContentPackage)target;
 
-                int status = contentService.getContentPackageStatus(contentPackage);
+                int status = scormContentService.getContentPackageStatus(contentPackage);
 
                 switch (status) {
                 case CONTENT_PACKAGE_STATUS_OPEN:

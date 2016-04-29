@@ -34,10 +34,7 @@ public class ConfirmPage extends ConsoleBasePage implements ScormConstants {
 
 	@SpringBean(name="org.sakaiproject.scorm.service.api.ScormResourceService")
 	ScormResourceService resourceService;
-
-	public ConfirmPage() {
-	}
-
+	
 	public ConfirmPage(PageParameters params) {
 		final String resourceId = params.getString("resourceId");
 		final int status = params.getInt("status");

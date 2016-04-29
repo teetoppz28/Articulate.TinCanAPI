@@ -41,11 +41,11 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCDeleteService;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
+import org.sakaiproject.scorm.ui.console.pages.ConsoleBasePage;
 import org.sakaiproject.scorm.ui.console.pages.PackageListPage;
-import org.sakaiproject.scorm.ui.console.pages.PackageRemovePage;
 import org.sakaiproject.wicket.markup.html.form.CancelButton;
 
-public class ArticulateTCPackageRemovePage extends PackageRemovePage {
+public class ArticulateTCPackageRemovePage extends ConsoleBasePage {
 
     private static final long serialVersionUID = 1L;
     private static final Log LOG = LogFactory.getLog(ArticulateTCPackageRemovePage.class);

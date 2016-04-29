@@ -22,9 +22,9 @@ package org.sakaiproject.scorm.ui.upload.pages.articulate;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.basic.Label;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
-import org.sakaiproject.scorm.ui.upload.pages.ConfirmPage;
+import org.sakaiproject.scorm.ui.console.pages.ConsoleBasePage;
 
-public class ArticulateTCConfirmPage extends ConfirmPage implements ArticulateTCConstants {
+public class ArticulateTCConfirmPage extends ConsoleBasePage implements ArticulateTCConstants {
 
     private static final long serialVersionUID = 1L;
 
@@ -67,6 +67,7 @@ public class ArticulateTCConfirmPage extends ConfirmPage implements ArticulateTC
         case VALIDATION_CONVERTFAILED:
             return "validate.convert.failed";
         };
+
         return "validate.failed";
     }
 

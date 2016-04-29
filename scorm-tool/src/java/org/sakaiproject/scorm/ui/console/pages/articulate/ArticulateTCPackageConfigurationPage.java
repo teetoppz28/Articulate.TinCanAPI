@@ -39,8 +39,9 @@ import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
+import org.sakaiproject.scorm.service.api.LearningManagementSystem;
+import org.sakaiproject.scorm.ui.console.pages.ConsoleBasePage;
 import org.sakaiproject.scorm.ui.console.pages.DisplayDesignatedPackage;
-import org.sakaiproject.scorm.ui.console.pages.PackageConfigurationPage;
 import org.sakaiproject.scorm.ui.console.pages.PackageListPage;
 import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.service.gradebook.shared.GradebookService;
@@ -49,24 +50,28 @@ import org.sakaiproject.wicket.markup.html.form.CancelButton;
 import org.sakaiproject.wicket.model.DecoratedPropertyModel;
 import org.sakaiproject.wicket.model.SimpleDateFormatPropertyModel;
 
-public class ArticulateTCPackageConfigurationPage extends PackageConfigurationPage implements ArticulateTCConstants {
+public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implements ArticulateTCConstants {
 
     private static final long serialVersionUID = 1L;
 
     @SpringBean(name="articulateTCContentPackageDao")
     private ArticulateTCContentPackageDao articulateTCContentPackageDao;
 
+    @SpringBean(name="org.sakaiproject.entitybroker.DeveloperHelperService")
+    private DeveloperHelperService developerHelperService;
+
     @SpringBean(name="org.sakaiproject.service.gradebook.GradebookService")
     private GradebookService gradebookService;
 
-    @SpringBean(name="org.sakaiproject.entitybroker.DeveloperHelperService")
-    private DeveloperHelperService developerHelperService;
+    @SpringBean
+    private LearningManagementSystem lms;
 
     @SpringBean(name="org.sakaiproject.tool.api.ToolManager")
     private ToolManager toolManager;
 
     private boolean hasGradebookInSite = false;
     private boolean hasGradebookItem = false;
+    private String unlimitedMessage;
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     public ArticulateTCPackageConfigurationPage(final PageParameters params) {

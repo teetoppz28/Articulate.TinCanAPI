@@ -197,7 +197,7 @@ public class PackageConfigurationPage extends ConsoleBasePage {
 	private static final long serialVersionUID = 1L;
 	private static ResourceReference PAGE_ICON = new ResourceReference(PackageConfigurationPage.class, "res/table_edit.png");
 	@SpringBean
-	protected LearningManagementSystem lms;
+	LearningManagementSystem lms;
 
 	@SpringBean(name="org.sakaiproject.scorm.service.api.ScormContentService")
 	ScormContentService contentService;
@@ -208,10 +208,7 @@ public class PackageConfigurationPage extends ConsoleBasePage {
 	@SpringBean(name = "org.sakaiproject.scorm.dao.api.ContentPackageManifestDao")
 	ContentPackageManifestDao contentPackageManifestDao;
 
-	protected String unlimitedMessage;
-
-	public PackageConfigurationPage() {
-	}
+	private String unlimitedMessage;
 
 	public PackageConfigurationPage(PageParameters params) {
 		super(params);

@@ -46,18 +46,28 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.lang.Bytes;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCImporter;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
+import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.event.api.NotificationService;
+import org.sakaiproject.scorm.service.api.ScormResourceService;
+import org.sakaiproject.scorm.ui.console.pages.ConsoleBasePage;
 import org.sakaiproject.scorm.ui.console.pages.articulate.ArticulateTCPackageListPage;
-import org.sakaiproject.scorm.ui.upload.pages.UploadPage;
 import org.sakaiproject.wicket.markup.html.form.CancelButton;
 
-public class ArticulateTCUploadPage extends UploadPage implements ArticulateTCConstants {
+public class ArticulateTCUploadPage extends ConsoleBasePage implements ArticulateTCConstants {
 
     private static final long serialVersionUID = 1L;
     private Log log = LogFactory.getLog(ArticulateTCUploadPage.class);
 
     @SpringBean(name="articulateTCImporter")
     private ArticulateTCImporter articulateTCImporter;
+
+    @SpringBean(name="org.sakaiproject.scorm.service.api.ScormResourceService")
+    protected ScormResourceService resourceService;
+
+    @SpringBean( name = "org.sakaiproject.component.api.ServerConfigurationService" )
+    private ServerConfigurationService serverConfigurationService;
+
+    private static final String SAK_PROP_SCORM_ENABLE_EMAIL = "scorm.enable.email";
 
     public ArticulateTCUploadPage(PageParameters params) {
         add(new FileUploadForm("uploadForm"));
@@ -79,6 +89,8 @@ public class ArticulateTCUploadPage extends UploadPage implements ArticulateTCCo
         }
 
         public FileUploadForm(String id) {
+            super(id);
+
             IModel model = new CompoundPropertyModel(this);
             this.setModel(model);
 

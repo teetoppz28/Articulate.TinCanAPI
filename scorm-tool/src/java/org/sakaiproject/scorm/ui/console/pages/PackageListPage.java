@@ -62,16 +62,13 @@ public class PackageListPage extends ConsoleBasePage implements ScormConstants {
 	@SuppressWarnings("unused")
 	private static final Log LOG = LogFactory.getLog(PackageListPage.class);
 
-	protected static final ResourceReference PAGE_ICON = new ResourceReference(PackageListPage.class, "res/table.png");
-	protected static final ResourceReference DELETE_ICON = new ResourceReference(PackageListPage.class, "res/delete.png");
+	private static final ResourceReference PAGE_ICON = new ResourceReference(PackageListPage.class, "res/table.png");
+	private static final ResourceReference DELETE_ICON = new ResourceReference(PackageListPage.class, "res/delete.png");
 
 	@SpringBean
-	protected LearningManagementSystem lms;
+	LearningManagementSystem lms;
 	@SpringBean(name="org.sakaiproject.scorm.service.api.ScormContentService")
-	protected ScormContentService contentService;
-
-	public PackageListPage() {
-	}
+	ScormContentService contentService;
 
 	public PackageListPage(PageParameters params) {
 

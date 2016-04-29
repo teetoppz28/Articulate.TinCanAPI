@@ -25,9 +25,9 @@ import org.apache.wicket.markup.html.link.InlineFrame;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCLaunchService;
-import org.sakaiproject.scorm.ui.player.pages.PlayerPage;
+import org.sakaiproject.scorm.ui.player.pages.BaseToolPage;
 
-public class ArticulateTCPlayerPage extends PlayerPage implements ArticulateTCConstants {
+public class ArticulateTCPlayerPage extends BaseToolPage implements ArticulateTCConstants {
 
     private static final long serialVersionUID = 1L;
 
