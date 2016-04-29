@@ -2,7 +2,6 @@ package org.sakaiproject.articulate.tincan.api;
 
 import java.io.InputStream;
 
-import org.sakaiproject.articulate.tincan.model.ArticulateTCContentPackage;
 import org.sakaiproject.articulate.tincan.model.ArticulateTCMeta;
 
 public interface ArticulateTCImporter {

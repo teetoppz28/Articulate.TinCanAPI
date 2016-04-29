@@ -20,7 +20,7 @@ import org.sakaiproject.entitybroker.EntityView;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserDirectoryService;
 
-public abstract class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService, ArticulateTCConstants {
+public class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService, ArticulateTCConstants {
 
     private Log log = LogFactory.getLog(ArticulateTCLaunchServiceImpl.class);
 

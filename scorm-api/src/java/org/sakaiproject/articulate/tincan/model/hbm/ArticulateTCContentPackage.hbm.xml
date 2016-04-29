@@ -22,7 +22,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping default-cascade="all" package="org.sakaiproject.articulate.tincan.model.hibernate" default-lazy="false">
 
-    <class name="org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage" table="ARTICULATE_CONTENT_PACKAGE">
+    <class name="org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage" table="ARTICULATE_TC_CONTENT_PACKAGE">
         <id name="contentPackageId" column="PACKAGE_ID" type="long">
             <generator class="native">
                 <param name="sequence">ARTICULATE_TC__UID_S</param>

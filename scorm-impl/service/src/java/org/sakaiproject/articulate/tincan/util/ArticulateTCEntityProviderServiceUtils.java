@@ -18,7 +18,7 @@ import org.sakaiproject.articulate.tincan.model.ArticulateTCRequestPayload;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
 
-public abstract class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConstants {
+public class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConstants {
 
     private static Log log = LogFactory.getLog(ArticulateTCEntityProviderServiceUtils.class);
 

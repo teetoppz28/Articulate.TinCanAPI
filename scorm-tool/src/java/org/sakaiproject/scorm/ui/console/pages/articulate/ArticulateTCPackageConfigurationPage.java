@@ -24,7 +24,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.wicket.PageParameters;
-import org.apache.wicket.ResourceReference;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.extensions.yui.calendar.DateTimeField;
@@ -71,8 +70,6 @@ public class ArticulateTCPackageConfigurationPage extends PackageConfigurationPa
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     public ArticulateTCPackageConfigurationPage(final PageParameters params) {
-        super(params);
-
         long contentPackageId = params.getLong("contentPackageId");
         final ArticulateTCContentPackage articulateTCContentPackage = articulateTCContentPackageDao.load(contentPackageId);
 
@@ -285,11 +282,6 @@ public class ArticulateTCPackageConfigurationPage extends PackageConfigurationPa
      */
     protected String getContext() {
         return developerHelperService.getCurrentLocationId();
-    }
-
-    @Override
-    protected ResourceReference getPageIconReference() {
-        return PAGE_ICON;
     }
 
     public class DisplayNamePropertyModel extends DecoratedPropertyModel implements Serializable {

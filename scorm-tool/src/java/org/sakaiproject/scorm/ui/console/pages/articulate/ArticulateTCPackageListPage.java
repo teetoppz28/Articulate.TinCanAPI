@@ -73,8 +73,6 @@ public class ArticulateTCPackageListPage extends PackageListPage implements Arti
 
     @SuppressWarnings("unchecked")
     public ArticulateTCPackageListPage(PageParameters params) {
-        super(params);
-
         final String context = lms.currentContext();
         final boolean canConfigure = lms.canConfigure(context);
         final boolean canGrade = lms.canGrade(context);
@@ -153,8 +151,7 @@ public class ArticulateTCPackageListPage extends PackageListPage implements Arti
 
         if (canGrade) {
             actionColumn.addAction(new Action(new StringResourceModel("column.action.grade.label", this, null), ResultsListPage.class, paramPropertyExpressions));
-        }
-        else if (canViewResults) {
+        } else if (canViewResults) {
             actionColumn.addAction(new Action(new StringResourceModel("column.action.grade.label", this, null), LearnerResultsPage.class, paramPropertyExpressions));
         }
 

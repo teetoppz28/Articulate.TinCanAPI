@@ -25,16 +25,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
-import org.apache.wicket.ResourceReference;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.IAjaxCallDecorator;
 import org.apache.wicket.ajax.calldecorator.AjaxPostprocessingCallDecorator;
 import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
 import org.apache.wicket.feedback.FeedbackMessages;
-import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
@@ -49,46 +46,21 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.lang.Bytes;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCImporter;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
-import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.event.api.NotificationService;
-import org.sakaiproject.scorm.service.api.ScormResourceService;
-import org.sakaiproject.scorm.ui.console.pages.ConsoleBasePage;
-import org.sakaiproject.scorm.ui.console.pages.PackageListPage;
+import org.sakaiproject.scorm.ui.console.pages.articulate.ArticulateTCPackageListPage;
+import org.sakaiproject.scorm.ui.upload.pages.UploadPage;
 import org.sakaiproject.wicket.markup.html.form.CancelButton;
 
-public class ArticulateTCUploadPage extends ConsoleBasePage implements ArticulateTCConstants {
+public class ArticulateTCUploadPage extends UploadPage implements ArticulateTCConstants {
 
     private static final long serialVersionUID = 1L;
-    private static final ResourceReference PAGE_ICON = new ResourceReference(ConsoleBasePage.class, "res/table_add.png");
     private Log log = LogFactory.getLog(ArticulateTCUploadPage.class);
 
-    // SCO-97 sakai.property to enable/disable (show/hide) email sending (drop down)
-    private static final String SAK_PROP_SCORM_ENABLE_EMAIL = "scorm.enable.email";
-    @SpringBean(name = "org.sakaiproject.component.api.ServerConfigurationService")
-    ServerConfigurationService serverConfigurationService;
-
     @SpringBean(name="articulateTCImporter")
-    ArticulateTCImporter articulateTCImporter;
-
-    @SpringBean(name="org.sakaiproject.scorm.service.api.ScormResourceService")
-    ScormResourceService resourceService;
+    private ArticulateTCImporter articulateTCImporter;
 
     public ArticulateTCUploadPage(PageParameters params) {
         add(new FileUploadForm("uploadForm"));
-    }
-
-    // SCO-124 - this is needed becasue we can't disable the button in Java and enable it in JavaScript, because Wicket will throw a runtime exception.
-    // So we have to both enable and disable the button via JavaScript.
-    @Override
-    public void renderHead(IHeaderResponse response) {
-        super.renderHead(response);
-        String javascript = "document.getElementsByName( \"btnSubmit\" )[0].disabled = true;";
-        response.renderOnLoadJavascript(javascript);
-    }
-
-    @Override
-    protected ResourceReference getPageIconReference() {
-        return PAGE_ICON;
     }
 
     public class FileUploadForm extends Form {
@@ -107,8 +79,6 @@ public class ArticulateTCUploadPage extends ConsoleBasePage implements Articulat
         }
 
         public FileUploadForm(String id) {
-            super(id);
-
             IModel model = new CompoundPropertyModel(this);
             this.setModel(model);
 
@@ -117,7 +87,6 @@ public class ArticulateTCUploadPage extends ConsoleBasePage implements Articulat
 
             // create a feedback panel, setMaxMessages not in this version
             final Component feedbackPanel = new FeedbackPanel("feedback").setOutputMarkupPlaceholderTag(true);
-            //feedbackPanel.setMaxMessages( 5 );
 
             setMultiPart(true);
 
@@ -126,7 +95,6 @@ public class ArticulateTCUploadPage extends ConsoleBasePage implements Articulat
             fileUploadField.add( new AttributeAppender("onchange", new Model("document.getElementsByName( \"btnSubmit\" )[0].disabled = this.value === '';"), ";"));
             add(fileUploadField);
 
-            // SCO-97 sakai.property to enable/disable (show/hide) email sending (drop down)
             @SuppressWarnings({"unchecked", "rawtypes"})
             DropDownChoice emailNotificationDropDown = new DropDownChoice(
                 "priority",
@@ -161,7 +129,6 @@ public class ArticulateTCUploadPage extends ConsoleBasePage implements Articulat
                 }
             );
 
-            // SCO-97 sakai.property to enable/disable (show/hide) email sending (drop down)
             boolean enableEmail = serverConfigurationService.getBoolean(SAK_PROP_SCORM_ENABLE_EMAIL, true);
             Label priorityLabel = new Label("lblPriority", new ResourceModel("upload.priority.label"));
 
@@ -175,8 +142,7 @@ public class ArticulateTCUploadPage extends ConsoleBasePage implements Articulat
             add(priorityLabel);
             add(emailNotificationDropDown);
 
-            // SCO-98 - disable buttons on submit, add spinner
-            final CancelButton btnCancel = new CancelButton("btnCancel", PackageListPage.class);
+            final CancelButton btnCancel = new CancelButton("btnCancel", ArticulateTCPackageListPage.class);
             IndicatingAjaxButton btnSubmit = new IndicatingAjaxButton("btnSubmit", this) {
                 private static final long serialVersionUID = 1L;
 
@@ -213,7 +179,7 @@ public class ArticulateTCUploadPage extends ConsoleBasePage implements Articulat
                             try {
                                 int status = articulateTCImporter.validateAndProcess(upload.getInputStream(), upload.getClientFileName(), upload.getContentType());
                                 if(status == VALIDATION_SUCCESS) {
-                                    setResponsePage(PackageListPage.class);
+                                    setResponsePage(ArticulateTCPackageListPage.class);
                                 } else {
                                     PageParameters params = new PageParameters();
                                     params.add("filename", upload.getClientFileName());

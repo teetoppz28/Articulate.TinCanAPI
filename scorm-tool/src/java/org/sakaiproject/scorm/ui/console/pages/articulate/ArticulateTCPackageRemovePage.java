@@ -61,13 +61,12 @@ public class ArticulateTCPackageRemovePage extends PackageRemovePage {
         add(new FileRemoveForm("removeForm", params));
     }
 
-    public class FileRemoveForm extends Form<Object> {
+    public class FileRemoveForm extends Form {
         private static final long serialVersionUID = 1L;
 
         @SuppressWarnings("unchecked")
         public FileRemoveForm(String id, final PageParameters params) {
             super(id);
-
             final long contentPackageId = params.getLong("contentPackageId");
             final ArticulateTCContentPackage articulateTCContentPackage = articulateTCContentPackageDao.load(contentPackageId);
 

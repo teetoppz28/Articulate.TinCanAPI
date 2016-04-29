@@ -27,7 +27,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public abstract class ArticulateTCImporterImpl implements ArticulateTCImporter, ArticulateTCConstants {
+public class ArticulateTCImporterImpl implements ArticulateTCImporter, ArticulateTCConstants {
 
     private Log log = LogFactory.getLog(ArticulateTCImporterImpl.class);
 

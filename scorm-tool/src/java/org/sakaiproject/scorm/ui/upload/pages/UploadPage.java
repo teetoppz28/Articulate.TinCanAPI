@@ -59,18 +59,21 @@ import org.sakaiproject.wicket.markup.html.form.CancelButton;
 public class UploadPage extends ConsoleBasePage implements ScormConstants {
 
 	private static final long serialVersionUID = 1L;
-	private static final ResourceReference PAGE_ICON = new ResourceReference(ConsoleBasePage.class, "res/table_add.png");
+	protected static final ResourceReference PAGE_ICON = new ResourceReference(ConsoleBasePage.class, "res/table_add.png");
 	private static final Log LOG = LogFactory.getLog(FileUploadForm.class);
 
 	// SCO-97 sakai.property to enable/disable (show/hide) email sending (drop down)
-	private static final String SAK_PROP_SCORM_ENABLE_EMAIL = "scorm.enable.email";
+	protected static final String SAK_PROP_SCORM_ENABLE_EMAIL = "scorm.enable.email";
 	@SpringBean( name = "org.sakaiproject.component.api.ServerConfigurationService" )
-	ServerConfigurationService serverConfigurationService;
+	protected ServerConfigurationService serverConfigurationService;
 
 	@SpringBean(name="org.sakaiproject.scorm.service.api.ScormContentService")
 	ScormContentService contentService;
 	@SpringBean(name="org.sakaiproject.scorm.service.api.ScormResourceService")
-	ScormResourceService resourceService;
+	protected ScormResourceService resourceService;
+
+	public UploadPage() {
+	}
 
 	public UploadPage(PageParameters params) {
 		add(new FileUploadForm("uploadForm"));

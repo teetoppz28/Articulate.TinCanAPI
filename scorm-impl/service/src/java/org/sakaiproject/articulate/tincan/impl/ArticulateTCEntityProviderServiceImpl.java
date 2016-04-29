@@ -29,7 +29,7 @@ import org.sakaiproject.event.api.LearningResourceStoreService;
 import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.service.gradebook.shared.GradebookService;
 
-public abstract class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntityProviderService, ArticulateTCConstants {
+public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntityProviderService, ArticulateTCConstants {
 
     private Log log = LogFactory.getLog(ArticulateTCEntityProviderServiceImpl.class);
 
