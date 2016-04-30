@@ -22,9 +22,9 @@ package org.sakaiproject.scorm.ui.upload.pages.articulate;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.basic.Label;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
-import org.sakaiproject.scorm.ui.console.pages.ConsoleBasePage;
+import org.sakaiproject.scorm.ui.console.pages.articulate.ArticulateTCConsoleBasePage;
 
-public class ArticulateTCConfirmPage extends ConsoleBasePage implements ArticulateTCConstants {
+public class ArticulateTCConfirmPage extends ArticulateTCConsoleBasePage implements ArticulateTCConstants {
 
     private static final long serialVersionUID = 1L;
 

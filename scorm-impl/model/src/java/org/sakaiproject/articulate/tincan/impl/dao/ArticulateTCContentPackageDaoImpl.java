@@ -19,13 +19,17 @@
  */
 package org.sakaiproject.articulate.tincan.impl.dao;
 
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.hibernate.Session;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
+import org.springframework.orm.hibernate3.SessionHolder;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 public class ArticulateTCContentPackageDaoImpl extends HibernateDaoSupport implements ArticulateTCContentPackageDao {
 
@@ -70,7 +74,33 @@ public class ArticulateTCContentPackageDaoImpl extends HibernateDaoSupport imple
 
     @Override
     public void save(ArticulateTCContentPackage articulateTCContentPackage) {
-        getHibernateTemplate().saveOrUpdate(articulateTCContentPackage);
+        Session session = null;
+
+        try {
+            // Since we are in a thread that doesn't have a hibernate session we need to manage it here
+            session = getSessionFactory().openSession();
+            TransactionSynchronizationManager.bindResource(getSessionFactory(), new SessionHolder(session));
+
+            try {
+                session.beginTransaction();
+                articulateTCContentPackage.setModifiedOn(new Date());
+                getHibernateTemplate().saveOrUpdate(articulateTCContentPackage);
+            } catch (Throwable e) {
+                logger.error("Error saving activity state data: ", e);
+                session.getTransaction().rollback();
+            } finally {
+                if (!session.getTransaction().wasRolledBack()) {
+                    session.flush();
+                    session.getTransaction().commit();
+                }
+            }
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+
+            TransactionSynchronizationManager.unbindResource(getSessionFactory());
+        }
     }
 
 }

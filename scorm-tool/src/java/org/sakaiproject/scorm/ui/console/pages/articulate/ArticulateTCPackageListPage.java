@@ -45,7 +45,6 @@ import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCAttemptDao;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
 import org.sakaiproject.scorm.model.api.ContentPackage;
-import org.sakaiproject.scorm.service.api.LearningManagementSystem;
 import org.sakaiproject.scorm.service.api.ScormContentService;
 import org.sakaiproject.scorm.ui.console.components.DecoratedDatePropertyColumn;
 import org.sakaiproject.scorm.ui.console.pages.PackageConfigurationPage;
@@ -71,20 +70,15 @@ public class ArticulateTCPackageListPage extends ArticulateTCConsoleBasePage imp
     @SpringBean(name="articulateTCAttemptDao")
     private ArticulateTCAttemptDao articulateTCAttemptDao;
 
-    @SpringBean(name="articulateTCContentPackageDao")
-    protected ArticulateTCContentPackageDao articulateTCContentPackageDao;
-
     @SpringBean(name="org.sakaiproject.scorm.service.api.ScormContentService")
     private ScormContentService scormContentService;
-
-    @SpringBean
-    private LearningManagementSystem lms;
 
     private static final ResourceReference DELETE_ICON = new ResourceReference(PackageListPage.class, "res/delete.png");
 
     @SuppressWarnings("unchecked")
     public ArticulateTCPackageListPage(PageParameters params) {
         super(params);
+
         final String context = lms.currentContext();
         final boolean canConfigure = lms.canConfigure(context);
         final boolean canGrade = lms.canGrade(context);

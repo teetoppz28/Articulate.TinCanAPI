@@ -46,14 +46,13 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.lang.Bytes;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCImporter;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
-import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.event.api.NotificationService;
 import org.sakaiproject.scorm.service.api.ScormResourceService;
-import org.sakaiproject.scorm.ui.console.pages.ConsoleBasePage;
+import org.sakaiproject.scorm.ui.console.pages.articulate.ArticulateTCConsoleBasePage;
 import org.sakaiproject.scorm.ui.console.pages.articulate.ArticulateTCPackageListPage;
 import org.sakaiproject.wicket.markup.html.form.CancelButton;
 
-public class ArticulateTCUploadPage extends ConsoleBasePage implements ArticulateTCConstants {
+public class ArticulateTCUploadPage extends ArticulateTCConsoleBasePage implements ArticulateTCConstants {
 
     private static final long serialVersionUID = 1L;
     private Log log = LogFactory.getLog(ArticulateTCUploadPage.class);
@@ -63,11 +62,6 @@ public class ArticulateTCUploadPage extends ConsoleBasePage implements Articulat
 
     @SpringBean(name="org.sakaiproject.scorm.service.api.ScormResourceService")
     protected ScormResourceService resourceService;
-
-    @SpringBean( name = "org.sakaiproject.component.api.ServerConfigurationService" )
-    private ServerConfigurationService serverConfigurationService;
-
-    private static final String SAK_PROP_SCORM_ENABLE_EMAIL = "scorm.enable.email";
 
     public ArticulateTCUploadPage(PageParameters params) {
         add(new FileUploadForm("uploadForm"));
@@ -110,8 +104,7 @@ public class ArticulateTCUploadPage extends ConsoleBasePage implements Articulat
             @SuppressWarnings({"unchecked", "rawtypes"})
             DropDownChoice emailNotificationDropDown = new DropDownChoice(
                 "priority",
-                Arrays.asList(new Integer[] {NotificationService.NOTI_NONE, NotificationService.NOTI_OPTIONAL, NotificationService.NOTI_REQUIRED}
-                ),
+                Arrays.asList(new Integer[] {NotificationService.NOTI_NONE, NotificationService.NOTI_OPTIONAL, NotificationService.NOTI_REQUIRED}),
                 new IChoiceRenderer() {
                     private static final long serialVersionUID = 1L;
 
@@ -227,7 +220,6 @@ public class ArticulateTCUploadPage extends ConsoleBasePage implements Articulat
         public void setPriority(int priority) {
             this.priority = priority;
         }
-
     }
 
 }

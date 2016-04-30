@@ -34,7 +34,9 @@ import org.hibernate.criterion.Subqueries;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCAttemptDao;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttempt;
 import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate3.SessionHolder;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 public class ArticulateTCAttemptDaoImpl extends HibernateDaoSupport implements ArticulateTCAttemptDao {
 
@@ -118,8 +120,33 @@ public class ArticulateTCAttemptDaoImpl extends HibernateDaoSupport implements A
     }
 
     public void save(ArticulateTCAttempt articulateTCAttempt) {
-        articulateTCAttempt.setLastModifiedDate(new Date());
-        save(articulateTCAttempt);
+        Session session = null;
+
+        try {
+            // Since we are in a thread that doesn't have a hibernate session we need to manage it here
+            session = getSessionFactory().openSession();
+            TransactionSynchronizationManager.bindResource(getSessionFactory(), new SessionHolder(session));
+
+            try {
+                session.beginTransaction();
+                articulateTCAttempt.setLastModifiedDate(new Date());
+                getHibernateTemplate().saveOrUpdate(articulateTCAttempt);
+            } catch (Throwable e) {
+                logger.error("Error saving activity state data: ", e);
+                session.getTransaction().rollback();
+            } finally {
+                if (!session.getTransaction().wasRolledBack()) {
+                    session.flush();
+                    session.getTransaction().commit();
+                }
+            }
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+
+            TransactionSynchronizationManager.unbindResource(getSessionFactory());
+        }
     }
 
     public ArticulateTCAttempt lookupNewest(long contentPackageId, String learnerId) {

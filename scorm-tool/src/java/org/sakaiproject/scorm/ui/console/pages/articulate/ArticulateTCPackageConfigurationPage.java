@@ -40,7 +40,6 @@ import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.scorm.service.api.LearningManagementSystem;
-import org.sakaiproject.scorm.ui.console.pages.ConsoleBasePage;
 import org.sakaiproject.scorm.ui.console.pages.DisplayDesignatedPackage;
 import org.sakaiproject.scorm.ui.console.pages.PackageListPage;
 import org.sakaiproject.service.gradebook.shared.Assignment;
@@ -50,12 +49,9 @@ import org.sakaiproject.wicket.markup.html.form.CancelButton;
 import org.sakaiproject.wicket.model.DecoratedPropertyModel;
 import org.sakaiproject.wicket.model.SimpleDateFormatPropertyModel;
 
-public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implements ArticulateTCConstants {
+public class ArticulateTCPackageConfigurationPage extends ArticulateTCConsoleBasePage implements ArticulateTCConstants {
 
     private static final long serialVersionUID = 1L;
-
-    @SpringBean(name="articulateTCContentPackageDao")
-    private ArticulateTCContentPackageDao articulateTCContentPackageDao;
 
     @SpringBean(name="org.sakaiproject.entitybroker.DeveloperHelperService")
     private DeveloperHelperService developerHelperService;
@@ -75,6 +71,8 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     public ArticulateTCPackageConfigurationPage(final PageParameters params) {
+        super(params);
+
         long contentPackageId = params.getLong("contentPackageId");
         final ArticulateTCContentPackage articulateTCContentPackage = articulateTCContentPackageDao.load(contentPackageId);
 

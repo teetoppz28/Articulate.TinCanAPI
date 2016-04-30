@@ -20,14 +20,12 @@
 package org.sakaiproject.scorm.ui.player.pages.articulate;
 
 import org.apache.wicket.PageParameters;
-import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.link.InlineFrame;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCLaunchService;
-import org.sakaiproject.scorm.ui.player.pages.BaseToolPage;
 
-public class ArticulateTCPlayerPage extends BaseToolPage implements ArticulateTCConstants {
+public class ArticulateTCPlayerPage extends ArticulateTCBaseToolPage implements ArticulateTCConstants {
 
     private static final long serialVersionUID = 1L;
 
@@ -59,14 +57,6 @@ public class ArticulateTCPlayerPage extends BaseToolPage implements ArticulateTC
         };
 
         add(iframe);
-    }
-
-    public void renderHead(IHeaderResponse response) {
-        response.renderJavascriptReference(HTML_HEADSCRIPTS);
-        response.renderOnLoadJavascript(HTML_BODY_ONLOAD_ADDTL);
-        response.renderCSSReference(TOOLBASE_CSS);
-        response.renderCSSReference(TOOL_CSS);
-        response.renderCSSReference(HTML_ARTICULATE_TC_CSS);
     }
 
 }

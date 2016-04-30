@@ -31,6 +31,7 @@ import org.apache.wicket.markup.html.resources.CompressedResourceReference;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
 import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.scorm.service.api.LearningManagementSystem;
 import org.sakaiproject.scorm.ui.Icon;
@@ -50,16 +51,20 @@ public class ArticulateTCConsoleBasePage extends SakaiPortletWebPage implements 
     private static ResourceReference LIST_ICON = new ResourceReference(ArticulateTCConsoleBasePage.class, "../res/table.png");
     private static ResourceReference UPLOAD_ICON = new ResourceReference(ArticulateTCConsoleBasePage.class, "../res/table_add.png");
     private static final String SAK_PROP_ENABLE_MENU_BUTTON_ICONS = "scorm.menuButton.icons";
+    protected static final String SAK_PROP_SCORM_ENABLE_EMAIL = "scorm.enable.email";
 
     // The feedback panel component displays dynamic messages to the user
     protected FeedbackPanel feedback;
     private BreadcrumbPanel breadcrumbs;
 
     @SpringBean
-    private LearningManagementSystem lms;
+    protected LearningManagementSystem lms;
+
+    @SpringBean(name="articulateTCContentPackageDao")
+    protected ArticulateTCContentPackageDao articulateTCContentPackageDao;
 
     @SpringBean( name = "org.sakaiproject.component.api.ServerConfigurationService" )
-    ServerConfigurationService serverConfigurationService;
+    protected ServerConfigurationService serverConfigurationService;
 
     @SpringBean
     private ToolManager toolManager;

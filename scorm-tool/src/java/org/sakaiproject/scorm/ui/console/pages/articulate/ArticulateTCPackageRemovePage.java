@@ -45,19 +45,17 @@ import org.sakaiproject.scorm.ui.console.pages.ConsoleBasePage;
 import org.sakaiproject.scorm.ui.console.pages.PackageListPage;
 import org.sakaiproject.wicket.markup.html.form.CancelButton;
 
-public class ArticulateTCPackageRemovePage extends ConsoleBasePage {
+public class ArticulateTCPackageRemovePage extends ArticulateTCConsoleBasePage {
 
     private static final long serialVersionUID = 1L;
     private static final Log LOG = LogFactory.getLog(ArticulateTCPackageRemovePage.class);
-
-    @SpringBean(name="articulateTCContentPackageDao")
-    private ArticulateTCContentPackageDao articulateTCContentPackageDao;
 
     @SpringBean(name="articulateTCDeleteService")
     private ArticulateTCDeleteService articulateTCDeleteService;
 
     public ArticulateTCPackageRemovePage(final PageParameters params) {
         super(params);
+
         add(new FileRemoveForm("removeForm", params));
     }
 
@@ -67,6 +65,7 @@ public class ArticulateTCPackageRemovePage extends ConsoleBasePage {
         @SuppressWarnings("unchecked")
         public FileRemoveForm(String id, final PageParameters params) {
             super(id);
+
             final long contentPackageId = params.getLong("contentPackageId");
             final ArticulateTCContentPackage articulateTCContentPackage = articulateTCContentPackageDao.load(contentPackageId);
 
