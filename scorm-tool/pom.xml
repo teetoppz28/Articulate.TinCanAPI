@@ -22,6 +22,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.sakaiproject.articulate</groupId>
+            <artifactId>sakai-articulate-api</artifactId>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.sakaiproject.scorm</groupId>
             <artifactId>sakai-scorm-api</artifactId>
             <type>jar</type>

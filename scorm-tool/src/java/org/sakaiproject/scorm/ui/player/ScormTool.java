@@ -35,9 +35,11 @@ import org.apache.wicket.protocol.http.pagestore.DiskPageStore;
 import org.apache.wicket.session.ISessionStore;
 import org.apache.wicket.settings.IExceptionSettings;
 import org.apache.wicket.util.file.Folder;
+import org.sakaiproject.component.cover.ServerConfigurationService;
 import org.sakaiproject.scorm.service.api.ScormResourceService;
 import org.sakaiproject.scorm.ui.ContentPackageResourceMountStrategy;
 import org.sakaiproject.scorm.ui.console.pages.PackageListPage;
+import org.sakaiproject.scorm.ui.console.pages.articulate.ArticulateTCPackageListPage;
 import org.sakaiproject.wicket.protocol.http.SakaiWebApplication;
 
 public class ScormTool extends SakaiWebApplication {
@@ -67,10 +69,14 @@ public class ScormTool extends SakaiWebApplication {
 		};
 	}
 
-	@Override
-	public Class getHomePage() {
-		return PackageListPage.class;
-	}
+    @Override
+    public Class getHomePage() {
+        // check to see if articulate contant should be allowed
+        boolean allowArticulate = ServerConfigurationService.getBoolean("articulate.tincanapi.package.allowed", true);
+        Class<?> homePage = allowArticulate ? ArticulateTCPackageListPage.class : PackageListPage.class;
+
+        return homePage;
+    }
 
 	public Folder getUploadFolder() {
 		Folder folder = new Folder(System.getProperty("java.io.tmpdir"), "scorm-uploads");
