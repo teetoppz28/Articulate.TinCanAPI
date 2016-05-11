@@ -9,11 +9,11 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <name>sakai-scorm-service-impl</name>
-    <groupId>org.sakaiproject.scorm</groupId>
-    <artifactId>sakai-scorm-service-impl</artifactId>
+    <name>sakai-articulate-service-impl</name>
+    <groupId>org.sakaiproject.articulate</groupId>
+    <artifactId>sakai-articulate-service-impl</artifactId>
     <packaging>jar</packaging>
-    <description>This project creates the service implementation used by the Sakai Scorm Tool</description>
+    <description>This project creates the service implementation used by the Sakai Articulate Tool</description>
     <organization>
         <name>Sakai Project</name>
         <url>http://sakaiproject.org/</url>
@@ -22,17 +22,14 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.sakaiproject.scorm</groupId>
-            <artifactId>sakai-scorm-api</artifactId>
+            <groupId>org.sakaiproject.articulate</groupId>
+            <artifactId>sakai-articulate-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.sakaiproject.scorm</groupId>
-            <artifactId>sakai-scorm-adl-impl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.sakaiproject.scorm</groupId>
-            <artifactId>sakai-scorm-content-impl</artifactId>
+            <artifactId>sakai-scorm-api</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.sakaiproject.scorm</groupId>
@@ -89,7 +86,13 @@
         <dependency>
            <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-        </dependency>        
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.6.2</version>
+        </dependency>
+        
     </dependencies>
 
     <build>

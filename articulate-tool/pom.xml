@@ -9,11 +9,11 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <name>sakai-scorm-tool</name>
-    <groupId>org.sakaiproject.scorm</groupId>
-    <artifactId>sakai-scorm-tool</artifactId>
+    <name>sakai-articulate-tool</name>
+    <groupId>org.sakaiproject.articulate</groupId>
+    <artifactId>sakai-articulate-tool</artifactId>
     <packaging>war</packaging>
-    <description>This project creates a war containing the Sakai Scorm Tool</description>
+    <description>This project creates a war containing the Sakai Articulate Tool</description>
     <organization>
         <name>Sakai Project</name>
         <url>http://sakaiproject.org/</url>
@@ -32,10 +32,6 @@
             <artifactId>sakai-scorm-api</artifactId>
             <type>jar</type>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.sakaiproject.scorm</groupId>
-            <artifactId>sakai-scorm-adl-impl</artifactId>
         </dependency>
         <dependency>
             <groupId>org.sakaiproject.scorm</groupId>
@@ -177,16 +173,6 @@
                 </includes>
             </resource>
         </resources>
-        <testResources>
-            <testResource>
-                <directory>src/test</directory>
-                <includes>
-                    <include>**/*.xml</include>
-                    <include>**/*.properties</include>
-                    <include>**/*.zip</include>
-                </includes>
-            </testResource>
-        </testResources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

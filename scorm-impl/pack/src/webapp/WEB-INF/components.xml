@@ -23,22 +23,16 @@
 <beans>
 	<!-- Bring in the HBM related beans -->
 	<import resource="classpath*:org/sakaiproject/scorm/**/spring-hibernate-hbms.xml" />
-    <import resource="classpath*:org/sakaiproject/articulate/tincan/**/articulate-tc-spring-hibernate-hbms.xml" />
 
 	<!-- Bring in the hibernate daos -->
 	<import resource="classpath*:org/sakaiproject/scorm/**/spring-hibernate-daos.xml" />
-    <import resource="classpath*:org/sakaiproject/articulate/tincan/**/articulate-tc-spring-hibernate-daos.xml" />
 
-	
 	<!-- Bring in the sakai daos -->
 	<import resource="classpath*:org/sakaiproject/scorm/**/spring-sakai-hbms.xml" />
 	<import resource="classpath*:org/sakaiproject/scorm/**/spring-sakai-daos.xml" />
 	
 	<!-- Bring the SCORM services -->
 	<import resource="classpath*:org/sakaiproject/**/spring-scorm-services.xml" />
-
-    <!-- Bring the Articulate TinCanAPI services -->
-    <import resource="classpath*:org/sakaiproject/**/articulate-tc-spring-services.xml" />
 
 	<!-- Bring the ADL services -->
 	<import resource="classpath*:org/sakaiproject/**/spring-adl-services.xml" />
