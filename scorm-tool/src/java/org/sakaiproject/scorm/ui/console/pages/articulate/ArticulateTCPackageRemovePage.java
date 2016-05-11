@@ -106,7 +106,7 @@ public class ArticulateTCPackageRemovePage extends ArticulateTCConsoleBasePage {
                     // remove content package
                     boolean cpSuccess = articulateTCDeleteService.deleteContentPackage(contentPackageId);
 
-                    setResponsePage(PackageListPage.class);
+                    setResponsePage(ArticulateTCPackageListPage.class);
 
                     if (!gbSuccess || !resourceSucess || !cpSuccess) {
                         LOG.warn("Failed to delete all underlying resources for content package ID: " + contentPackageId);
