@@ -17,12 +17,12 @@
  * limitations under the License.
  * #L%
  */
-package org.sakaiproject.scorm.ui.upload.pages.articulate;
+package org.sakaiproject.atriculate.ui.upload.pages;
 
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.basic.Label;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
-import org.sakaiproject.scorm.ui.console.pages.articulate.ArticulateTCConsoleBasePage;
+import org.sakaiproject.atriculate.ui.console.pages.ArticulateTCConsoleBasePage;
 
 public class ArticulateTCConfirmPage extends ArticulateTCConsoleBasePage implements ArticulateTCConstants {
 

@@ -49,6 +49,8 @@ public interface ArticulateTCConstants extends ScormConstants {
     public final static String ARCHIVE_ZIP_MIMETYPE = "application/zip";
     public final static String ARCHIVE_META_XML_FILE = "meta.xml";
     public final static String ARCHIVE_TINCAN_XML_FILE = "tincan.xml";
+    public final static String ARCHIVE_META_ATTR_ID = "id";
+    public final static String ARCHIVE_META_ATTR_TITLE = "title";
 
     /*
      * HTML page
@@ -64,5 +66,7 @@ public interface ArticulateTCConstants extends ScormConstants {
     public final static int CONFIGURATION_DEFAULT_ATTEMPTS = 10;
     public final static boolean CONFIGURATION_DEFAULT_IS_GRADED = false;
     public final static String CONFIGURATION_DEFAULT_APP_CONTENT_TYPE = "Articulate TinCanAPI";
+    public final static int CONFIGURATION_DEFAULT_NUMBER_OF_TRIES_UNLIMITED = -1;
+    public final static boolean CONFIGURATION_DEFAULT_ACTIVITY_STATE_DELETED = false;
 
 }

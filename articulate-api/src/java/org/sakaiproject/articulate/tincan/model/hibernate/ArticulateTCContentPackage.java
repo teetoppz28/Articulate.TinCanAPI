@@ -25,19 +25,32 @@ import java.util.Date;
 import org.apache.commons.lang.StringUtils;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.model.ArticulateTCMeta;
-import org.sakaiproject.scorm.model.api.ContentPackage;
 
-public class ArticulateTCContentPackage extends ContentPackage implements ArticulateTCConstants, Serializable {
+public class ArticulateTCContentPackage implements ArticulateTCConstants, Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private Long contentPackageId;
+    private String title;
+    private String resourceId;
+    private String context;
+    private String url;
+    private Date releaseOn;
+    private Date dueOn;
+    private Date acceptUntil;
+    private Date createdOn;
+    private String createdBy;
+    private Date modifiedOn;
+    private String modifiedBy;
+    private int numberOfTries;
+    private boolean isDeleted;
     private Long assignmentId;
     private String gradebookItemTitle;
     private boolean graded;
     private Double points;
 
     public ArticulateTCContentPackage() {
-        super();
+        this.numberOfTries = CONFIGURATION_DEFAULT_NUMBER_OF_TRIES_UNLIMITED;
         this.graded = CONFIGURATION_DEFAULT_IS_GRADED;
         this.points = CONFIGURATION_DEFAULT_POINTS;
     }
@@ -61,6 +74,118 @@ public class ArticulateTCContentPackage extends ContentPackage implements Articu
     public ArticulateTCContentPackage(ArticulateTCMeta articulateTCMeta, String launchUrl) {
         this(articulateTCMeta);
         setUrl(launchUrl);
+    }
+
+    public Long getContentPackageId() {
+        return contentPackageId;
+    }
+
+    public void setContentPackageId(Long contentPackageId) {
+        this.contentPackageId = contentPackageId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getResourceId() {
+        return resourceId;
+    }
+
+    public void setResourceId(String resourceId) {
+        this.resourceId = resourceId;
+    }
+
+    public String getContext() {
+        return context;
+    }
+
+    public void setContext(String context) {
+        this.context = context;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public Date getReleaseOn() {
+        return releaseOn;
+    }
+
+    public void setReleaseOn(Date releaseOn) {
+        this.releaseOn = releaseOn;
+    }
+
+    public Date getDueOn() {
+        return dueOn;
+    }
+
+    public void setDueOn(Date dueOn) {
+        this.dueOn = dueOn;
+    }
+
+    public Date getAcceptUntil() {
+        return acceptUntil;
+    }
+
+    public void setAcceptUntil(Date acceptUntil) {
+        this.acceptUntil = acceptUntil;
+    }
+
+    public Date getCreatedOn() {
+        return createdOn;
+    }
+
+    public void setCreatedOn(Date createdOn) {
+        this.createdOn = createdOn;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Date getModifiedOn() {
+        return modifiedOn;
+    }
+
+    public void setModifiedOn(Date modifiedOn) {
+        this.modifiedOn = modifiedOn;
+    }
+
+    public String getModifiedBy() {
+        return modifiedBy;
+    }
+
+    public void setModifiedBy(String modifiedBy) {
+        this.modifiedBy = modifiedBy;
+    }
+
+    public int getNumberOfTries() {
+        return numberOfTries;
+    }
+
+    public void setNumberOfTries(int numberOfTries) {
+        this.numberOfTries = numberOfTries;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 
     public Long getAssignmentId() {

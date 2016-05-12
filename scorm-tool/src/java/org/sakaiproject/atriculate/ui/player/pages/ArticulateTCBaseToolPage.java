@@ -17,7 +17,7 @@
  * limitations under the License.
  * #L%
  */
-package org.sakaiproject.scorm.ui.player.pages.articulate;
+package org.sakaiproject.atriculate.ui.player.pages;
 
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
@@ -27,9 +27,10 @@ import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 public class ArticulateTCBaseToolPage extends WebPage implements ArticulateTCConstants, IHeaderContributor {
     private static final long serialVersionUID = 2L;
 
+    protected final static String RES_PREFIX = "../../../../scorm/ui/player/pages/";
     protected static final String TOOLBASE_CSS = "/library/skin/tool_base.css";
     protected static final String TOOL_CSS = "/library/skin/default/tool.css";
-    protected static final String SCORM_CSS = "styles/scorm.css";
+    protected static final String SCORM_CSS = RES_PREFIX + "styles/scorm.css";
 
     protected static final String SAK_PROP_SCORM_ENABLE_EMAIL = "scorm.enable.email";
 

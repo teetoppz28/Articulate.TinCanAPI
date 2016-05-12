@@ -1,11 +1,15 @@
 package org.sakaiproject.articulate.tincan.model.hibernate;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class ArticulateTCAttemptResult {
+public class ArticulateTCAttemptResult implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private long id;
-    private long attemptId;
+    private Long attemptId;
+    private int attemptNumber;
     private Double score;
     private Date dateCompleted;
     private Date modified;
@@ -21,12 +25,20 @@ public class ArticulateTCAttemptResult {
         this.id = id;
     }
 
-    public long getAttemptId() {
+    public Long getAttemptId() {
         return attemptId;
     }
 
-    public void setAttemptId(long attemptId) {
+    public void setAttemptId(Long attemptId) {
         this.attemptId = attemptId;
+    }
+
+    public int getAttemptNumber() {
+        return attemptNumber;
+    }
+
+    public void setAttemptNumber(int attemptNumber) {
+        this.attemptNumber = attemptNumber;
     }
 
     public Double getScore() {

@@ -17,7 +17,7 @@
  * limitations under the License.
  * #L%
  */
-package org.sakaiproject.scorm.ui.console.pages.articulate;
+package org.sakaiproject.atriculate.ui.console.pages;
 
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.ResourceReference;
@@ -32,13 +32,13 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
+import org.sakaiproject.atriculate.ui.upload.pages.ArticulateTCUploadPage;
 import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.scorm.service.api.LearningManagementSystem;
 import org.sakaiproject.scorm.ui.Icon;
 import org.sakaiproject.scorm.ui.console.components.BreadcrumbPanel;
 import org.sakaiproject.scorm.ui.console.components.SakaiFeedbackPanel;
 import org.sakaiproject.scorm.ui.console.pages.MaydayWebMarkupContainer;
-import org.sakaiproject.scorm.ui.upload.pages.articulate.ArticulateTCUploadPage;
 import org.sakaiproject.tool.api.ToolManager;
 import org.sakaiproject.wicket.markup.html.SakaiPortletWebPage;
 import org.sakaiproject.wicket.markup.html.link.NavIntraLink;
@@ -47,9 +47,10 @@ public class ArticulateTCConsoleBasePage extends SakaiPortletWebPage implements 
 
     private static final long serialVersionUID = 1L;
 
-    private static ResourceReference CONSOLE_CSS = new CompressedResourceReference(ArticulateTCConsoleBasePage.class, "../res/scorm_console.css");
-    private static ResourceReference LIST_ICON = new ResourceReference(ArticulateTCConsoleBasePage.class, "../res/table.png");
-    private static ResourceReference UPLOAD_ICON = new ResourceReference(ArticulateTCConsoleBasePage.class, "../res/table_add.png");
+    protected final static String RES_PREFIX = "../../../../scorm/ui/console/pages/";
+    private static ResourceReference CONSOLE_CSS = new CompressedResourceReference(ArticulateTCConsoleBasePage.class, RES_PREFIX + "res/scorm_console.css");
+    private static ResourceReference LIST_ICON = new ResourceReference(ArticulateTCConsoleBasePage.class, RES_PREFIX + "res/table.png");
+    private static ResourceReference UPLOAD_ICON = new ResourceReference(ArticulateTCConsoleBasePage.class, RES_PREFIX + "res/table_add.png");
     private static final String SAK_PROP_ENABLE_MENU_BUTTON_ICONS = "scorm.menuButton.icons";
     protected static final String SAK_PROP_SCORM_ENABLE_EMAIL = "scorm.enable.email";
 

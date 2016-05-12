@@ -17,7 +17,7 @@
  * limitations under the License.
  * #L%
  */
-package org.sakaiproject.scorm.ui.upload.pages.articulate;
+package org.sakaiproject.atriculate.ui.upload.pages;
 
 import java.util.Arrays;
 
@@ -46,10 +46,10 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.lang.Bytes;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCImporter;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
+import org.sakaiproject.atriculate.ui.console.pages.ArticulateTCConsoleBasePage;
+import org.sakaiproject.atriculate.ui.console.pages.ArticulateTCPackageListPage;
 import org.sakaiproject.event.api.NotificationService;
 import org.sakaiproject.scorm.service.api.ScormResourceService;
-import org.sakaiproject.scorm.ui.console.pages.articulate.ArticulateTCConsoleBasePage;
-import org.sakaiproject.scorm.ui.console.pages.articulate.ArticulateTCPackageListPage;
 import org.sakaiproject.wicket.markup.html.form.CancelButton;
 
 public class ArticulateTCUploadPage extends ArticulateTCConsoleBasePage implements ArticulateTCConstants {

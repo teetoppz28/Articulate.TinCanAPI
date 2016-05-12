@@ -1,17 +1,15 @@
 package org.sakaiproject.articulate.tincan.model;
 
 import org.apache.commons.lang.StringUtils;
+import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 
-public class ArticulateTCMeta {
+public class ArticulateTCMeta implements ArticulateTCConstants {
 
     private String courseId;
     private String createdBy;
     private String id;
     private String title;
 
-    public final static String ATTR_ID = "id";
-    public final static String ATTR_TITLE = "title";
-    
     public ArticulateTCMeta() {
     }
 
@@ -70,4 +68,5 @@ public class ArticulateTCMeta {
 
         return true;
     }
+
 }
