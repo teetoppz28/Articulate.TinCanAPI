@@ -11,15 +11,16 @@ public class ArticulateTCActivityState implements Serializable, ArticulateTCCons
     private static final long serialVersionUID = 1L;
 
     private String content;
-    private long id;
+    private Long id;
     private String packageId;
     private String registration;
     private String stateId;
     private String userId;
-    private boolean deleted = false;
+    private boolean deleted;
     private Date modified;
 
     public ArticulateTCActivityState() {
+        this.deleted = CONFIGURATION_DEFAULT_ACTIVITY_STATE_DELETED;
     }
 
     public ArticulateTCActivityState(ArticulateTCRequestPayload articulateTCRequestPayload) {
@@ -28,6 +29,7 @@ public class ArticulateTCActivityState implements Serializable, ArticulateTCCons
         this.registration = articulateTCRequestPayload.getSiteId();
         this.stateId = articulateTCRequestPayload.getStateId();
         this.userId = articulateTCRequestPayload.getUserId();
+        this.deleted = CONFIGURATION_DEFAULT_ACTIVITY_STATE_DELETED;
     }
 
     public String getContent() {
@@ -38,11 +40,11 @@ public class ArticulateTCActivityState implements Serializable, ArticulateTCCons
         this.content = content;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -94,7 +96,7 @@ public class ArticulateTCActivityState implements Serializable, ArticulateTCCons
     }
 
     /**
-     * Updates only the allowed updatable db fields
+     * Updates only the allowed modifiable database fields
      * 
      * @param articulateTCRequestPayload the {@link ArticulateTCRequestPayload} object
      */

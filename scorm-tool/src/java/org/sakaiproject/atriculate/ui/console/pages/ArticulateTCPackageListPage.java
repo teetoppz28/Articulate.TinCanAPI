@@ -17,7 +17,7 @@
  * limitations under the License.
  * #L%
  */
-package org.sakaiproject.scorm.ui.console.pages.articulate;
+package org.sakaiproject.atriculate.ui.console.pages;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -42,18 +42,17 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.lang.PropertyResolver;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCAttemptDao;
-import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
+import org.sakaiproject.atriculate.ui.console.pages.ArticulateTCPackageConfigurationPage;
+import org.sakaiproject.atriculate.ui.console.pages.ArticulateTCPackageRemovePage;
+import org.sakaiproject.atriculate.ui.player.pages.ArticulateTCPlayerPage;
 import org.sakaiproject.scorm.model.api.ContentPackage;
 import org.sakaiproject.scorm.service.api.ScormContentService;
 import org.sakaiproject.scorm.ui.console.components.DecoratedDatePropertyColumn;
 import org.sakaiproject.scorm.ui.console.pages.PackageConfigurationPage;
 import org.sakaiproject.scorm.ui.console.pages.PackageListPage;
 import org.sakaiproject.scorm.ui.console.pages.PackageRemovePage;
-import org.sakaiproject.scorm.ui.console.pages.articulate.ArticulateTCPackageConfigurationPage;
-import org.sakaiproject.scorm.ui.console.pages.articulate.ArticulateTCPackageRemovePage;
 import org.sakaiproject.scorm.ui.player.pages.PlayerPage;
-import org.sakaiproject.scorm.ui.player.pages.articulate.ArticulateTCPlayerPage;
 import org.sakaiproject.scorm.ui.reporting.pages.LearnerResultsPage;
 import org.sakaiproject.scorm.ui.reporting.pages.ResultsListPage;
 import org.sakaiproject.wicket.markup.html.link.BookmarkablePageLabeledLink;
@@ -73,7 +72,7 @@ public class ArticulateTCPackageListPage extends ArticulateTCConsoleBasePage imp
     @SpringBean(name="org.sakaiproject.scorm.service.api.ScormContentService")
     private ScormContentService scormContentService;
 
-    private static final ResourceReference DELETE_ICON = new ResourceReference(PackageListPage.class, "res/delete.png");
+    private static final ResourceReference DELETE_ICON = new ResourceReference(PackageListPage.class, RES_PREFIX + "res/delete.png");
 
     @SuppressWarnings("unchecked")
     public ArticulateTCPackageListPage(PageParameters params) {
@@ -98,8 +97,7 @@ public class ArticulateTCPackageListPage extends ArticulateTCConsoleBasePage imp
         Action launchAction = new Action("title", paramPropertyExpressions){
             private static final long serialVersionUID = 1L;
             @Override
-            public Component newLink(String id, Object bean) {
-                ContentPackage contentPackage = (ContentPackage) bean;
+            public Component newLink(String id, Object contentPackage) {
                 boolean isArticulate = contentPackage instanceof ArticulateTCContentPackage;
                 pageClass = (isArticulate) ? ArticulateTCPlayerPage.class : PlayerPage.class;
 
@@ -111,11 +109,11 @@ public class ArticulateTCPackageListPage extends ArticulateTCConsoleBasePage imp
                 if (displayModel != null) {
                     labelModel = displayModel;
                 } else {
-                    String labelValue = String.valueOf(PropertyResolver.getValue(labelPropertyExpression, bean));
+                    String labelValue = String.valueOf(PropertyResolver.getValue(labelPropertyExpression, contentPackage));
                     labelModel = new Model<String>(labelValue);
                 }
 
-                PageParameters params = buildPageParameters(paramPropertyExpressions, bean);
+                PageParameters params = buildPageParameters(paramPropertyExpressions, contentPackage);
                 Link link = new BookmarkablePageLabeledLink(id, labelModel, pageClass, params);
 
                 if (popupWindowName != null && !isArticulate) {
@@ -128,8 +126,13 @@ public class ArticulateTCPackageListPage extends ArticulateTCConsoleBasePage imp
                     link.setPopupSettings(popupSettings);
                 }
 
-                link.setEnabled(isEnabled(bean) && lms.canLaunch(contentPackage));
-                link.setVisible(isVisible(bean));
+                if (isArticulate) {
+                    link.setEnabled(isEnabled(contentPackage));
+                } else {
+                    link.setEnabled(isEnabled(contentPackage) && lms.canLaunch((ContentPackage) contentPackage));
+                }
+
+                link.setVisible(isVisible(contentPackage));
 
                 return link;
             }
@@ -142,11 +145,10 @@ public class ArticulateTCPackageListPage extends ArticulateTCConsoleBasePage imp
                 new Action(new ResourceModel("column.action.edit.label"), paramPropertyExpressions) {
                     private static final long serialVersionUID = 1L;
                     @Override
-                    public Component newLink(String id, Object bean) {
-                        ContentPackage contentPackage = (ContentPackage) bean;
+                    public Component newLink(String id, Object contentPackage) {
                         boolean isArticulate = contentPackage instanceof ArticulateTCContentPackage;
                         pageClass = (isArticulate) ? ArticulateTCPackageConfigurationPage.class : PackageConfigurationPage.class;
-                        PageParameters params = buildPageParameters(paramPropertyExpressions, bean);
+                        PageParameters params = buildPageParameters(paramPropertyExpressions, contentPackage);
                         Link link = new BookmarkablePageLabeledLink(id, new ResourceModel("column.action.edit.label"), pageClass, params);
 
                         return link;
@@ -183,27 +185,26 @@ public class ArticulateTCPackageListPage extends ArticulateTCConsoleBasePage imp
 
                 @Override
                 public void populateItem(Item cellItem, String componentId, IModel model) {
-                    Object bean = model.getObject();
+                    Object contentPackage = model.getObject();
 
-                    final PageParameters params = buildPageParameters(paramPropertyExpressions, bean);
+                    final PageParameters params = buildPageParameters(paramPropertyExpressions, contentPackage);
 
-                    ContentPackage contentPackage = (ContentPackage) bean;
                     boolean isArticulate = contentPackage instanceof ArticulateTCContentPackage;
                     Class<?> pageClass = (isArticulate) ? ArticulateTCPackageRemovePage.class : PackageRemovePage.class;
 
                     if (iconProperty != null) {
-                        String iconPropertyValue = String.valueOf(PropertyResolver.getValue(iconProperty, bean));
+                        String iconPropertyValue = String.valueOf(PropertyResolver.getValue(iconProperty, contentPackage));
                         iconReference = getIconPropertyReference(iconPropertyValue);
                     }
 
                     cellItem.add(new IconLink("cell", pageClass, params, iconReference, popupWindowName));
                 }
             };
+
             columns.add(link);
         }
 
         BasicDataTable table = new BasicDataTable("cpTable", columns, allPackages);
-
         add(table);
     }
 
@@ -296,19 +297,15 @@ public class ArticulateTCPackageListPage extends ArticulateTCConsoleBasePage imp
         }
 
         protected String createLabelModel(IModel<ContentPackage> embeddedModel) {
-            Object target = embeddedModel.getObject();
+            Object contentPackage = embeddedModel.getObject();
 
-            if (target instanceof ContentPackage) {
-                ContentPackage contentPackage = (ContentPackage) target;
-
-                if (contentPackage instanceof ArticulateTCContentPackage) {
-                    return CONFIGURATION_DEFAULT_APP_CONTENT_TYPE;
-                } else {
-                    return "SCORM 2004 v3";
-                }
+            if (contentPackage instanceof ArticulateTCContentPackage) {
+                return CONFIGURATION_DEFAULT_APP_CONTENT_TYPE;
+            } else if (contentPackage instanceof ContentPackage) {
+                return "SCORM 2004 v3";
+            } else {
+                return "unknown";
             }
-
-            return "unknown";
         }
     }
 

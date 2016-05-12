@@ -17,7 +17,7 @@
  * limitations under the License.
  * #L%
  */
-package org.sakaiproject.scorm.ui.console.pages.articulate;
+package org.sakaiproject.atriculate.ui.console.pages;
 
 import java.io.Serializable;
 import java.util.LinkedList;

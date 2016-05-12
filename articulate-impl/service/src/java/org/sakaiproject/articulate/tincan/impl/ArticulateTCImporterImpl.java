@@ -162,8 +162,8 @@ public class ArticulateTCImporterImpl implements ArticulateTCImporter, Articulat
             tinCanAPIMeta = new ArticulateTCMeta(
                 getCurrentContext(),
                 getCurrentUserId(),
-                element.getAttribute(ArticulateTCMeta.ATTR_ID),
-                element.getAttribute(ArticulateTCMeta.ATTR_TITLE)
+                element.getAttribute(ArticulateTCConstants.ARCHIVE_META_ATTR_ID),
+                element.getAttribute(ArticulateTCConstants.ARCHIVE_META_ATTR_TITLE)
             );
         } catch (Exception e) {
             log.error("Error occurred processing the meta XML document.", e);

@@ -28,6 +28,7 @@
         </id>
         <properties name="attempt_id_unique" unique="true">
             <property name="attemptId" column="ATTEMPT_ID" />
+            <property name="attemptNumber" column="ATTEMPT_NUMBER" />
         </properties>
         <property name="score" column="SCORE" />
         <property name="dateCompleted" column="DATE_COMPLETED" />
