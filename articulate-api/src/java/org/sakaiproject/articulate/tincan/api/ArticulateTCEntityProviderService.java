@@ -73,4 +73,13 @@ public interface ArticulateTCEntityProviderService {
      */
     void saveAttemptResult(long contentPackageId, String userId, Double score);
 
+    /**
+     * Update the scores using the scaled score, if the points in the configuration has changed
+     * 
+     * @param gradebookUid the UID of the gradebook
+     * @param assignmentId the ID of the assignment item
+     * @param currentPoints
+     */
+    void updateScaledScores(String gradebookUid, long assignmentId, Double currentPoints);
+
 }

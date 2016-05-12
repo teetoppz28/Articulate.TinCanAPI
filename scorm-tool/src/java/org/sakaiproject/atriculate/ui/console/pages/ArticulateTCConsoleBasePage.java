@@ -31,6 +31,7 @@ import org.apache.wicket.markup.html.resources.CompressedResourceReference;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.sakaiproject.articulate.tincan.api.ArticulateTCEntityProviderService;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
 import org.sakaiproject.atriculate.ui.upload.pages.ArticulateTCUploadPage;
 import org.sakaiproject.component.api.ServerConfigurationService;
@@ -60,6 +61,9 @@ public class ArticulateTCConsoleBasePage extends SakaiPortletWebPage implements 
 
     @SpringBean
     protected LearningManagementSystem lms;
+
+    @SpringBean(name="articulateTCEntityProviderService")
+    protected ArticulateTCEntityProviderService articulateTCEntityProviderService;
 
     @SpringBean(name="articulateTCContentPackageDao")
     protected ArticulateTCContentPackageDao articulateTCContentPackageDao;

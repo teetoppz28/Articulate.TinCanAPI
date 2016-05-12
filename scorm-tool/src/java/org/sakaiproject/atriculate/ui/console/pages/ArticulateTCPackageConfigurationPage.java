@@ -36,12 +36,10 @@ import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
-import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.scorm.service.api.LearningManagementSystem;
 import org.sakaiproject.scorm.ui.console.pages.DisplayDesignatedPackage;
-import org.sakaiproject.scorm.ui.console.pages.PackageListPage;
 import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.service.gradebook.shared.GradebookService;
 import org.sakaiproject.tool.api.ToolManager;
@@ -92,9 +90,15 @@ public class ArticulateTCPackageConfigurationPage extends ArticulateTCConsoleBas
                 Double points = articulateTCContentPackage.getPoints();
 
                 if (hasAssignmentDefined && gradebookChecked) {
+                    Double previousPoints = assignment.getPoints();
                     assignment.setDueDate(articulateTCContentPackage.getDueOn());
                     assignment.setPoints(points);
+                    assignment.setName(fixedTitle);
                     gradebookService.updateAssignment(getContext(), assignment.getName(), assignment);
+                    // update the scores for the new points, if changed
+                    if (previousPoints != points) {
+                        articulateTCEntityProviderService.updateScaledScores(getContext(), assignment.getId(), previousPoints);
+                    }
                 } else if (!hasAssignmentDefined && gradebookChecked) {
                     assignment = new Assignment();
                     assignment.setName(fixedTitle);
@@ -117,7 +121,7 @@ public class ArticulateTCPackageConfigurationPage extends ArticulateTCConsoleBas
 
                 articulateTCContentPackageDao.save(articulateTCContentPackage);
 
-                setResponsePage(params.getBoolean("no-toolbar") ? DisplayDesignatedPackage.class : PackageListPage.class);
+                setResponsePage(params.getBoolean("no-toolbar") ? DisplayDesignatedPackage.class : ArticulateTCPackageListPage.class);
             }
         };
 
@@ -198,18 +202,7 @@ public class ArticulateTCPackageConfigurationPage extends ArticulateTCConsoleBas
         gradebookSettingsTitle.setOutputMarkupId(true);
         gradebookSettingsTitle.setOutputMarkupPlaceholderTag(true);
         gradebookSettingsTitle.setMarkupId("gradebook-input-text-title");
-        gradebookSettingsTitle.setVisible(!hasGradebookItem); // only editable on first load
         gradebookSettingsTitleContainer.add(gradebookSettingsTitle);
-
-        /*
-         * GB Title non-editable text
-         */
-        final Label gradebookSettingsTitleLabel = new Label("gradebook-input-text-title-label", new PropertyModel<String>(articulateTCContentPackage, "gradebookItemTitle"));
-        gradebookSettingsTitleLabel.setOutputMarkupId(true);
-        gradebookSettingsTitleLabel.setOutputMarkupPlaceholderTag(true);
-        gradebookSettingsTitleLabel.setMarkupId("gradebook-input-text-title-label");
-        gradebookSettingsTitleLabel.setVisible(hasGradebookItem);
-        gradebookSettingsTitleContainer.add(gradebookSettingsTitleLabel);
 
         /**
          * GB Points container
@@ -255,7 +248,7 @@ public class ArticulateTCPackageConfigurationPage extends ArticulateTCConsoleBas
         gradebookCheckboxSync.setMarkupId("gradebook-input-checkbox-sync");
         gradebookSettingsCheckboxContainer.add(gradebookCheckboxSync);
 
-        form.add(new CancelButton("cancel", (params.getBoolean("no-toolbar")) ? DisplayDesignatedPackage.class : PackageListPage.class));
+        form.add(new CancelButton("cancel", (params.getBoolean("no-toolbar")) ? DisplayDesignatedPackage.class : ArticulateTCPackageListPage.class));
 
         add(form);
     }

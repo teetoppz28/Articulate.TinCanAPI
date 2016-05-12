@@ -7,21 +7,22 @@ public class ArticulateTCAttemptResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private long id;
+    private Long id;
     private Long attemptId;
     private int attemptNumber;
-    private Double score;
+    private Double scaledScore;
     private Date dateCompleted;
     private Date modified;
 
     public ArticulateTCAttemptResult() {
+        this.scaledScore = 0.0;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -41,12 +42,12 @@ public class ArticulateTCAttemptResult implements Serializable {
         this.attemptNumber = attemptNumber;
     }
 
-    public Double getScore() {
-        return score;
+    public Double getScaledScore() {
+        return scaledScore;
     }
 
-    public void setScore(Double score) {
-        this.score = score;
+    public void setScaledScore(Double scaledScore) {
+        this.scaledScore = scaledScore;
     }
 
     public Date getDateCompleted() {

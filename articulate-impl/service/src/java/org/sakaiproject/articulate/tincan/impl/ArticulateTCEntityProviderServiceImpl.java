@@ -2,6 +2,7 @@ package org.sakaiproject.articulate.tincan.impl;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -23,11 +24,18 @@ import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttemptRes
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
 import org.sakaiproject.articulate.tincan.util.ArticulateTCEntityProviderServiceUtils;
 import org.sakaiproject.articulate.tincan.util.ArticulateTCJsonUtils;
+import org.sakaiproject.authz.api.Member;
 import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.event.api.LearningResourceStoreService;
+import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.service.gradebook.shared.Assignment;
+import org.sakaiproject.service.gradebook.shared.CommentDefinition;
 import org.sakaiproject.service.gradebook.shared.GradebookService;
+import org.sakaiproject.site.api.Site;
+import org.sakaiproject.site.api.SiteService;
+import org.sakaiproject.tool.gradebook.ui.helpers.entity.GradeAssignmentItem;
+import org.sakaiproject.tool.gradebook.ui.helpers.entity.GradeAssignmentItemDetail;
 
 public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntityProviderService, ArticulateTCConstants {
 
@@ -50,6 +58,9 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
 
     @Setter
     private DeveloperHelperService developerHelperService;
+
+    @Setter
+    private SiteService siteService;
 
     private GradebookService gradebookService;
     private LearningResourceStoreService learningResourceStoreService;
@@ -206,7 +217,7 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
             Double assignmentPoints = assignment.getPoints();
             Double studentPoints = (assignmentPoints != null) ? assignmentPoints * scaled : 0d;
 
-            saveAttemptResult(articulateTCContentPackage.getContentPackageId(), articulateTCRequestPayload.getUserId(), studentPoints);
+            saveAttemptResult(articulateTCContentPackage.getContentPackageId(), articulateTCRequestPayload.getUserId(), scaled);
 
             if (!allowedToPostAttemptGrade(articulateTCContentPackage.getContentPackageId(), articulateTCRequestPayload.getUserId())) {
                 // this attempt is greater than the allowed max attempt number
@@ -249,7 +260,7 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
     }
 
     @Override
-    public void saveAttemptResult(long contentPackageId, String userId, Double score) {
+    public void saveAttemptResult(long contentPackageId, String userId, Double scaledScore) {
         ArticulateTCAttempt newestAttempt = articulateTCAttemptDao.lookupNewest(contentPackageId, userId);
 
         if (newestAttempt == null) {
@@ -265,9 +276,49 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
             articulateTCAttemptResult.setAttemptId(newestAttempt.getId());
         }
 
-        articulateTCAttemptResult.setScore(score);
+        articulateTCAttemptResult.setScaledScore(scaledScore);
         articulateTCAttemptResult.setDateCompleted(new Date());
         articulateTCAttemptResultDao.save(articulateTCAttemptResult);
+    }
+
+    @Override
+    public void updateScaledScores(String gradebookUid, long assignmentId, Double currentPoints) {
+        Assignment assignment = gradebookService.getAssignment(gradebookUid, assignmentId);
+
+        if (assignment == null) {
+            // no assignment found in this gradebook
+            return;
+        }
+
+        String siteId = developerHelperService.getCurrentLocationId();
+        Site site = null;
+
+        try {
+            site = siteService.getSite(siteId);
+        } catch (Exception e) {
+            // no current site, so abort saving assignment scores
+            return;
+        }
+
+        Set<Member> members = site.getMembers();
+
+        for (Member member : members) {
+            String previousScoreStr = gradebookService.getAssignmentScoreString(siteId, assignment.getName(), member.getUserId());
+            if (StringUtils.isBlank(previousScoreStr)) {
+                // no current score, move on to next member
+                continue;
+            }
+
+            Double previousScore = Double.parseDouble(previousScoreStr);
+            Double previousScale = previousScore / currentPoints;
+            String newScore = Double.toString(assignment.getPoints() * previousScale);
+
+            CommentDefinition cd = gradebookService.getAssignmentScoreComment(siteId, assignment.getName(), member.getUserId());
+            String comment = cd != null ? cd.getCommentText() : "";
+
+            gradebookService.saveGradeAndCommentForStudent(gradebookUid, assignmentId, member.getUserId(), newScore, comment);
+        }
+
     }
 
 }
