@@ -33,6 +33,7 @@
         <property name="resourceId" column="RESOURCE_ID" />
         <property name="context" column="CONTEXT" />
         <property name="url" column="URL" />
+        <property name="recordType" column="RECORD_TYPE" />
         <property name="releaseOn" column="RELEASE_ON" />
         <property name="dueOn" column="DUE_ON" />
         <property name="acceptUntil" column="ACCEPT_UNTIL" />

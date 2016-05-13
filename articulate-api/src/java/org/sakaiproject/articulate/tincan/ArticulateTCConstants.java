@@ -68,5 +68,7 @@ public interface ArticulateTCConstants extends ScormConstants {
     public final static String CONFIGURATION_DEFAULT_APP_CONTENT_TYPE = "Articulate TinCanAPI";
     public final static int CONFIGURATION_DEFAULT_NUMBER_OF_TRIES_UNLIMITED = -1;
     public final static boolean CONFIGURATION_DEFAULT_ACTIVITY_STATE_DELETED = false;
+    public final static String CONFIGURATION_RECORD_SCORE_TYPE_BEST = "BEST";
+    public final static String CONFIGURATION_RECORD_SCORE_TYPE_LATEST = "LATEST";
 
 }

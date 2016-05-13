@@ -101,7 +101,7 @@ public class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService,
         newAttempt.setLearnerId(userId);
         newAttempt.setLearnerName(displayName);
         newAttempt.setBeginDate(new Date());
-        newAttempt.setAttemptNumber(latestAttempt == null ? 1 :latestAttempt.getAttemptNumber() + 1);
+        newAttempt.setAttemptNumber(latestAttempt == null ? 1 : latestAttempt.getAttemptNumber() + 1);
 
         articulateTCAttemptDao.save(newAttempt);
 

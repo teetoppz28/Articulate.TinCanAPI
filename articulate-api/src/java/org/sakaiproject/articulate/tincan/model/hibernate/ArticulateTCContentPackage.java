@@ -35,6 +35,7 @@ public class ArticulateTCContentPackage implements ArticulateTCConstants, Serial
     private String resourceId;
     private String context;
     private String url;
+    private String recordType;
     private Date releaseOn;
     private Date dueOn;
     private Date acceptUntil;
@@ -53,6 +54,7 @@ public class ArticulateTCContentPackage implements ArticulateTCConstants, Serial
         this.numberOfTries = CONFIGURATION_DEFAULT_NUMBER_OF_TRIES_UNLIMITED;
         this.graded = CONFIGURATION_DEFAULT_IS_GRADED;
         this.points = CONFIGURATION_DEFAULT_POINTS;
+        this.recordType = CONFIGURATION_RECORD_SCORE_TYPE_LATEST;
     }
 
     public ArticulateTCContentPackage(ArticulateTCMeta articulateTCMeta) {
@@ -114,6 +116,14 @@ public class ArticulateTCContentPackage implements ArticulateTCConstants, Serial
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getRecordType() {
+        return recordType;
+    }
+
+    public void setRecordType(String recordType) {
+        this.recordType = recordType;
     }
 
     public Date getReleaseOn() {
@@ -220,6 +230,10 @@ public class ArticulateTCContentPackage implements ArticulateTCConstants, Serial
 
     public void setPoints(Double points) {
         this.points = points;
+    }
+
+    public boolean isRecordBest() {
+        return StringUtils.equals(recordType, CONFIGURATION_RECORD_SCORE_TYPE_BEST);
     }
 
     public boolean isValid() {

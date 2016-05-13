@@ -9,7 +9,7 @@ public class ArticulateTCAttemptResult implements Serializable {
 
     private Long id;
     private Long attemptId;
-    private int attemptNumber;
+    private Long attemptNumber;
     private Double scaledScore;
     private Date dateCompleted;
     private Date modified;
@@ -34,11 +34,11 @@ public class ArticulateTCAttemptResult implements Serializable {
         this.attemptId = attemptId;
     }
 
-    public int getAttemptNumber() {
+    public Long getAttemptNumber() {
         return attemptNumber;
     }
 
-    public void setAttemptNumber(int attemptNumber) {
+    public void setAttemptNumber(Long attemptNumber) {
         this.attemptNumber = attemptNumber;
     }
 

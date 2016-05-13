@@ -215,7 +215,7 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
             }
 
             Double assignmentPoints = assignment.getPoints();
-            Double studentPoints = (assignmentPoints != null) ? assignmentPoints * scaled : 0d;
+            Double attemptScore = (assignmentPoints != null) ? assignmentPoints * scaled : 0d;
 
             saveAttemptResult(articulateTCContentPackage.getContentPackageId(), articulateTCRequestPayload.getUserId(), scaled);
 
@@ -224,12 +224,25 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
                 return;
             }
 
+            String previousScoreStr = gradebookService.getAssignmentScoreString(articulateTCRequestPayload.getSiteId(), assignment.getName(), articulateTCRequestPayload.getUserId());
+
+            if (StringUtils.isNotBlank(previousScoreStr)) {
+                Double previousScore = Double.parseDouble(previousScoreStr);
+                if (articulateTCContentPackage.isRecordBest()) {
+                    // only record the best attempt score
+                    if (attemptScore < previousScore) {
+                        // configured to only record best score and score is not better than previous, skip saving to gradebook
+                        return;
+                    }
+                }
+            }
+
             // set the score on the assignment for the user
             gradebookService.setAssignmentScoreString(
                 articulateTCRequestPayload.getSiteId(),
                 assignment.getName(),
                 articulateTCRequestPayload.getUserId(),
-                Double.toString(studentPoints),
+                Double.toString(attemptScore),
                 CONFIGURATION_DEFAULT_APP_CONTENT_TYPE
             );
         } catch (Exception e) {
@@ -276,6 +289,7 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
             articulateTCAttemptResult.setAttemptId(newestAttempt.getId());
         }
 
+        articulateTCAttemptResult.setAttemptNumber(newestAttempt.getAttemptNumber());
         articulateTCAttemptResult.setScaledScore(scaledScore);
         articulateTCAttemptResult.setDateCompleted(new Date());
         articulateTCAttemptResultDao.save(articulateTCAttemptResult);
