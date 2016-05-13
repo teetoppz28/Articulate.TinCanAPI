@@ -72,6 +72,7 @@
         <property name="articulateTCContentPackageDao" ref="articulateTCContentPackageDao" />
         <property name="articulateTCEntityProviderServiceUtils" ref="articulateTCEntityProviderServiceUtils" />
         <property name="developerHelperService" ref="org.sakaiproject.entitybroker.DeveloperHelperService" />
+        <property name="siteService" ref="org.sakaiproject.site.api.SiteService" />
     </bean>
 
     <bean id="articulateTCEntityProviderServiceUtils" class="org.sakaiproject.articulate.tincan.util.ArticulateTCEntityProviderServiceUtils">

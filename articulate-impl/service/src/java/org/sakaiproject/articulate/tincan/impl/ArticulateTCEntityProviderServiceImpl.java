@@ -1,8 +1,8 @@
 package org.sakaiproject.articulate.tincan.impl;
 
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -24,18 +24,13 @@ import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttemptRes
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
 import org.sakaiproject.articulate.tincan.util.ArticulateTCEntityProviderServiceUtils;
 import org.sakaiproject.articulate.tincan.util.ArticulateTCJsonUtils;
-import org.sakaiproject.authz.api.Member;
 import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.event.api.LearningResourceStoreService;
-import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.service.gradebook.shared.CommentDefinition;
 import org.sakaiproject.service.gradebook.shared.GradebookService;
-import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.SiteService;
-import org.sakaiproject.tool.gradebook.ui.helpers.entity.GradeAssignmentItem;
-import org.sakaiproject.tool.gradebook.ui.helpers.entity.GradeAssignmentItemDetail;
 
 public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntityProviderService, ArticulateTCConstants {
 
@@ -64,6 +59,8 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
 
     private GradebookService gradebookService;
     private LearningResourceStoreService learningResourceStoreService;
+
+    private final static DecimalFormat GRADE_DECIMAL_FORMAT = new DecimalFormat("#.##");
 
     public void init() {
         learningResourceStoreService = (LearningResourceStoreService) ComponentManager.get("org.sakaiproject.event.api.LearningResourceStoreService");
@@ -304,33 +301,33 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
             return;
         }
 
-        String siteId = developerHelperService.getCurrentLocationId();
-        Site site = null;
-
         try {
-            site = siteService.getSite(siteId);
-        } catch (Exception e) {
-            // no current site, so abort saving assignment scores
-            return;
-        }
+            String siteId = developerHelperService.getCurrentLocationId();
+            Map<String, String> studentsToGrade = gradebookService.getViewableStudentsForItemForCurrentUser(gradebookUid, assignmentId);
 
-        Set<Member> members = site.getMembers();
+            for (Map.Entry<String, String> student : studentsToGrade.entrySet()) {
+                if (StringUtils.equalsIgnoreCase(student.getValue(), "grade")) {
+                    String previousScoreStr = gradebookService.getAssignmentScoreString(siteId, assignment.getId(), student.getKey());
 
-        for (Member member : members) {
-            String previousScoreStr = gradebookService.getAssignmentScoreString(siteId, assignment.getName(), member.getUserId());
-            if (StringUtils.isBlank(previousScoreStr)) {
-                // no current score, move on to next member
-                continue;
+                    if (StringUtils.isBlank(previousScoreStr)) {
+                        // no current score, move on to next user
+                        continue;
+                    }
+
+                    Double previousScore = Double.parseDouble(previousScoreStr);
+                    Double previousScale = previousScore / currentPoints;
+                    String newScore = GRADE_DECIMAL_FORMAT.format(assignment.getPoints() * previousScale);
+
+                    CommentDefinition cd = gradebookService.getAssignmentScoreComment(siteId, assignment.getId(), student.getKey());
+                    String comment = cd != null ? cd.getCommentText() : "";
+
+                    gradebookService.saveGradeAndCommentForStudent(gradebookUid, assignmentId, student.getKey(), newScore, comment);
+                }
             }
-
-            Double previousScore = Double.parseDouble(previousScoreStr);
-            Double previousScale = previousScore / currentPoints;
-            String newScore = Double.toString(assignment.getPoints() * previousScale);
-
-            CommentDefinition cd = gradebookService.getAssignmentScoreComment(siteId, assignment.getName(), member.getUserId());
-            String comment = cd != null ? cd.getCommentText() : "";
-
-            gradebookService.saveGradeAndCommentForStudent(gradebookUid, assignmentId, member.getUserId(), newScore, comment);
+        } catch (Exception e) {
+            // an error occurred, so abort saving assignment scores
+            log.error("Error occurred saving grades.", e);
+            return;
         }
 
     }
