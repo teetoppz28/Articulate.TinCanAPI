@@ -1,7 +1,9 @@
 package org.sakaiproject.articulate.tincan.impl;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,6 +31,7 @@ import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.event.api.LearningResourceStoreService;
 import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.service.gradebook.shared.CommentDefinition;
+import org.sakaiproject.service.gradebook.shared.GradeDefinition;
 import org.sakaiproject.service.gradebook.shared.GradebookService;
 import org.sakaiproject.site.api.SiteService;
 
@@ -234,14 +237,26 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
                 }
             }
 
+            // TODO use the GradeDefinition way
+            GradeDefinition gradeDefinition = new GradeDefinition();
+            gradeDefinition.setDateRecorded(new Date());
+            gradeDefinition.setGrade(Double.toString(attemptScore));
+            gradeDefinition.setStudentUid(articulateTCRequestPayload.getUserId());
+            gradeDefinition.setGraderUid(""); // TODO get the instructor ID
+
+            List<GradeDefinition> gradeDefinitions = new ArrayList<GradeDefinition>();
+            gradeDefinitions.add(gradeDefinition);
+
+            gradebookService.saveGradesAndComments(articulateTCRequestPayload.getSiteId(), assignment.getId(), gradeDefinitions);
+
             // set the score on the assignment for the user
-            gradebookService.setAssignmentScoreString(
+            /*gradebookService.setAssignmentScoreString(
                 articulateTCRequestPayload.getSiteId(),
                 assignment.getName(),
                 articulateTCRequestPayload.getUserId(),
                 Double.toString(attemptScore),
                 CONFIGURATION_DEFAULT_APP_CONTENT_TYPE
-            );
+            );*/
         } catch (Exception e) {
             log.error("Error sending grade to gradebook.", e);
         } finally {
