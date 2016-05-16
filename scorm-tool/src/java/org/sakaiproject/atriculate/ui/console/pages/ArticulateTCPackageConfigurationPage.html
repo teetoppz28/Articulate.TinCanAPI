@@ -109,6 +109,21 @@
                 </label>
                 <input type="text" wicket:id="gradebook-input-text-points" />
             </p>
+            <p class="shorttext" wicket:id="gradebook-checkbox-record-score">
+                <label>
+                    <wicket:message key="form.label.gradebook.record.score"></wicket:message>
+                </label>
+                <wicket:container wicket:id="gradebook-checkbox-record-score-radio-group">
+                    <label class="gradebook-record-type">
+                        <input wicket:id="gradebook-input-record-latest" type="radio" name="gradebook-checkbox-record-score"/>
+                        <wicket:message key="form.label.gradebook.record.latest"></wicket:message>
+                    </label>
+                    <label class="gradebook-record-type">
+                        <input wicket:id="gradebook-input-record-best" type="radio" name="gradebook-checkbox-record-score"/>
+                        <wicket:message key="form.label.gradebook.record.best"></wicket:message>
+                    </label>
+                </wicket:container>
+            </p>
             <div wicket:id="gradebook-verify-message" class="alertMessage">
                 <wicket:message key="verify.synchronizeWithGradebook"></wicket:message>
             </div>

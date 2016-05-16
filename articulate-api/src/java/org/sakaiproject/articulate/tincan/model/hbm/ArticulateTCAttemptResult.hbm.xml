@@ -30,7 +30,7 @@
             <property name="attemptId" column="ATTEMPT_ID" />
             <property name="attemptNumber" column="ATTEMPT_NUMBER" />
         </properties>
-        <property name="score" column="SCORE" />
+        <property name="scaledScore" column="SCALED_SCORE" />
         <property name="dateCompleted" column="DATE_COMPLETED" />
         <property name="modified" column="MODIFIED" />
     </class>

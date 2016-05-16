@@ -32,16 +32,17 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.ChoiceRenderer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.Radio;
+import org.apache.wicket.markup.html.form.RadioGroup;
 import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
-import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.scorm.service.api.LearningManagementSystem;
 import org.sakaiproject.scorm.ui.console.pages.DisplayDesignatedPackage;
-import org.sakaiproject.scorm.ui.console.pages.PackageListPage;
 import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.service.gradebook.shared.GradebookService;
 import org.sakaiproject.tool.api.ToolManager;
@@ -92,9 +93,14 @@ public class ArticulateTCPackageConfigurationPage extends ArticulateTCConsoleBas
                 Double points = articulateTCContentPackage.getPoints();
 
                 if (hasAssignmentDefined && gradebookChecked) {
+                    Double previousPoints = assignment.getPoints();
                     assignment.setDueDate(articulateTCContentPackage.getDueOn());
                     assignment.setPoints(points);
                     gradebookService.updateAssignment(getContext(), assignment.getName(), assignment);
+                    // update the scores for the new points, if changed
+                    if (previousPoints != points) {
+                        articulateTCEntityProviderService.updateScaledScores(getContext(), assignment.getId(), previousPoints);
+                    }
                 } else if (!hasAssignmentDefined && gradebookChecked) {
                     assignment = new Assignment();
                     assignment.setName(fixedTitle);
@@ -117,7 +123,7 @@ public class ArticulateTCPackageConfigurationPage extends ArticulateTCConsoleBas
 
                 articulateTCContentPackageDao.save(articulateTCContentPackage);
 
-                setResponsePage(params.getBoolean("no-toolbar") ? DisplayDesignatedPackage.class : PackageListPage.class);
+                setResponsePage(params.getBoolean("no-toolbar") ? DisplayDesignatedPackage.class : ArticulateTCPackageListPage.class);
             }
         };
 
@@ -201,7 +207,7 @@ public class ArticulateTCPackageConfigurationPage extends ArticulateTCConsoleBas
         gradebookSettingsTitle.setVisible(!hasGradebookItem); // only editable on first load
         gradebookSettingsTitleContainer.add(gradebookSettingsTitle);
 
-        /*
+        /**
          * GB Title non-editable text
          */
         final Label gradebookSettingsTitleLabel = new Label("gradebook-input-text-title-label", new PropertyModel<String>(articulateTCContentPackage, "gradebookItemTitle"));
@@ -231,6 +237,27 @@ public class ArticulateTCPackageConfigurationPage extends ArticulateTCConsoleBas
         gradebookSettingsPointsContainer.add(gradebookSettingsPoints);
 
         /**
+         * GB Record Score container
+         */
+        final WebMarkupContainer gradebookSettingsRecordScoreContainer = new WebMarkupContainer("gradebook-checkbox-record-score");
+        gradebookSettingsRecordScoreContainer.setOutputMarkupId(true);
+        gradebookSettingsRecordScoreContainer.setOutputMarkupPlaceholderTag(true);
+        gradebookSettingsRecordScoreContainer.setMarkupId("gradebook-checkbox-record-score");
+        gradebookSettingsRecordScoreContainer.setVisible(hasGradebookInSite && hasGradebookItem);
+        form.add(gradebookSettingsRecordScoreContainer);
+
+        /**
+         * GB Record Score radio group input
+         */
+        final RadioGroup gradebookSettingsRecordScoreRadioGroup = new RadioGroup("gradebook-checkbox-record-score-radio-group", new PropertyModel<String>(articulateTCContentPackage, "recordType"));
+        gradebookSettingsRecordScoreRadioGroup.setOutputMarkupId(true);
+        gradebookSettingsRecordScoreRadioGroup.setOutputMarkupPlaceholderTag(true);
+        gradebookSettingsRecordScoreRadioGroup.setMarkupId("gradebook-checkbox-record-score-radio-group");
+        gradebookSettingsRecordScoreRadioGroup.add(new Radio("gradebook-input-record-best", new Model<String>(CONFIGURATION_RECORD_SCORE_TYPE_BEST)));
+        gradebookSettingsRecordScoreRadioGroup.add(new Radio("gradebook-input-record-latest", new Model<String>(CONFIGURATION_RECORD_SCORE_TYPE_LATEST)));
+        gradebookSettingsRecordScoreContainer.add(gradebookSettingsRecordScoreRadioGroup);
+
+        /**
          * GB checkbox input
          */
         AjaxCheckBox gradebookCheckboxSync = new AjaxCheckBox("gradebook-input-checkbox-sync", new PropertyModel<Boolean>(articulateTCContentPackage, "graded")) {
@@ -248,6 +275,9 @@ public class ArticulateTCPackageConfigurationPage extends ArticulateTCConsoleBas
                 // points row
                 gradebookSettingsPointsContainer.setVisible(isChecked);
                 target.addComponent(gradebookSettingsPointsContainer);
+                // record type row
+                gradebookSettingsRecordScoreContainer.setVisible(isChecked);
+                target.addComponent(gradebookSettingsRecordScoreContainer);
             }
         };
         gradebookCheckboxSync.setOutputMarkupId(true);
@@ -255,7 +285,7 @@ public class ArticulateTCPackageConfigurationPage extends ArticulateTCConsoleBas
         gradebookCheckboxSync.setMarkupId("gradebook-input-checkbox-sync");
         gradebookSettingsCheckboxContainer.add(gradebookCheckboxSync);
 
-        form.add(new CancelButton("cancel", (params.getBoolean("no-toolbar")) ? DisplayDesignatedPackage.class : PackageListPage.class));
+        form.add(new CancelButton("cancel", (params.getBoolean("no-toolbar")) ? DisplayDesignatedPackage.class : ArticulateTCPackageListPage.class));
 
         add(form);
     }
@@ -269,6 +299,7 @@ public class ArticulateTCPackageConfigurationPage extends ArticulateTCConsoleBas
      */
     private String getItemTitle(ArticulateTCContentPackage articulateTCContentPackage, String context) {
         String fixedTitle = articulateTCContentPackage.getGradebookItemTitle();
+
         int count = 1;
 
         while (gradebookService.isAssignmentDefined(context, fixedTitle)) {

@@ -31,6 +31,8 @@ import org.apache.wicket.markup.html.resources.CompressedResourceReference;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
+import org.sakaiproject.articulate.tincan.api.ArticulateTCEntityProviderService;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
 import org.sakaiproject.atriculate.ui.upload.pages.ArticulateTCUploadPage;
 import org.sakaiproject.component.api.ServerConfigurationService;
@@ -43,7 +45,7 @@ import org.sakaiproject.tool.api.ToolManager;
 import org.sakaiproject.wicket.markup.html.SakaiPortletWebPage;
 import org.sakaiproject.wicket.markup.html.link.NavIntraLink;
 
-public class ArticulateTCConsoleBasePage extends SakaiPortletWebPage implements IHeaderContributor {
+public class ArticulateTCConsoleBasePage extends SakaiPortletWebPage implements ArticulateTCConstants, IHeaderContributor {
 
     private static final long serialVersionUID = 1L;
 
@@ -60,6 +62,9 @@ public class ArticulateTCConsoleBasePage extends SakaiPortletWebPage implements 
 
     @SpringBean
     protected LearningManagementSystem lms;
+
+    @SpringBean(name="articulateTCEntityProviderService")
+    protected ArticulateTCEntityProviderService articulateTCEntityProviderService;
 
     @SpringBean(name="articulateTCContentPackageDao")
     protected ArticulateTCContentPackageDao articulateTCContentPackageDao;
@@ -97,13 +102,13 @@ public class ArticulateTCConsoleBasePage extends SakaiPortletWebPage implements 
         uploadContainer.add(uploadLink);
 
         SimpleAttributeModifier className = new SimpleAttributeModifier("class", "current");
-        if( listLink.linksTo(getPage())) {
+        if (listLink.linksTo(getPage())) {
             listContainer.add(className);
             listLink.add(className);
-        } else if(uploadLink.linksTo(getPage())) {
+        } else if (uploadLink.linksTo(getPage())) {
             uploadContainer.add(className);
             uploadLink.add(className);
-        } else if(articulateTCUploadLink.linksTo(getPage())) {
+        } else if (articulateTCUploadLink.linksTo(getPage())) {
             articulateTCUploadContainer.add(className);
             articulateTCUploadLink.add(className);
         }
@@ -115,8 +120,8 @@ public class ArticulateTCConsoleBasePage extends SakaiPortletWebPage implements 
         Icon uploadIcon = new Icon("uploadIcon", UPLOAD_ICON);
         Icon articulateTCUploadIcon = new Icon("articulate-tc-upload-icon", UPLOAD_ICON);
 
-        boolean enableMenuBarIcons = serverConfigurationService.getBoolean( SAK_PROP_ENABLE_MENU_BUTTON_ICONS, true );
-        if(enableMenuBarIcons) {
+        boolean enableMenuBarIcons = serverConfigurationService.getBoolean(SAK_PROP_ENABLE_MENU_BUTTON_ICONS, true);
+        if (enableMenuBarIcons) {
             listIcon.setVisible(canUpload || canValidate);
             uploadIcon.setVisible(canUpload);
             articulateTCUploadIcon.setVisible(canUpload);
@@ -164,6 +169,7 @@ public class ArticulateTCConsoleBasePage extends SakaiPortletWebPage implements 
     public void renderHead(IHeaderResponse response) {
         super.renderHead(response);
         response.renderCSSReference(CONSOLE_CSS);
+        response.renderCSSReference(HTML_ARTICULATE_TC_CSS);
     }
 
     protected ResourceReference getPageIconReference() {
