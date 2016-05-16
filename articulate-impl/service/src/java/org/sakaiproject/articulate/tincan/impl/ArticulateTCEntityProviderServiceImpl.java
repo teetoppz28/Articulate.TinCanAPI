@@ -299,7 +299,7 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
             return;
         }
 
-        ArticulateTCAttemptResult articulateTCAttemptResult = articulateTCAttemptResultDao.findByAttemptId(newestAttempt.getId());
+        ArticulateTCAttemptResult articulateTCAttemptResult = articulateTCAttemptResultDao.findByAttemptIdNumber(newestAttempt.getId(), newestAttempt.getAttemptNumber());
 
         if (articulateTCAttemptResult == null) {
             articulateTCAttemptResult = new ArticulateTCAttemptResult();

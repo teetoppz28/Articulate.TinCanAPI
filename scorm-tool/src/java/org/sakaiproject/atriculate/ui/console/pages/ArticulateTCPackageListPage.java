@@ -46,6 +46,8 @@ import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPac
 import org.sakaiproject.atriculate.ui.console.pages.ArticulateTCPackageConfigurationPage;
 import org.sakaiproject.atriculate.ui.console.pages.ArticulateTCPackageRemovePage;
 import org.sakaiproject.atriculate.ui.player.pages.ArticulateTCPlayerPage;
+import org.sakaiproject.atriculate.ui.reporting.pages.ArticulateTCLearnerResultsPage;
+import org.sakaiproject.atriculate.ui.reporting.pages.ArticulateTCResultsListPage;
 import org.sakaiproject.scorm.model.api.ContentPackage;
 import org.sakaiproject.scorm.service.api.ScormContentService;
 import org.sakaiproject.scorm.ui.console.components.DecoratedDatePropertyColumn;
@@ -158,9 +160,37 @@ public class ArticulateTCPackageListPage extends ArticulateTCConsoleBasePage imp
         }
 
         if (canGrade) {
-            actionColumn.addAction(new Action(new StringResourceModel("column.action.grade.label", this, null), ResultsListPage.class, paramPropertyExpressions));
+            actionColumn.addAction(
+                    new Action(new ResourceModel("column.action.grade.label"), paramPropertyExpressions) {
+                        private static final long serialVersionUID = 1L;
+                        @Override
+                        public Component newLink(String id, Object contentPackage) {
+                            boolean isArticulate = contentPackage instanceof ArticulateTCContentPackage;
+                            pageClass = (isArticulate) ? ArticulateTCResultsListPage.class : ResultsListPage.class;
+                            PageParameters params = buildPageParameters(paramPropertyExpressions, contentPackage);
+                            Link link = new BookmarkablePageLabeledLink(id, new ResourceModel("column.action.grade.label"), pageClass, params);
+
+                            return link;
+                        }
+                    }
+                );
+            //actionColumn.addAction(new Action(new StringResourceModel("column.action.grade.label", this, null), ResultsListPage.class, paramPropertyExpressions));
         } else if (canViewResults) {
-            actionColumn.addAction(new Action(new StringResourceModel("column.action.grade.label", this, null), LearnerResultsPage.class, paramPropertyExpressions));
+            actionColumn.addAction(
+                    new Action(new ResourceModel("column.action.grade.label"), paramPropertyExpressions) {
+                        private static final long serialVersionUID = 1L;
+                        @Override
+                        public Component newLink(String id, Object contentPackage) {
+                            boolean isArticulate = contentPackage instanceof ArticulateTCContentPackage;
+                            pageClass = (isArticulate) ? ArticulateTCLearnerResultsPage.class : LearnerResultsPage.class;
+                            PageParameters params = buildPageParameters(paramPropertyExpressions, contentPackage);
+                            Link link = new BookmarkablePageLabeledLink(id, new ResourceModel("column.action.grade.label"), pageClass, params);
+
+                            return link;
+                        }
+                    }
+                );
+            //actionColumn.addAction(new Action(new StringResourceModel("column.action.grade.label", this, null), LearnerResultsPage.class, paramPropertyExpressions));
         }
 
         columns.add(actionColumn);

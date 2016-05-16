@@ -64,10 +64,25 @@ public class ArticulateTCAttemptResultDaoImpl extends HibernateDaoSupport implem
 
     @SuppressWarnings("unchecked")
     @Override
-    public ArticulateTCAttemptResult findByAttemptId(long attemptId) {
+    public List<ArticulateTCAttemptResult> findByAttemptId(long attemptId) {
         String statement = new StringBuilder(" FROM ").append(ArticulateTCAttemptResult.class.getName()).append(" WHERE attemptId = ? ").toString();
 
         List<ArticulateTCAttemptResult> list = getHibernateTemplate().find(statement, new Object[] {attemptId});
+
+        // no row exists with the package ID
+        if (list.isEmpty()) {
+            return null;
+        }
+
+        return list;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public ArticulateTCAttemptResult findByAttemptIdNumber(long attemptId, long attemptNumber) {
+        String statement = new StringBuilder(" FROM ").append(ArticulateTCAttemptResult.class.getName()).append(" WHERE attemptId = ? AND attemptNumber = ? ").toString();
+
+        List<ArticulateTCAttemptResult> list = getHibernateTemplate().find(statement, new Object[] {attemptId, attemptNumber});
 
         // no row exists with the package ID
         if (list.isEmpty()) {
