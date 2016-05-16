@@ -4,7 +4,7 @@ import java.text.DecimalFormat;
 
 import org.sakaiproject.scorm.api.ScormConstants;
 
-interface ArticulateTCConstants extends ScormConstants {
+public interface ArticulateTCConstants extends ScormConstants {
 
     /**
      * Entity provider prefix
