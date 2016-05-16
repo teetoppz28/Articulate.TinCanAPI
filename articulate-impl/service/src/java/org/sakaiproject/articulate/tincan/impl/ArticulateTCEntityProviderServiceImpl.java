@@ -63,8 +63,6 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
     private GradebookService gradebookService;
     private LearningResourceStoreService learningResourceStoreService;
 
-    private final static DecimalFormat GRADE_DECIMAL_FORMAT = new DecimalFormat("#.##");
-
     public void init() {
         learningResourceStoreService = (LearningResourceStoreService) ComponentManager.get("org.sakaiproject.event.api.LearningResourceStoreService");
         gradebookService = (GradebookService)  ComponentManager.get("org.sakaiproject.service.gradebook.GradebookService");
