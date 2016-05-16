@@ -157,6 +157,10 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
     @Override
     public void processGradebookData(String statementJson, String payload) {
         try {
+            /*
+             * Get the attempt and package objects
+             */
+
             ArticulateTCRequestPayload articulateTCRequestPayload = articulateTCEntityProviderServiceUtils.getPayloadObject(payload);
             ArticulateTCContentPackage articulateTCContentPackage = articulateTCContentPackageDao.load(Long.parseLong(articulateTCRequestPayload.getPackageId()));
 
@@ -183,6 +187,10 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
                 // assignment is not defined in gradebook
                 return;
             }
+
+            /*
+             * Retrieve data from the objects
+             */
 
             Map<String, Object> statement = (Map<String, Object>) ArticulateTCJsonUtils.parseFromJsonObject(statementJson);
             if (statement.isEmpty()) {
@@ -215,9 +223,18 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
             }
 
             Double assignmentPoints = assignment.getPoints();
+
+            /*
+             * Save the Attempt result
+             */
+
             Double attemptScore = (assignmentPoints != null) ? assignmentPoints * scaled : 0d;
 
             saveAttemptResult(articulateTCContentPackage.getContentPackageId(), articulateTCRequestPayload.getUserId(), scaled);
+
+            /*
+             * Save grade to gradebook
+             */
 
             if (!allowedToPostAttemptGrade(articulateTCContentPackage.getContentPackageId(), articulateTCRequestPayload.getUserId())) {
                 // this attempt is greater than the allowed max attempt number
@@ -237,26 +254,16 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
                 }
             }
 
-            // TODO use the GradeDefinition way
             GradeDefinition gradeDefinition = new GradeDefinition();
             gradeDefinition.setDateRecorded(new Date());
             gradeDefinition.setGrade(Double.toString(attemptScore));
             gradeDefinition.setStudentUid(articulateTCRequestPayload.getUserId());
-            gradeDefinition.setGraderUid(""); // TODO get the instructor ID
+            gradeDefinition.setGraderUid(articulateTCContentPackage.getCreatedBy());
 
             List<GradeDefinition> gradeDefinitions = new ArrayList<GradeDefinition>();
             gradeDefinitions.add(gradeDefinition);
 
             gradebookService.saveGradesAndComments(articulateTCRequestPayload.getSiteId(), assignment.getId(), gradeDefinitions);
-
-            // set the score on the assignment for the user
-            /*gradebookService.setAssignmentScoreString(
-                articulateTCRequestPayload.getSiteId(),
-                assignment.getName(),
-                articulateTCRequestPayload.getUserId(),
-                Double.toString(attemptScore),
-                CONFIGURATION_DEFAULT_APP_CONTENT_TYPE
-            );*/
         } catch (Exception e) {
             log.error("Error sending grade to gradebook.", e);
         } finally {
