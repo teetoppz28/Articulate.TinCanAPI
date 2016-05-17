@@ -7,7 +7,7 @@
 
 .launch-content iframe {
     position:absolute;
-    top:0;
+    top:50px;
     left:0;
     width:100%;
     height:100%;
@@ -18,4 +18,40 @@
     margin: 0;
     padding: 0;
     width: 60px !important;
+}
+
+.results-container {
+    width: 80%;
+    margin: 1em auto 2em auto;
+    padding: 0;
+}
+
+.results-table-heading {
+    width: 80%;
+    margin: .5em auto;
+    padding: 0;
+}
+
+.results-table {
+    width: 100%;
+}
+
+.results-table th,
+.results-table td {
+    width: 33%;
+    max-width: 33%;
+    min-width: 33%;
+}
+
+.results-table-label {
+    width: 500px;
+    margin: 1em auto;
+    padding: 0;
+    text-align: center;
+}
+
+.back-button {
+    margin: 1em;
+    color: #fff !important;
+    text-decoration: none !important;
 }

@@ -19,33 +19,21 @@
  */
 package org.sakaiproject.atriculate.ui.reporting.pages;
 
-import java.util.List;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.wicket.PageParameters;
-import org.apache.wicket.ResourceReference;
-import org.apache.wicket.model.IModel;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCAttemptDao;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCAttemptResultDao;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
-import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttempt;
-import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
 import org.sakaiproject.atriculate.ui.console.pages.ArticulateTCConsoleBasePage;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.service.gradebook.shared.GradebookService;
 import org.sakaiproject.site.api.SiteService;
 import org.sakaiproject.user.api.UserDirectoryService;
-import org.sakaiproject.wicket.markup.html.repeater.data.table.DecoratedPropertyColumn;
 
 public abstract class ArticulateTCBaseResultsPage extends ArticulateTCConsoleBasePage {
 
     private static final long serialVersionUID = 1L;
-    private static final Log LOG = LogFactory.getLog(ArticulateTCBaseResultsPage.class);
-
-    private static final ResourceReference NEXT_ICON = new ResourceReference(ArticulateTCBaseResultsPage.class, RES_PREFIX + "res/arrow_right.png");
-    private static final ResourceReference PREV_ICON = new ResourceReference(ArticulateTCBaseResultsPage.class, RES_PREFIX + "res/arrow_left.png");
 
     @SpringBean(name="articulateTCAttemptDao")
     protected ArticulateTCAttemptDao articulateTCAttemptDao;
@@ -70,43 +58,14 @@ public abstract class ArticulateTCBaseResultsPage extends ArticulateTCConsoleBas
 
     public ArticulateTCBaseResultsPage(PageParameters pageParams) {
         super(pageParams);
-
-        long contentPackageId = pageParams.getLong("contentPackageId");
-        String learnerId = developerHelperService.getCurrentUserId();
-
-        ArticulateTCContentPackage articulateTCContentPackage = articulateTCContentPackageDao.get(contentPackageId);
-
-        List<ArticulateTCAttempt> attempts = articulateTCAttemptDao.find(contentPackageId, learnerId);
-        int numberOfAttempts = attempts.size();
-        long attemptNumber = 0;
-
     }
 
-    public class PercentageColumn extends DecoratedPropertyColumn {
-
-        private static final long serialVersionUID = 1L;
-
-        public PercentageColumn(IModel displayModel, String sortProperty, String propertyExpression) {
-            super(displayModel, sortProperty, propertyExpression);
-        }
-
-        @Override
-        public Object convertObject(Object object) {
-            Double d = (Double)object;
-            
-            return getPercentageString(d);
-        }
-
-        private String getPercentageString(double d) {
-            double p = d * 100.0;
-            String percentage = "" + p + " %";
-
-            if (d < 0.0) {
-                percentage = "Not available";
-            }
-
-            return percentage;
-        }
+    @Override
+    public void renderHead(IHeaderResponse response) {
+        super.renderHead(response);
+        response.renderCSSReference(CONSOLE_CSS);
+        response.renderCSSReference(HTML_ARTICULATE_TC_CSS);
+        response.renderCSSReference(HTML_BOOTSTRAP_CSS);
     }
 
 }

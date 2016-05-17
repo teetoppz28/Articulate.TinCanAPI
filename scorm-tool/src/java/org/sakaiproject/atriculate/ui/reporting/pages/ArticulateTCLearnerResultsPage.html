@@ -27,7 +27,38 @@
 </head>
 <body>
     <wicket:extend>
-        <span wicket:id="boom"></span>
+
+    <div class="prev">
+        <a wicket:id="link-back-results-page" class="btn btn-info back-button"><wicket:message key="link.back.results.page" /></a>
+        <a wicket:id="link-back-list-page" class="btn btn-info back-button"><wicket:message key="link.back.list.page" /></a>
+    </div>
+    <div class="results-table-heading">
+        <ul class="list-group">
+            <li class="list-group-item">
+                <span><wicket:message key="table.full.name" /></span>
+                <span wicket:id="full-name"></span>
+            </li>
+            <li class="list-group-item">
+                <span><wicket:message key="table.gradebook.score" /></span>
+                <span wicket:id="gradebook-score"></span>
+            </li>
+        </ul>
+    </div>
+
+    <div class="results-container">
+        <div class="results-table-label">
+            <h3><wicket:message key="results-table-complete-label" /></h3>
+        </div>
+        <table wicket:id="results-table-complete" class="results-table table-striped table-bordered table-hover table-condensed table-responsive"></table>
+    </div>
+
+    <div class="results-container">
+        <div class="results-table-label">
+            <h3><wicket:message key="results-table-incomplete-label" /></h3>
+        </div>
+        <table wicket:id="results-table-incomplete" class="results-table table-striped table-bordered table-hover table-condensed table-responsive"></table>
+    </div>
+
     </wicket:extend>
 </body>
 </html>

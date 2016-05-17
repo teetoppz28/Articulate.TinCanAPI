@@ -74,7 +74,7 @@ public class ArticulateTCPackageListPage extends ArticulateTCConsoleBasePage imp
     @SpringBean(name="org.sakaiproject.scorm.service.api.ScormContentService")
     private ScormContentService scormContentService;
 
-    private static final ResourceReference DELETE_ICON = new ResourceReference(PackageListPage.class, RES_PREFIX + "res/delete.png");
+    private static final ResourceReference DELETE_ICON = new ResourceReference(PackageListPage.class, RES_CONSOLE_PREFIX + "res/delete.png");
 
     @SuppressWarnings("unchecked")
     public ArticulateTCPackageListPage(PageParameters params) {

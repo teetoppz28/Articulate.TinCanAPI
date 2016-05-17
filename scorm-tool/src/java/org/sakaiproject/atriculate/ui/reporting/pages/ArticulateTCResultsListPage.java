@@ -27,15 +27,11 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.ResourceReference;
-import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.StringResourceModel;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.sakaiproject.articulate.tincan.model.ArticulateTCMemberAttemptResult;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttempt;
-import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttemptResult;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
 import org.sakaiproject.atriculate.ui.reporting.providers.ArticulateTCResultsListProvider;
 import org.sakaiproject.authz.api.Member;
@@ -48,7 +44,7 @@ public class ArticulateTCResultsListPage extends ArticulateTCBaseResultsPage {
 
     private static final long serialVersionUID = 1L;
 
-    private static final ResourceReference PAGE_ICON = new ResourceReference(ArticulateTCLearnerResultsPage.class, RES_PREFIX + "res/report.png");
+    private static final ResourceReference PAGE_ICON = new ResourceReference(ArticulateTCLearnerResultsPage.class, RES_CONSOLE_PREFIX + "res/report.png");
 
     public ArticulateTCResultsListPage(PageParameters pageParams) {
         super(pageParams);
@@ -98,12 +94,6 @@ public class ArticulateTCResultsListPage extends ArticulateTCBaseResultsPage {
 
             ArticulateTCAttempt articulateTCAttempt = articulateTCAttemptDao.lookupNewest(contentPackageId, member.getUserId());
 
-            List<ArticulateTCAttemptResult> articulateTCAttemptResults = null;
-
-            if (articulateTCAttempt != null) {
-                articulateTCAttemptResults = articulateTCAttemptResultDao.findByAttemptId(articulateTCAttempt.getId());
-            }
-
             String gradebookScore = "-";
             if (assignmentId != null) {
                 gradebookScore = gradebookService.getAssignmentScoreString(siteId, assignmentId, member.getUserId());
@@ -116,7 +106,6 @@ public class ArticulateTCResultsListPage extends ArticulateTCBaseResultsPage {
             articulateTCMemberAttemptResult.setLastName(lastName);
             articulateTCMemberAttemptResult.setFullName(fullName);
             articulateTCMemberAttemptResult.setArticulateTCAttempt(articulateTCAttempt);
-            articulateTCMemberAttemptResult.setArticulateTCAttemptResults(articulateTCAttemptResults);
             articulateTCMemberAttemptResult.setGradebookScore(gradebookScore);
 
             articulateTCMemberAttemptResults.add(articulateTCMemberAttemptResult);

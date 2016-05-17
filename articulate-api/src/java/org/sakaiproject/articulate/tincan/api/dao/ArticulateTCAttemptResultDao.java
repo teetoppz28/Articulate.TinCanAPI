@@ -31,12 +31,29 @@ public interface ArticulateTCAttemptResultDao {
     ArticulateTCAttemptResult load(long id);
 
     /**
-     * Finds the row(s) with the given attempt ID
+     * Finds the completed attempt row(s) with the given attempt ID
      * 
      * @param attemptId the attempt ID
      * @return
      */
     List<ArticulateTCAttemptResult> findByAttemptId(long attemptId);
+
+    /**
+     * Finds the incompleted attempt row(s) with the given attempt ID
+     * 
+     * @param attemptId the attempt ID
+     * @return
+     */
+    List<ArticulateTCAttemptResult> findByAttemptIdIncomplete(long attemptId);
+
+    /**
+     * Finds the row(s) with the given attempt ID
+     * 
+     * @param attemptId the attempt ID
+     * @param onlyCompleted only retrieve completed attempts?
+     * @return
+     */
+    List<ArticulateTCAttemptResult> findByAttemptId(long attemptId, boolean onlyCompleted);
 
     /**
      * Finds the row with the given attempt ID and the attempt number

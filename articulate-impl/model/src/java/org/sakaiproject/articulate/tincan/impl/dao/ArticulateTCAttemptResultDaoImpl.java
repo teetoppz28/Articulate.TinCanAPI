@@ -62,14 +62,40 @@ public class ArticulateTCAttemptResultDaoImpl extends HibernateDaoSupport implem
         return articulateTCAttemptResult;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<ArticulateTCAttemptResult> findByAttemptId(long attemptId) {
-        String statement = new StringBuilder(" FROM ").append(ArticulateTCAttemptResult.class.getName()).append(" WHERE attemptId = ? ").toString();
+        return findByAttemptId(attemptId, true);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<ArticulateTCAttemptResult> findByAttemptId(long attemptId, boolean onlyCompleted) {
+        String where = " WHERE attemptId = ? ";
+
+        if (onlyCompleted) {
+            where += "AND dateCompleted IS NOT NULL ";
+        }
+
+        String statement = new StringBuilder(" FROM ").append(ArticulateTCAttemptResult.class.getName()).append(where).toString();
 
         List<ArticulateTCAttemptResult> list = getHibernateTemplate().find(statement, new Object[] {attemptId});
 
-        // no row exists with the package ID
+        // no row exists with the attempt ID
+        if (list.isEmpty()) {
+            return null;
+        }
+
+        return list;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<ArticulateTCAttemptResult> findByAttemptIdIncomplete(long attemptId) {
+        String statement = new StringBuilder(" FROM ").append(ArticulateTCAttemptResult.class.getName()).append(" WHERE attemptId = ? AND dateCompleted IS NULL ").toString();
+
+        List<ArticulateTCAttemptResult> list = getHibernateTemplate().find(statement, new Object[] {attemptId});
+
+        // no row exists with the attempt ID
         if (list.isEmpty()) {
             return null;
         }

@@ -49,12 +49,13 @@ public class ArticulateTCConsoleBasePage extends SakaiPortletWebPage implements 
 
     private static final long serialVersionUID = 1L;
 
-    protected final static String RES_PREFIX = "../../../../scorm/ui/console/pages/";
-    private static ResourceReference CONSOLE_CSS = new CompressedResourceReference(ArticulateTCConsoleBasePage.class, RES_PREFIX + "res/scorm_console.css");
-    private static ResourceReference LIST_ICON = new ResourceReference(ArticulateTCConsoleBasePage.class, RES_PREFIX + "res/table.png");
-    private static ResourceReference UPLOAD_ICON = new ResourceReference(ArticulateTCConsoleBasePage.class, RES_PREFIX + "res/table_add.png");
-    private static final String SAK_PROP_ENABLE_MENU_BUTTON_ICONS = "scorm.menuButton.icons";
-    protected static final String SAK_PROP_SCORM_ENABLE_EMAIL = "scorm.enable.email";
+    protected final static String RES_CONSOLE_PREFIX = "../../../../scorm/ui/console/pages/";
+    protected final static String RES_REPORTING_PREFIX = "../../../../scorm/ui/reporting/pages/";
+    protected final static ResourceReference CONSOLE_CSS = new CompressedResourceReference(ArticulateTCConsoleBasePage.class, RES_CONSOLE_PREFIX + "res/scorm_console.css");
+    private static ResourceReference LIST_ICON = new ResourceReference(ArticulateTCConsoleBasePage.class, RES_CONSOLE_PREFIX + "res/table.png");
+    private static ResourceReference UPLOAD_ICON = new ResourceReference(ArticulateTCConsoleBasePage.class, RES_CONSOLE_PREFIX + "res/table_add.png");
+    private final static String SAK_PROP_ENABLE_MENU_BUTTON_ICONS = "scorm.menuButton.icons";
+    protected final static String SAK_PROP_SCORM_ENABLE_EMAIL = "scorm.enable.email";
 
     // The feedback panel component displays dynamic messages to the user
     protected FeedbackPanel feedback;

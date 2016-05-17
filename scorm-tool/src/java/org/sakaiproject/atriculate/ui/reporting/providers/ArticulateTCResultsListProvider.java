@@ -68,7 +68,7 @@ public class ArticulateTCResultsListProvider extends SortableDataProvider<Articu
         }
 
         public int size() {
-           return articulateTCMemberAttemptResults.size();
+           return articulateTCMemberAttemptResults != null ? articulateTCMemberAttemptResults.size() : 0;
         }
 
         public IModel<ArticulateTCMemberAttemptResult> model(ArticulateTCMemberAttemptResult articulateTCMemberAttemptResult) {

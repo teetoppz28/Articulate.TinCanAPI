@@ -2,7 +2,6 @@ package org.sakaiproject.atriculate.ui.reporting.pages;
 
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
-import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
@@ -51,17 +50,29 @@ public class ArticulateTCStudentReportLinkPanel<T> extends PropertyColumn<T> {
             Link<T> link = new Link<T>("link", rowModel) {
                 private static final long serialVersionUID = 1L;
 
+                ArticulateTCMemberAttemptResult articulateTCMemberAttemptResult = (ArticulateTCMemberAttemptResult) rowModel.getObject();
+
                 @Override
                 public void onClick() {
-                    ArticulateTCMemberAttemptResult articulateTCMemberAttemptResult = (ArticulateTCMemberAttemptResult) rowModel.getObject();
-                    pageParameters.add("userId", articulateTCMemberAttemptResult.getUserId());
+                    pageParameters.add("fullName", articulateTCMemberAttemptResult.getFullName());
+                    pageParameters.add("gradebookScore", articulateTCMemberAttemptResult.getGradebookScore());
+
+                    if (articulateTCMemberAttemptResult.getArticulateTCAttempt() != null) {
+                        pageParameters.add("attemptId", Long.toString(articulateTCMemberAttemptResult.getArticulateTCAttempt().getId()));
+                    }
+
                     setResponsePage(ArticulateTCLearnerResultsPage.class, pageParameters);
+                }
+
+                @Override
+                public boolean isEnabled() {
+                    return articulateTCMemberAttemptResult.getArticulateTCAttempt() != null;
                 }
             };
 
-            add(link);
-
             link.add(new Label("label", labelModel));
+
+            add(link);
         }
     }
 
