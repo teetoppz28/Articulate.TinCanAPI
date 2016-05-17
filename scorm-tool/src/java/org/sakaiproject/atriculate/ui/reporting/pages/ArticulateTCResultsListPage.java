@@ -27,6 +27,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.ResourceReference;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.model.Model;
@@ -122,14 +123,13 @@ public class ArticulateTCResultsListPage extends ArticulateTCBaseResultsPage {
         }
 
         List<IColumn<ArticulateTCMemberAttemptResult>> columns = new ArrayList<IColumn<ArticulateTCMemberAttemptResult>>();
-        columns.add(new PropertyColumn<ArticulateTCMemberAttemptResult>(new StringResourceModel("column.header.name", this, null), "fullName","fullName"));
+        columns.add(new ArticulateTCStudentReportLinkPanel<ArticulateTCMemberAttemptResult>(new StringResourceModel("column.header.name", this, null), "fullName", "fullName", pageParams));
         columns.add(new PropertyColumn<ArticulateTCMemberAttemptResult>(new StringResourceModel("column.header.id", this, null), "eid", "eid"));
         columns.add(new PropertyColumn<ArticulateTCMemberAttemptResult>(new StringResourceModel("column.header.attempts", this, null), "attemptNumber", "articulateTCAttempt.attemptNumber"));
         columns.add(new PropertyColumn<ArticulateTCMemberAttemptResult>(new StringResourceModel("column.header.gradebook.score", this, null), "gradebookScore", "gradebookScore"));
 
         BasicDataTable dataTable = new BasicDataTable("results-table", columns, new ArticulateTCResultsListProvider(articulateTCMemberAttemptResults));
         add(dataTable);
-        // TODO create action link to display student attempts
 
     }
 

@@ -174,7 +174,6 @@ public class ArticulateTCPackageListPage extends ArticulateTCConsoleBasePage imp
                         }
                     }
                 );
-            //actionColumn.addAction(new Action(new StringResourceModel("column.action.grade.label", this, null), ResultsListPage.class, paramPropertyExpressions));
         } else if (canViewResults) {
             actionColumn.addAction(
                     new Action(new ResourceModel("column.action.grade.label"), paramPropertyExpressions) {
@@ -190,7 +189,6 @@ public class ArticulateTCPackageListPage extends ArticulateTCConsoleBasePage imp
                         }
                     }
                 );
-            //actionColumn.addAction(new Action(new StringResourceModel("column.action.grade.label", this, null), LearnerResultsPage.class, paramPropertyExpressions));
         }
 
         columns.add(actionColumn);
