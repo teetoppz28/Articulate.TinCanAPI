@@ -108,17 +108,5 @@ public interface ScormContentService extends ScormConstants {
 	 * @throws ResourceStorageException
 	 */
 	public int storeAndValidate(String resourceId, boolean isValidateToSchema, String encoding) throws ResourceStorageException;
-
-    /**
-     * Validates AND STORES the content package.
-     * @param resourceId
-     * @param isValidateToSchema
-     * @param encoding
-     * @param createContentPackage TODO
-     * @param isTinCanAPI
-     * @return
-     * @throws ResourceStorageException
-     */
-    public int storeAndValidate(String resourceId, boolean isValidateToSchema, String encoding, boolean isTinCanAPI) throws ResourceStorageException;
-
+	
 }

@@ -40,6 +40,7 @@
         <dependency>
             <groupId>org.sakaiproject.scorm</groupId>
             <artifactId>sakai-wicket-for-scorm-tool</artifactId>
+            <version>${project.version}</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
@@ -85,6 +86,7 @@
         <dependency>
             <groupId>org.sakaiproject.scorm</groupId>
             <artifactId>sakai-scorm-service-impl</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>xerces</groupId>
@@ -155,10 +157,6 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
         </dependency>
     </dependencies>
 

@@ -72,7 +72,7 @@ public class ScormTool extends SakaiWebApplication {
     @Override
     public Class getHomePage() {
         // check to see if articulate contant should be allowed
-        boolean allowArticulate = ServerConfigurationService.getBoolean("articulate.tincanapi.package.allowed", false);
+        boolean allowArticulate = ServerConfigurationService.getBoolean("articulate.tincanapi.package.allowed", true);
         Class<?> homePage = allowArticulate ? ArticulateTCPackageListPage.class : PackageListPage.class;
 
         return homePage;
