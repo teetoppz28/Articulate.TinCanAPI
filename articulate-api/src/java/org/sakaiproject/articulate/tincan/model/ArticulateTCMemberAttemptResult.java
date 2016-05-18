@@ -1,11 +1,10 @@
 package org.sakaiproject.articulate.tincan.model;
 
 import java.io.Serializable;
-import java.util.List;
 
-import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttempt;
-import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttemptResult;
-
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public class ArticulateTCMemberAttemptResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -15,8 +14,8 @@ public class ArticulateTCMemberAttemptResult implements Serializable {
     private String firstName;
     private String lastName;
     private String fullName;
-    private ArticulateTCAttempt articulateTCAttempt;
-    private List<ArticulateTCAttemptResult> articulateTCAttemptResults;
+    private String attemptNumber;
+    private String gradebookPointsPossible;
     private String gradebookScore;
 
     public ArticulateTCMemberAttemptResult() {
@@ -62,21 +61,12 @@ public class ArticulateTCMemberAttemptResult implements Serializable {
         this.lastName = lastName;
     }
 
-    public ArticulateTCAttempt getArticulateTCAttempt() {
-        return articulateTCAttempt;
+    public String getAttemptNumber() {
+        return attemptNumber;
     }
 
-    public void setArticulateTCAttempt(ArticulateTCAttempt articulateTCAttempt) {
-        this.articulateTCAttempt = articulateTCAttempt;
-    }
-
-    public List<ArticulateTCAttemptResult> getArticulateTCAttemptResults() {
-        return articulateTCAttemptResults;
-    }
-
-    public void setArticulateTCAttemptResults(
-            List<ArticulateTCAttemptResult> articulateTCAttemptResults) {
-        this.articulateTCAttemptResults = articulateTCAttemptResults;
+    public void setAttemptNumber(String attemptNumber) {
+        this.attemptNumber = attemptNumber;
     }
 
     public String getGradebookScore() {
@@ -85,6 +75,18 @@ public class ArticulateTCMemberAttemptResult implements Serializable {
 
     public void setGradebookScore(String gradebookScore) {
         this.gradebookScore = gradebookScore;
+    }
+
+    public String getGradebookPointsPossible() {
+        return gradebookPointsPossible;
+    }
+
+    public void setGradebookPointsPossible(String gradebookPointsPossible) {
+        this.gradebookPointsPossible = gradebookPointsPossible;
+    }
+
+    public String getGradebookDisplay() {
+        return (gradebookScore == null ? "-" : gradebookScore) + " / " + gradebookPointsPossible;
     }
 
 }

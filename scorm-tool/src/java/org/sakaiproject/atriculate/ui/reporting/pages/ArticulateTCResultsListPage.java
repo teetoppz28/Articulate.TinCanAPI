@@ -29,30 +29,37 @@ import org.apache.wicket.PageParameters;
 import org.apache.wicket.ResourceReference;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.StringResourceModel;
 import org.sakaiproject.articulate.tincan.model.ArticulateTCMemberAttemptResult;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttempt;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
+import org.sakaiproject.atriculate.ui.console.pages.ArticulateTCPackageListPage;
 import org.sakaiproject.atriculate.ui.reporting.providers.ArticulateTCResultsListProvider;
 import org.sakaiproject.authz.api.Member;
 import org.sakaiproject.exception.IdUnusedException;
+import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.wicket.markup.html.repeater.data.table.BasicDataTable;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public class ArticulateTCResultsListPage extends ArticulateTCBaseResultsPage {
 
     private static final long serialVersionUID = 1L;
 
-    private static final ResourceReference PAGE_ICON = new ResourceReference(ArticulateTCLearnerResultsPage.class, RES_CONSOLE_PREFIX + "res/report.png");
+    private static final ResourceReference PAGE_ICON = new ResourceReference(ArticulateTCLearnerResultsPage.class, HTML_RES_CONSOLE_PREFIX + "res/report.png");
 
-    public ArticulateTCResultsListPage(PageParameters pageParams) {
+    public ArticulateTCResultsListPage(final PageParameters pageParams) {
         super(pageParams);
 
         List<ArticulateTCMemberAttemptResult> articulateTCMemberAttemptResults = new ArrayList<ArticulateTCMemberAttemptResult>();
         long contentPackageId = pageParams.getLong("contentPackageId");
         ArticulateTCContentPackage articulateTCContentPackage = articulateTCContentPackageDao.get(contentPackageId);
         Long assignmentId = articulateTCContentPackage.getAssignmentId();
+        String gradebookPointsPossible = "-";
 
         String siteId = articulateTCContentPackage.getContext();
         Site site = null;
@@ -76,6 +83,16 @@ public class ArticulateTCResultsListPage extends ArticulateTCBaseResultsPage {
             }
         }
 
+        // get assignment points possible
+        if (assignmentId != null) {
+            Assignment assignment = gradebookService.getAssignment(siteId, assignmentId);
+
+            if (assignment != null) {
+                Double pointsPossible = assignment.getPoints();
+                gradebookPointsPossible = Double.toString(pointsPossible);
+            }
+        }
+
         // get attempts for each student
         for (Member member : members) {
             String firstName = "[First name unknown]";
@@ -95,6 +112,7 @@ public class ArticulateTCResultsListPage extends ArticulateTCBaseResultsPage {
             ArticulateTCAttempt articulateTCAttempt = articulateTCAttemptDao.lookupNewest(contentPackageId, member.getUserId());
 
             String gradebookScore = "-";
+
             if (assignmentId != null) {
                 gradebookScore = gradebookService.getAssignmentScoreString(siteId, assignmentId, member.getUserId());
             }
@@ -105,8 +123,10 @@ public class ArticulateTCResultsListPage extends ArticulateTCBaseResultsPage {
             articulateTCMemberAttemptResult.setFirstName(firstName);
             articulateTCMemberAttemptResult.setLastName(lastName);
             articulateTCMemberAttemptResult.setFullName(fullName);
-            articulateTCMemberAttemptResult.setArticulateTCAttempt(articulateTCAttempt);
+            String attemptNumber = articulateTCAttempt != null ? Long.toString(articulateTCAttempt.getAttemptNumber()) : "-";
+            articulateTCMemberAttemptResult.setAttemptNumber(attemptNumber);
             articulateTCMemberAttemptResult.setGradebookScore(gradebookScore);
+            articulateTCMemberAttemptResult.setGradebookPointsPossible(gradebookPointsPossible);
 
             articulateTCMemberAttemptResults.add(articulateTCMemberAttemptResult);
         }
@@ -114,12 +134,26 @@ public class ArticulateTCResultsListPage extends ArticulateTCBaseResultsPage {
         List<IColumn<ArticulateTCMemberAttemptResult>> columns = new ArrayList<IColumn<ArticulateTCMemberAttemptResult>>();
         columns.add(new ArticulateTCStudentReportLinkPanel<ArticulateTCMemberAttemptResult>(new StringResourceModel("column.header.name", this, null), "fullName", "fullName", pageParams));
         columns.add(new PropertyColumn<ArticulateTCMemberAttemptResult>(new StringResourceModel("column.header.id", this, null), "eid", "eid"));
-        columns.add(new PropertyColumn<ArticulateTCMemberAttemptResult>(new StringResourceModel("column.header.attempts", this, null), "attemptNumber", "articulateTCAttempt.attemptNumber"));
-        columns.add(new PropertyColumn<ArticulateTCMemberAttemptResult>(new StringResourceModel("column.header.gradebook.score", this, null), "gradebookScore", "gradebookScore"));
+        columns.add(new PropertyColumn<ArticulateTCMemberAttemptResult>(new StringResourceModel("column.header.attempts", this, null), "attemptNumber", "attemptNumber"));
+        columns.add(new PropertyColumn<ArticulateTCMemberAttemptResult>(new StringResourceModel("column.header.gradebook.score", this, null), "gradebookScore", "gradebookDisplay"));
 
         BasicDataTable dataTable = new BasicDataTable("results-table", columns, new ArticulateTCResultsListProvider(articulateTCMemberAttemptResults));
         add(dataTable);
 
+        add(new Link<Void>("link-back-list-page") {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void onClick() {
+                setResponsePage(ArticulateTCPackageListPage.class, pageParams);
+            }
+
+            @Override
+            public boolean isVisible() {
+                return true;
+            }
+        });
     }
 
     @Override

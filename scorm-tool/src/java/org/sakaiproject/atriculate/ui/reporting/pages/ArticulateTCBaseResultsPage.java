@@ -31,7 +31,10 @@ import org.sakaiproject.service.gradebook.shared.GradebookService;
 import org.sakaiproject.site.api.SiteService;
 import org.sakaiproject.user.api.UserDirectoryService;
 
-public abstract class ArticulateTCBaseResultsPage extends ArticulateTCConsoleBasePage {
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
+public class ArticulateTCBaseResultsPage extends ArticulateTCConsoleBasePage {
 
     private static final long serialVersionUID = 1L;
 

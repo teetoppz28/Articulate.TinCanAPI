@@ -52,7 +52,6 @@ import org.sakaiproject.scorm.model.api.ContentPackage;
 import org.sakaiproject.scorm.service.api.ScormContentService;
 import org.sakaiproject.scorm.ui.console.components.DecoratedDatePropertyColumn;
 import org.sakaiproject.scorm.ui.console.pages.PackageConfigurationPage;
-import org.sakaiproject.scorm.ui.console.pages.PackageListPage;
 import org.sakaiproject.scorm.ui.console.pages.PackageRemovePage;
 import org.sakaiproject.scorm.ui.player.pages.PlayerPage;
 import org.sakaiproject.scorm.ui.reporting.pages.LearnerResultsPage;
@@ -64,6 +63,9 @@ import org.sakaiproject.wicket.markup.html.repeater.data.table.ActionColumn;
 import org.sakaiproject.wicket.markup.html.repeater.data.table.BasicDataTable;
 import org.sakaiproject.wicket.markup.html.repeater.data.table.ImageLinkColumn;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public class ArticulateTCPackageListPage extends ArticulateTCConsoleBasePage implements ArticulateTCConstants {
 
     private static final long serialVersionUID = 1L;
@@ -74,7 +76,7 @@ public class ArticulateTCPackageListPage extends ArticulateTCConsoleBasePage imp
     @SpringBean(name="org.sakaiproject.scorm.service.api.ScormContentService")
     private ScormContentService scormContentService;
 
-    private static final ResourceReference DELETE_ICON = new ResourceReference(PackageListPage.class, RES_CONSOLE_PREFIX + "res/delete.png");
+    private static final ResourceReference DELETE_ICON = new ResourceReference(ArticulateTCPackageListPage.class, HTML_RES_CONSOLE_PREFIX + "res/delete.png");
 
     @SuppressWarnings("unchecked")
     public ArticulateTCPackageListPage(PageParameters params) {
@@ -293,8 +295,8 @@ public class ArticulateTCPackageListPage extends ArticulateTCConsoleBasePage imp
         protected String createLabelModel(IModel<ContentPackage> embeddedModel) {
             Object target = embeddedModel.getObject();
 
-            if (target instanceof ContentPackage) {
-                ContentPackage contentPackage = (ContentPackage) target;
+            if (target instanceof ArticulateTCContentPackage) {
+                ArticulateTCContentPackage contentPackage = (ArticulateTCContentPackage) target;
 
                 String userId = lms.currentLearnerId();
                 int attemptsCount = articulateTCAttemptDao.count(contentPackage.getContentPackageId(), userId);

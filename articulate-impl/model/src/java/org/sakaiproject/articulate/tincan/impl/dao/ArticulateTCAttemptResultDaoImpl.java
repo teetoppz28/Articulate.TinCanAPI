@@ -11,6 +11,9 @@ import org.springframework.orm.hibernate3.SessionHolder;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public class ArticulateTCAttemptResultDaoImpl extends HibernateDaoSupport implements ArticulateTCAttemptResultDao {
 
     @Override

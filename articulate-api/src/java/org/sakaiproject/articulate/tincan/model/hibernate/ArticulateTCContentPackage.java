@@ -26,6 +26,9 @@ import org.apache.commons.lang.StringUtils;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.model.ArticulateTCMeta;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public class ArticulateTCContentPackage implements ArticulateTCConstants, Serializable {
 
     private static final long serialVersionUID = 1L;

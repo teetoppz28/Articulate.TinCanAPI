@@ -20,27 +20,34 @@
     width: 60px !important;
 }
 
-.results-container {
+.results-container,
+.results-table-heading {
     width: 80%;
     margin: 1em auto 2em auto;
     padding: 0;
 }
 
 .results-table-heading {
-    width: 80%;
     margin: .5em auto;
-    padding: 0;
 }
 
-.results-table {
+.results-list-table,
+.results-learner-table {
     width: 100%;
 }
 
-.results-table th,
-.results-table td {
+.results-learner-table th,
+.results-learner-table td {
     width: 33%;
     max-width: 33%;
     min-width: 33%;
+}
+
+.results-list-table th,
+.results-list-table td {
+    width: 25%;
+    max-width: 25%;
+    min-width: 25%;
 }
 
 .results-table-label {

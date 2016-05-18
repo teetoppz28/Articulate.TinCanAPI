@@ -28,8 +28,12 @@
 <body>
     <wicket:extend>
 
+        <div class="prev">
+            <a wicket:id="link-back-list-page" class="btn btn-info back-button"><wicket:message key="link.back.list.page" /></a>
+        </div>
+
         <div class="results-container">
-            <table wicket:id="results-table" class="results-table table-striped table-bordered table-hover table-condensed table-responsive"></table>
+            <table wicket:id="results-table" class="results-list-table table-striped table-bordered table-hover table-condensed table-responsive"></table>
         </div>
 
     </wicket:extend>

@@ -23,6 +23,9 @@ import java.util.List;
 
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public interface ArticulateTCContentPackageDao {
 
     int countContentPackages(String context, String name);

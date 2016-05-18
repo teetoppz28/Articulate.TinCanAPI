@@ -28,6 +28,9 @@ import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCLaunchService;
 import org.sakaiproject.atriculate.ui.console.pages.ArticulateTCPackageListPage;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public class ArticulateTCPlayerPage extends ArticulateTCBaseToolPage implements ArticulateTCConstants {
 
     private static final long serialVersionUID = 1L;

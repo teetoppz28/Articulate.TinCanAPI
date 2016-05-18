@@ -24,6 +24,9 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.atriculate.ui.console.pages.ArticulateTCConsoleBasePage;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public class ArticulateTCConfirmPage extends ArticulateTCConsoleBasePage implements ArticulateTCConstants {
 
     private static final long serialVersionUID = 1L;
@@ -43,7 +46,7 @@ public class ArticulateTCConfirmPage extends ArticulateTCConsoleBasePage impleme
 
         return getLocalizer().getString(resultKey, this);
     }
-    
+
     private String getKey(int status) {
         switch (status) {
         case VALIDATION_SUCCESS:

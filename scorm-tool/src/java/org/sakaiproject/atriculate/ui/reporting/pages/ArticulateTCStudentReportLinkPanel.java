@@ -1,5 +1,7 @@
 package org.sakaiproject.atriculate.ui.reporting.pages;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
@@ -11,6 +13,9 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.sakaiproject.articulate.tincan.model.ArticulateTCMemberAttemptResult;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public class ArticulateTCStudentReportLinkPanel<T> extends PropertyColumn<T> {
 
     private static final long serialVersionUID = 1L;
@@ -37,7 +42,6 @@ public class ArticulateTCStudentReportLinkPanel<T> extends PropertyColumn<T> {
     }
 
     protected void onClick(IModel<T> clicked) {
-        
     }
 
     private class LinkPanel extends Panel {
@@ -56,10 +60,12 @@ public class ArticulateTCStudentReportLinkPanel<T> extends PropertyColumn<T> {
                 public void onClick() {
                     pageParameters.remove("fullName");
                     pageParameters.remove("userId");
+                    pageParameters.remove("gradebookPointsPossible");
                     pageParameters.remove("gradebookScore");
 
                     pageParameters.add("fullName", articulateTCMemberAttemptResult.getFullName());
                     pageParameters.add("userId", articulateTCMemberAttemptResult.getUserId());
+                    pageParameters.add("gradebookPointsPossible", articulateTCMemberAttemptResult.getGradebookPointsPossible());
                     pageParameters.add("gradebookScore", articulateTCMemberAttemptResult.getGradebookScore());
 
                     setResponsePage(ArticulateTCLearnerResultsPage.class, pageParameters);
@@ -67,7 +73,7 @@ public class ArticulateTCStudentReportLinkPanel<T> extends PropertyColumn<T> {
 
                 @Override
                 public boolean isEnabled() {
-                    return articulateTCMemberAttemptResult.getArticulateTCAttempt() != null;
+                    return NumberUtils.isNumber(articulateTCMemberAttemptResult.getAttemptNumber());
                 }
             };
 

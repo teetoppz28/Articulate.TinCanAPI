@@ -50,6 +50,9 @@ import org.sakaiproject.wicket.markup.html.form.CancelButton;
 import org.sakaiproject.wicket.model.DecoratedPropertyModel;
 import org.sakaiproject.wicket.model.SimpleDateFormatPropertyModel;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public class ArticulateTCPackageConfigurationPage extends ArticulateTCConsoleBasePage implements ArticulateTCConstants {
 
     private static final long serialVersionUID = 1L;

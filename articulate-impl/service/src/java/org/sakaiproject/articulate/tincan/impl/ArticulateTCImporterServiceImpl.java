@@ -9,7 +9,7 @@ import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.sakaiproject.articulate.tincan.api.ArticulateTCImporter;
+import org.sakaiproject.articulate.tincan.api.ArticulateTCImporterService;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.model.ArticulateTCMeta;
@@ -27,9 +27,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class ArticulateTCImporterImpl implements ArticulateTCImporter, ArticulateTCConstants {
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
+public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterService, ArticulateTCConstants {
 
-    private Log log = LogFactory.getLog(ArticulateTCImporterImpl.class);
+    private Log log = LogFactory.getLog(ArticulateTCImporterServiceImpl.class);
 
     @Setter
     private ArticulateTCContentEntityUtils articulateTCContentEntityUtils;
@@ -292,7 +295,7 @@ public class ArticulateTCImporterImpl implements ArticulateTCImporter, Articulat
     /**
      * Move the new package content to the permanent directory
      * 
-     * @return
+     * @return true, if moved successfully
      */
     private boolean moveContentPackage() {
         String existingDirectory = getPackageCollectionPath(false);
@@ -332,9 +335,8 @@ public class ArticulateTCImporterImpl implements ArticulateTCImporter, Articulat
         String title = articulateTCContentPackage.getTitle();
         int count = articulateTCContentPackageDao.countContentPackages(getCurrentContext(), title);
 
-        // count return from method is 1, even if there are no rows with this title in the site
         if (count > 1) {
-            title += " (" + --count + ")";
+            title += " (" + count + ")";
         }
 
         return title;

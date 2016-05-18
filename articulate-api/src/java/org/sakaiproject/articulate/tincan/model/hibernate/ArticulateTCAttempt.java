@@ -22,6 +22,9 @@ package org.sakaiproject.articulate.tincan.model.hibernate;
 import java.io.Serializable;
 import java.util.Date;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public class ArticulateTCAttempt implements Serializable {
 
     private static final long serialVersionUID = 1L;

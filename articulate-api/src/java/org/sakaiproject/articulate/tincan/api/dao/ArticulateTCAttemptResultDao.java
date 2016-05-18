@@ -4,6 +4,9 @@ import java.util.List;
 
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttemptResult;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public interface ArticulateTCAttemptResultDao {
 
     /**

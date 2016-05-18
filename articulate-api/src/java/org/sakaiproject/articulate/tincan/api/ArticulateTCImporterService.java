@@ -4,7 +4,10 @@ import java.io.InputStream;
 
 import org.sakaiproject.articulate.tincan.model.ArticulateTCMeta;
 
-public interface ArticulateTCImporter {
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
+public interface ArticulateTCImporterService {
 
     /**
      * Validates the file uploaded is a valid TinCanAPI zip archive and processes it

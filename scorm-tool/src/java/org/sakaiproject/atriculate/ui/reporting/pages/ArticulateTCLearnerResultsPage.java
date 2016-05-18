@@ -36,18 +36,22 @@ import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPac
 import org.sakaiproject.atriculate.ui.console.pages.ArticulateTCPackageListPage;
 import org.sakaiproject.atriculate.ui.reporting.providers.ArticulateTCLearnerResultsProvider;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
+import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.wicket.markup.html.repeater.data.table.BasicDataTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public class ArticulateTCLearnerResultsPage extends ArticulateTCBaseResultsPage {
 
     private static final long serialVersionUID = 1L;
 
     private Logger log = LoggerFactory.getLogger(ArticulateTCLearnerResultsPage.class);
 
-    private static final ResourceReference PAGE_ICON = new ResourceReference(ArticulateTCLearnerResultsPage.class, RES_REPORTING_PREFIX + "res/report_user.png");
+    private static final ResourceReference PAGE_ICON = new ResourceReference(ArticulateTCLearnerResultsPage.class, HTML_RES_REPORTING_PREFIX + "res/report_user.png");
 
     public ArticulateTCLearnerResultsPage(final PageParameters pageParams) {
         super(pageParams);
@@ -110,6 +114,29 @@ public class ArticulateTCLearnerResultsPage extends ArticulateTCBaseResultsPage 
             }
         }
 
+        String gradebookPointsPossible = pageParams.getString("gradebookPointsPossible");
+
+        if (StringUtils.isBlank(gradebookPointsPossible)) {
+            gradebookPointsPossible = "-";
+            ArticulateTCContentPackage articulateTCContentPackage = articulateTCContentPackageDao.get(Long.parseLong(contentPackageId));
+
+            if (articulateTCContentPackage != null) {
+                Long assignmentId = articulateTCContentPackage.getAssignmentId();
+
+                if (assignmentId != null) {
+                    Assignment assignment = gradebookService.getAssignment(articulateTCContentPackage.getContext(), assignmentId);
+
+                    if (assignment != null) {
+                        Double pointsPossible = assignment.getPoints();
+ 
+                        if (pointsPossible != null) {
+                            gradebookPointsPossible = Double.toString(pointsPossible);
+                        }
+                    }
+                }
+            }
+        }
+
         List<IColumn<ArticulateTCAttemptResult>> completeColumns = new ArrayList<IColumn<ArticulateTCAttemptResult>>();
         completeColumns.add(new PropertyColumn<ArticulateTCAttemptResult>(new StringResourceModel("column.header.attempt.number", this, null), "attemptNumber", "attemptNumber"));
         completeColumns.add(new PropertyColumn<ArticulateTCAttemptResult>(new StringResourceModel("column.header.date.completed", this, null), "dateCompleted", "dateCompleted"));
@@ -127,7 +154,7 @@ public class ArticulateTCLearnerResultsPage extends ArticulateTCBaseResultsPage 
         add(resultsTableIncomplete);
 
         add(new Label("full-name", fullName));
-        add(new Label("gradebook-score", gradebookScore));
+        add(new Label("gradebook-score", (gradebookScore == null ? "-" : gradebookScore) + " / " + gradebookPointsPossible));
 
         add(new Link<Void>("link-back-results-page") {
 

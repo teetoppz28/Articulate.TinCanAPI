@@ -44,7 +44,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.lang.Bytes;
-import org.sakaiproject.articulate.tincan.api.ArticulateTCImporter;
+import org.sakaiproject.articulate.tincan.api.ArticulateTCImporterService;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.atriculate.ui.console.pages.ArticulateTCConsoleBasePage;
 import org.sakaiproject.atriculate.ui.console.pages.ArticulateTCPackageListPage;
@@ -52,13 +52,16 @@ import org.sakaiproject.event.api.NotificationService;
 import org.sakaiproject.scorm.service.api.ScormResourceService;
 import org.sakaiproject.wicket.markup.html.form.CancelButton;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public class ArticulateTCUploadPage extends ArticulateTCConsoleBasePage implements ArticulateTCConstants {
 
     private static final long serialVersionUID = 1L;
     private Log log = LogFactory.getLog(ArticulateTCUploadPage.class);
 
-    @SpringBean(name="articulateTCImporter")
-    private ArticulateTCImporter articulateTCImporter;
+    @SpringBean(name="articulateTCImporterService")
+    private ArticulateTCImporterService articulateTCImporterService;
 
     @SpringBean(name="org.sakaiproject.scorm.service.api.ScormResourceService")
     protected ScormResourceService resourceService;
@@ -67,7 +70,7 @@ public class ArticulateTCUploadPage extends ArticulateTCConsoleBasePage implemen
         add(new FileUploadForm("uploadForm"));
     }
 
-    public class FileUploadForm extends Form {
+    public class FileUploadForm extends Form<Object> {
         private static final long serialVersionUID = 1L;
         private FileUploadField fileUploadField;
         private boolean fileHidden = false;
@@ -98,7 +101,7 @@ public class ArticulateTCUploadPage extends ArticulateTCConsoleBasePage implemen
 
             // Add JavaScript to enable the submit button only when there is a file selected (this cannot be done via Wicket/Java code)
             fileUploadField = new FileUploadField("fileInput");
-            fileUploadField.add( new AttributeAppender("onchange", new Model("document.getElementsByName( \"btnSubmit\" )[0].disabled = this.value === '';"), ";"));
+            fileUploadField.add( new AttributeAppender("onchange", new Model<String>("document.getElementsByName( \"btnSubmit\" )[0].disabled = this.value === '';"), ";"));
             add(fileUploadField);
 
             @SuppressWarnings({"unchecked", "rawtypes"})
@@ -182,7 +185,7 @@ public class ArticulateTCUploadPage extends ArticulateTCConsoleBasePage implemen
 
                         if(upload != null) {
                             try {
-                                int status = articulateTCImporter.validateAndProcess(upload.getInputStream(), upload.getClientFileName(), upload.getContentType());
+                                int status = articulateTCImporterService.validateAndProcess(upload.getInputStream(), upload.getClientFileName(), upload.getContentType());
                                 if(status == VALIDATION_SUCCESS) {
                                     setResponsePage(ArticulateTCPackageListPage.class);
                                 } else {

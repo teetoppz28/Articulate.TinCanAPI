@@ -23,6 +23,9 @@ import java.util.List;
 
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttempt;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public interface ArticulateTCAttemptDao {
 
     int count(long contentPackageId, String learnerId);
