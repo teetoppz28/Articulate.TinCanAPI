@@ -24,7 +24,7 @@
 
     <!--  Package Importer -->
 
-    <bean id="articulateTCImporter" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCImporterImpl">
+    <bean id="articulateTCImporterService" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCImporterServiceImpl">
         <property name="articulateTCContentEntityUtils" ref="articulateTCContentEntityUtils" />
         <property name="articulateTCContentPackageDao" ref="articulateTCContentPackageDao" />
         <property name="articulateTCDocumentUtils" ref="articulateTCDocumentUtils" />

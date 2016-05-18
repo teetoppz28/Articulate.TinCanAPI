@@ -31,10 +31,13 @@ import org.springframework.orm.hibernate3.SessionHolder;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public class ArticulateTCContentPackageDaoImpl extends HibernateDaoSupport implements ArticulateTCContentPackageDao {
 
     public int countContentPackages(String context, String name) {
-        int count = 1;
+        int count = 0;
         List<ArticulateTCContentPackage> articulateTContentPackages = find(context);
 
         for (ArticulateTCContentPackage articulateTContentPackage : articulateTContentPackages) {

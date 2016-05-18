@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  #%L
+  SCORM Tool
+  %%
+  Copyright (C) 2007 - 2016 Sakai Project
+  %%
+  Licensed under the Educational Community License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+              http://opensource.org/licenses/ecl2
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  #L%
+  -->
+
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.sourceforge.net/" xml:lang="en" lang="en">
+<head>
+    <wicket:head>
+        <title><wicket:message key="page.title"/></title>
+    </wicket:head>
+</head>
+<body>
+    <wicket:extend>
+
+    <div class="prev">
+        <a wicket:id="link-back-results-page" class="btn btn-info back-button"><wicket:message key="link.back.results.page" /></a>
+        <a wicket:id="link-back-list-page" class="btn btn-info back-button"><wicket:message key="link.back.list.page" /></a>
+    </div>
+    <div class="results-table-heading">
+        <ul class="list-group">
+            <li class="list-group-item">
+                <span><wicket:message key="table.full.name" /></span>
+                <span wicket:id="full-name"></span>
+            </li>
+            <li class="list-group-item">
+                <span><wicket:message key="table.gradebook.score" /></span>
+                <span wicket:id="gradebook-score"></span>
+            </li>
+        </ul>
+    </div>
+
+    <div class="results-container">
+        <div class="results-table-label">
+            <h3><wicket:message key="results-table-complete-label" /></h3>
+        </div>
+        <table wicket:id="results-table-complete" class="results-learner-table table-striped table-bordered table-hover table-condensed table-responsive"></table>
+    </div>
+
+    <div class="results-container">
+        <div class="results-table-label">
+            <h3><wicket:message key="results-table-incomplete-label" /></h3>
+        </div>
+        <table wicket:id="results-table-incomplete" class="results-learner-table table-striped table-bordered table-hover table-condensed table-responsive"></table>
+    </div>
+
+    </wicket:extend>
+</body>
+</html>

@@ -24,15 +24,11 @@ import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebPage;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public class ArticulateTCBaseToolPage extends WebPage implements ArticulateTCConstants, IHeaderContributor {
     private static final long serialVersionUID = 2L;
-
-    protected final static String RES_PREFIX = "../../../../scorm/ui/player/pages/";
-    protected static final String TOOLBASE_CSS = "/library/skin/tool_base.css";
-    protected static final String TOOL_CSS = "/library/skin/default/tool.css";
-    protected static final String SCORM_CSS = RES_PREFIX + "styles/scorm.css";
-
-    protected static final String SAK_PROP_SCORM_ENABLE_EMAIL = "scorm.enable.email";
 
     public void renderHead(IHeaderResponse response) {
         response.renderJavascriptReference(HTML_HEADSCRIPTS);

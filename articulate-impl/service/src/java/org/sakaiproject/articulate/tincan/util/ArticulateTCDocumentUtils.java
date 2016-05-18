@@ -14,6 +14,9 @@ import org.sakaiproject.content.api.ContentHostingService;
 import org.sakaiproject.content.api.ContentResource;
 import org.w3c.dom.Document;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public class ArticulateTCDocumentUtils {
 
     private Log log = LogFactory.getLog(ArticulateTCDocumentUtils.class);

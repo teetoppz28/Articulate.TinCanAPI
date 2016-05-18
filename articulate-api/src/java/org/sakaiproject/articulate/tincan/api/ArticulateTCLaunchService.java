@@ -1,5 +1,8 @@
 package org.sakaiproject.articulate.tincan.api;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public interface ArticulateTCLaunchService {
 
     /**
@@ -40,7 +43,8 @@ public interface ArticulateTCLaunchService {
      * Persists a new attempt result when the content package is launched
      * 
      * @param attemptId the attempt ID
+     * @param attemptNumber the attempt number
      */
-    void addAttemptResult(Long attemptId);
+    void addAttemptResult(Long attemptId, Long attemptNumber);
 
 }

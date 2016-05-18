@@ -6,6 +6,9 @@ import java.util.Date;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.model.ArticulateTCRequestPayload;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public class ArticulateTCActivityState implements Serializable, ArticulateTCConstants {
 
     private static final long serialVersionUID = 1L;

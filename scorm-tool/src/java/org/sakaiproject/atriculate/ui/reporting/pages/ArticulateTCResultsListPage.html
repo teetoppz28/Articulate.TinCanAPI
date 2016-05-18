@@ -19,18 +19,23 @@
   #L%
   -->
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.sourceforge.net/" xml:lang="en" lang="en">
 <head>
-    <title>Articulate TinCanAPI Content</title>
+    <wicket:head>
+        <title>Articulate TinCanAPI Console</title>
+    </wicket:head>
 </head>
-<wicket:extend>
+<body>
+    <wicket:extend>
 
-    <div class="prev">
-        <a wicket:id="link-back-list-page" class="btn btn-info back-button"><wicket:message key="link.back.list.page" /></a>
-    </div>
+        <div class="prev">
+            <a wicket:id="link-back-list-page" class="btn btn-info back-button"><wicket:message key="link.back.list.page" /></a>
+        </div>
 
-    <div class="launch-content">
-        <iframe wicket:id="launch-frame" frameBorder="0" scrolling="no" seamless="seamless">></iframe>
-    </div>
+        <div class="results-container">
+            <table wicket:id="results-table" class="results-list-table table-striped table-bordered table-hover table-condensed table-responsive"></table>
+        </div>
 
-</wicket:extend>
+    </wicket:extend>
+</body>
+</html>

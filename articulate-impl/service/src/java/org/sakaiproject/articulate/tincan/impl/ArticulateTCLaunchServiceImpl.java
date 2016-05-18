@@ -20,6 +20,9 @@ import org.sakaiproject.entitybroker.EntityView;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserDirectoryService;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService, ArticulateTCConstants {
 
     private Log log = LogFactory.getLog(ArticulateTCLaunchServiceImpl.class);
@@ -105,11 +108,11 @@ public class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService,
 
         articulateTCAttemptDao.save(newAttempt);
 
-        addAttemptResult(newAttempt.getId());
+        addAttemptResult(newAttempt.getId(), newAttempt.getAttemptNumber());
     }
 
     @Override
-    public void addAttemptResult(Long attemptId) {
+    public void addAttemptResult(Long attemptId, Long attemptNumber) {
         if (attemptId == null) {
             /*
              * attempt object ID is null (probably not persisted to the db yet),
@@ -121,6 +124,7 @@ public class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService,
 
         ArticulateTCAttemptResult articulateTCAttemptResult = new ArticulateTCAttemptResult();
         articulateTCAttemptResult.setAttemptId(attemptId);
+        articulateTCAttemptResult.setAttemptNumber(attemptNumber);
 
         articulateTCAttemptResultDao.save(articulateTCAttemptResult);
     }

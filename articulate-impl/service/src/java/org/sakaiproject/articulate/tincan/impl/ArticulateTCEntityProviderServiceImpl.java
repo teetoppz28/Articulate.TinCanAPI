@@ -1,6 +1,5 @@
 package org.sakaiproject.articulate.tincan.impl;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -35,6 +34,9 @@ import org.sakaiproject.service.gradebook.shared.GradeDefinition;
 import org.sakaiproject.service.gradebook.shared.GradebookService;
 import org.sakaiproject.site.api.SiteService;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntityProviderService, ArticulateTCConstants {
 
     private Log log = LogFactory.getLog(ArticulateTCEntityProviderServiceImpl.class);
@@ -299,7 +301,7 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
             return;
         }
 
-        ArticulateTCAttemptResult articulateTCAttemptResult = articulateTCAttemptResultDao.findByAttemptId(newestAttempt.getId());
+        ArticulateTCAttemptResult articulateTCAttemptResult = articulateTCAttemptResultDao.findByAttemptIdNumber(newestAttempt.getId(), newestAttempt.getAttemptNumber());
 
         if (articulateTCAttemptResult == null) {
             articulateTCAttemptResult = new ArticulateTCAttemptResult();

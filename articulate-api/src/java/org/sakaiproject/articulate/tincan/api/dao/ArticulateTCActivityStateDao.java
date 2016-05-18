@@ -5,6 +5,9 @@ import java.util.List;
 import org.sakaiproject.articulate.tincan.model.ArticulateTCRequestPayload;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCActivityState;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public interface ArticulateTCActivityStateDao {
 
     /**

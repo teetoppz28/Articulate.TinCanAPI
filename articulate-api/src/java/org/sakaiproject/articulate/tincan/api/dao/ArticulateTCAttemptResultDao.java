@@ -1,7 +1,12 @@
 package org.sakaiproject.articulate.tincan.api.dao;
 
+import java.util.List;
+
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttemptResult;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public interface ArticulateTCAttemptResultDao {
 
     /**
@@ -29,12 +34,38 @@ public interface ArticulateTCAttemptResultDao {
     ArticulateTCAttemptResult load(long id);
 
     /**
-     * Finds the row with the given attempt ID
+     * Finds the completed attempt row(s) with the given attempt ID
      * 
      * @param attemptId the attempt ID
      * @return
      */
-    ArticulateTCAttemptResult findByAttemptId(long attemptId);
+    List<ArticulateTCAttemptResult> findByAttemptId(long attemptId);
+
+    /**
+     * Finds the incompleted attempt row(s) with the given attempt ID
+     * 
+     * @param attemptId the attempt ID
+     * @return
+     */
+    List<ArticulateTCAttemptResult> findByAttemptIdIncomplete(long attemptId);
+
+    /**
+     * Finds the row(s) with the given attempt ID
+     * 
+     * @param attemptId the attempt ID
+     * @param onlyCompleted only retrieve completed attempts?
+     * @return
+     */
+    List<ArticulateTCAttemptResult> findByAttemptId(long attemptId, boolean onlyCompleted);
+
+    /**
+     * Finds the row with the given attempt ID and the attempt number
+     * 
+     * @param attemptId the attempt ID
+     * @param attemptNumber the attempt number
+     * @return
+     */
+    ArticulateTCAttemptResult findByAttemptIdNumber(long attemptId, long attemptNumber);
 
     /**
      * Is the attempt completed?

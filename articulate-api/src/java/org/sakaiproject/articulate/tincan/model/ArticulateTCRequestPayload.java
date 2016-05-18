@@ -3,6 +3,9 @@ package org.sakaiproject.articulate.tincan.model;
 import org.apache.commons.lang.StringUtils;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public class ArticulateTCRequestPayload implements ArticulateTCConstants {
 
     private String activityId;

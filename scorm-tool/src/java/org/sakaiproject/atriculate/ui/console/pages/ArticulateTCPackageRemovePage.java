@@ -43,6 +43,9 @@ import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPac
 import org.sakaiproject.scorm.ui.console.pages.PackageListPage;
 import org.sakaiproject.wicket.markup.html.form.CancelButton;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public class ArticulateTCPackageRemovePage extends ArticulateTCConsoleBasePage {
 
     private static final long serialVersionUID = 1L;
@@ -57,7 +60,7 @@ public class ArticulateTCPackageRemovePage extends ArticulateTCConsoleBasePage {
         add(new FileRemoveForm("removeForm", params));
     }
 
-    public class FileRemoveForm extends Form {
+    public class FileRemoveForm extends Form<Object> {
         private static final long serialVersionUID = 1L;
 
         @SuppressWarnings("unchecked")

@@ -16,6 +16,9 @@ import org.sakaiproject.content.api.ContentResourceEdit;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.service.gradebook.shared.GradebookService;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public class ArticulateTCDeleteServiceImpl implements ArticulateTCDeleteService, ArticulateTCConstants {
 
     private Log log = LogFactory.getLog(ArticulateTCDeleteServiceImpl.class);

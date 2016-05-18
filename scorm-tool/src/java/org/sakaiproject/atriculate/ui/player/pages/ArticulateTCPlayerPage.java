@@ -20,11 +20,17 @@
 package org.sakaiproject.atriculate.ui.player.pages;
 
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.link.InlineFrame;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCLaunchService;
+import org.sakaiproject.atriculate.ui.console.pages.ArticulateTCPackageListPage;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public class ArticulateTCPlayerPage extends ArticulateTCBaseToolPage implements ArticulateTCConstants {
 
     private static final long serialVersionUID = 1L;
@@ -57,6 +63,28 @@ public class ArticulateTCPlayerPage extends ArticulateTCBaseToolPage implements 
         };
 
         add(iframe);
+
+        add(new Link<Void>("link-back-list-page") {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void onClick() {
+                setResponsePage(ArticulateTCPackageListPage.class, pageParams);
+            }
+
+            @Override
+            public boolean isVisible() {
+                return true;
+            }
+        });
+    }
+
+    @Override
+    public void renderHead(IHeaderResponse response) {
+        super.renderHead(response);
+        response.renderCSSReference(HTML_ARTICULATE_TC_CSS);
+        response.renderCSSReference(HTML_BOOTSTRAP_CSS);
     }
 
 }

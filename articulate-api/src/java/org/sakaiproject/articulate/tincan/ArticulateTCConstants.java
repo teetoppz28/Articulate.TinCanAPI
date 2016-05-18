@@ -4,6 +4,9 @@ import java.text.DecimalFormat;
 
 import org.sakaiproject.scorm.api.ScormConstants;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public interface ArticulateTCConstants extends ScormConstants {
 
     /**
@@ -58,14 +61,24 @@ public interface ArticulateTCConstants extends ScormConstants {
      * HTML page
      */
     final static String HTML_ARTICULATE_TC_CSS = "styles/articulatetc.css";
+    final static String HTML_BOOTSTRAP_CSS = "//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css";
     final static String HTML_HEADSCRIPTS = "/library/js/headscripts.js";
     final static String HTML_BODY_ONLOAD_ADDTL="setMainFrameHeight(window.name)";
+    final static String HTML_RES_CONSOLE_PREFIX = "../../../../scorm/ui/console/pages/";
+    final static String HTML_RES_REPORTING_PREFIX = "../../../../scorm/ui/reporting/pages/";
+    final static String HTML_RES_PLAYER_PREFIX = "../../../../scorm/ui/player/pages/";
+    final static String TOOLBASE_CSS = "/library/skin/tool_base.css";
+    final static String TOOL_CSS = "/library/skin/default/tool.css";
+    final static String SCORM_CSS = HTML_RES_PLAYER_PREFIX + "styles/scorm.css";
+    final static String SAK_PROP_SCORM_ENABLE_EMAIL = "scorm.enable.email";
+    final static String SAK_PROP_ENABLE_MENU_BUTTON_ICONS = "scorm.menuButton.icons";
 
     /*
      * Configuration page
      */
     final static Double CONFIGURATION_DEFAULT_POINTS = 100d;
     final static int CONFIGURATION_DEFAULT_ATTEMPTS = 10;
+    final static Double CONFIGURATION_DEFAULT_SCALED_SCORE = 0.0d;
     final static boolean CONFIGURATION_DEFAULT_IS_GRADED = false;
     final static String CONFIGURATION_DEFAULT_APP_CONTENT_TYPE = "Articulate TinCanAPI";
     final static int CONFIGURATION_DEFAULT_NUMBER_OF_TRIES_UNLIMITED = -1;

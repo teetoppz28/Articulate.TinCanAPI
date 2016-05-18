@@ -11,6 +11,9 @@ import org.sakaiproject.entity.api.Edit;
 import org.sakaiproject.entity.api.ResourcePropertiesEdit;
 import org.sakaiproject.exception.IdUsedException;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public class ArticulateTCContentEntityUtils {
 
     private Log log = LogFactory.getLog(ArticulateTCContentEntityUtils.class);

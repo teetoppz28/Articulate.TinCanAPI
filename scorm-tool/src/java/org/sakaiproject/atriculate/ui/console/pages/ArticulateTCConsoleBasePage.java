@@ -45,18 +45,17 @@ import org.sakaiproject.tool.api.ToolManager;
 import org.sakaiproject.wicket.markup.html.SakaiPortletWebPage;
 import org.sakaiproject.wicket.markup.html.link.NavIntraLink;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public class ArticulateTCConsoleBasePage extends SakaiPortletWebPage implements ArticulateTCConstants, IHeaderContributor {
 
     private static final long serialVersionUID = 1L;
 
-    protected final static String RES_PREFIX = "../../../../scorm/ui/console/pages/";
-    private static ResourceReference CONSOLE_CSS = new CompressedResourceReference(ArticulateTCConsoleBasePage.class, RES_PREFIX + "res/scorm_console.css");
-    private static ResourceReference LIST_ICON = new ResourceReference(ArticulateTCConsoleBasePage.class, RES_PREFIX + "res/table.png");
-    private static ResourceReference UPLOAD_ICON = new ResourceReference(ArticulateTCConsoleBasePage.class, RES_PREFIX + "res/table_add.png");
-    private static final String SAK_PROP_ENABLE_MENU_BUTTON_ICONS = "scorm.menuButton.icons";
-    protected static final String SAK_PROP_SCORM_ENABLE_EMAIL = "scorm.enable.email";
+    protected final static ResourceReference CONSOLE_CSS = new CompressedResourceReference(ArticulateTCConsoleBasePage.class, HTML_RES_CONSOLE_PREFIX + "res/scorm_console.css");
+    private static ResourceReference LIST_ICON = new ResourceReference(ArticulateTCConsoleBasePage.class, HTML_RES_CONSOLE_PREFIX + "res/table.png");
+    private static ResourceReference UPLOAD_ICON = new ResourceReference(ArticulateTCConsoleBasePage.class, HTML_RES_CONSOLE_PREFIX + "res/table_add.png");
 
-    // The feedback panel component displays dynamic messages to the user
     protected FeedbackPanel feedback;
     private BreadcrumbPanel breadcrumbs;
 

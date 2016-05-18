@@ -4,6 +4,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCActivityState;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public interface ArticulateTCEntityProviderService {
 
     /**

@@ -3,7 +3,12 @@ package org.sakaiproject.articulate.tincan.model.hibernate;
 import java.io.Serializable;
 import java.util.Date;
 
-public class ArticulateTCAttemptResult implements Serializable {
+import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
+
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
+public class ArticulateTCAttemptResult implements ArticulateTCConstants, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -15,7 +20,7 @@ public class ArticulateTCAttemptResult implements Serializable {
     private Date modified;
 
     public ArticulateTCAttemptResult() {
-        this.scaledScore = 0.0;
+        this.scaledScore = CONFIGURATION_DEFAULT_SCALED_SCORE;
     }
 
     public Long getId() {

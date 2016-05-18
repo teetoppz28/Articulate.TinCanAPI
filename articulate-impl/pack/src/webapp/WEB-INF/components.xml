@@ -22,13 +22,13 @@
   -->
 <beans>
 
-	<!-- Bring in the HBM related beans -->
+    <!-- HBM related beans -->
     <import resource="classpath*:org/sakaiproject/articulate/tincan/**/articulate-tc-spring-hibernate-hbms.xml" />
 
-	<!-- Bring in the hibernate daos -->
+    <!-- hibernate daos -->
     <import resource="classpath*:org/sakaiproject/articulate/tincan/**/articulate-tc-spring-hibernate-daos.xml" />
 
-    <!-- Bring the Articulate TinCanAPI services -->
+    <!-- Articulate TinCanAPI services -->
     <import resource="classpath*:org/sakaiproject/**/articulate-tc-spring-services.xml" />
 
 </beans>

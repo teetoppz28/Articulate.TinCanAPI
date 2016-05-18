@@ -1,5 +1,8 @@
 package org.sakaiproject.articulate.tincan.api;
 
+/**
+ * @author Robert Long (rlong @ unicon.net)
+ */
 public interface ArticulateTCDeleteService {
 
     /**
