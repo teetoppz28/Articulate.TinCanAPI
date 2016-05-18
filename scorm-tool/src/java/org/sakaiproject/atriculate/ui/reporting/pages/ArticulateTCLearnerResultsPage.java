@@ -38,10 +38,14 @@ import org.sakaiproject.atriculate.ui.reporting.providers.ArticulateTCLearnerRes
 import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.wicket.markup.html.repeater.data.table.BasicDataTable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ArticulateTCLearnerResultsPage extends ArticulateTCBaseResultsPage {
 
     private static final long serialVersionUID = 1L;
+
+    private Logger log = LoggerFactory.getLogger(ArticulateTCLearnerResultsPage.class);
 
     private static final ResourceReference PAGE_ICON = new ResourceReference(ArticulateTCLearnerResultsPage.class, RES_REPORTING_PREFIX + "res/report_user.png");
 
@@ -54,11 +58,11 @@ public class ArticulateTCLearnerResultsPage extends ArticulateTCBaseResultsPage 
         final boolean isStudent;
         String contentPackageId = pageParams.getString("contentPackageId");
 
-        String userId = null;
+        String userId = pageParams.getString("userId");
         String fullName = pageParams.getString("fullName");
 
-        if (StringUtils.isBlank(fullName)) {
-            // no full name passed in, must be from student page
+        if (StringUtils.isBlank(fullName) || StringUtils.isBlank(userId)) {
+            // no full name or user ID passed in, must be from student page
             isStudent = true;
 
             User user = userDirectoryService.getCurrentUser();
@@ -70,13 +74,19 @@ public class ArticulateTCLearnerResultsPage extends ArticulateTCBaseResultsPage 
             isStudent = false;
         }
 
-        String attemptId = pageParams.getString("attemptId");
+        List<ArticulateTCAttempt> articulateTCAttempts = articulateTCAttemptDao.find(Long.parseLong(contentPackageId), userId);
 
-        if (StringUtils.isBlank(attemptId)) {
-            ArticulateTCAttempt articulateTCAttempt = articulateTCAttemptDao.lookupNewest(Long.parseLong(contentPackageId), userId);
+        for (ArticulateTCAttempt articulateTCAttempt : articulateTCAttempts) {
+            List<ArticulateTCAttemptResult> complete = articulateTCAttemptResultDao.findByAttemptId(articulateTCAttempt.getId());
 
-            if (articulateTCAttempt != null) {
-                attemptId = Long.toString(articulateTCAttempt.getId());
+            if (complete != null) {
+                articulateTCAttemptResultsComplete.addAll(complete);
+            }
+
+            List<ArticulateTCAttemptResult> incomplete = articulateTCAttemptResultDao.findByAttemptIdIncomplete(articulateTCAttempt.getId());
+
+            if (incomplete != null) {
+                articulateTCAttemptResultsIncomplete.addAll(incomplete);
             }
         }
 
@@ -92,16 +102,12 @@ public class ArticulateTCLearnerResultsPage extends ArticulateTCBaseResultsPage 
                         developerHelperService.setCurrentUser(DeveloperHelperService.ADMIN_USER_REF);
                         gradebookScore = gradebookService.getAssignmentScoreString(articulateTCContentPackage.getContext(), articulateTCContentPackage.getAssignmentId(), userId);
                     } catch (Exception e) {
+                        log.error("Error getting score string for user {} in site {} and asignment {}", userId, articulateTCContentPackage.getContext(), articulateTCContentPackage.getAssignmentId(), e);
                     } finally {
                         developerHelperService.restoreCurrentUser();
                     }
                 }
             }
-        }
-
-        if (StringUtils.isNotBlank(attemptId)) {
-            articulateTCAttemptResultsComplete = articulateTCAttemptResultDao.findByAttemptId(Long.parseLong(attemptId));
-            articulateTCAttemptResultsIncomplete = articulateTCAttemptResultDao.findByAttemptIdIncomplete(Long.parseLong(attemptId));
         }
 
         List<IColumn<ArticulateTCAttemptResult>> completeColumns = new ArrayList<IColumn<ArticulateTCAttemptResult>>();

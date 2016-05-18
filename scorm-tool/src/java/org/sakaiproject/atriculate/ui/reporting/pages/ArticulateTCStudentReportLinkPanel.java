@@ -54,12 +54,13 @@ public class ArticulateTCStudentReportLinkPanel<T> extends PropertyColumn<T> {
 
                 @Override
                 public void onClick() {
-                    pageParameters.add("fullName", articulateTCMemberAttemptResult.getFullName());
-                    pageParameters.add("gradebookScore", articulateTCMemberAttemptResult.getGradebookScore());
+                    pageParameters.remove("fullName");
+                    pageParameters.remove("userId");
+                    pageParameters.remove("gradebookScore");
 
-                    if (articulateTCMemberAttemptResult.getArticulateTCAttempt() != null) {
-                        pageParameters.add("attemptId", Long.toString(articulateTCMemberAttemptResult.getArticulateTCAttempt().getId()));
-                    }
+                    pageParameters.add("fullName", articulateTCMemberAttemptResult.getFullName());
+                    pageParameters.add("userId", articulateTCMemberAttemptResult.getUserId());
+                    pageParameters.add("gradebookScore", articulateTCMemberAttemptResult.getGradebookScore());
 
                     setResponsePage(ArticulateTCLearnerResultsPage.class, pageParameters);
                 }

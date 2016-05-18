@@ -40,7 +40,8 @@ public interface ArticulateTCLaunchService {
      * Persists a new attempt result when the content package is launched
      * 
      * @param attemptId the attempt ID
+     * @param attemptNumber the attempt number
      */
-    void addAttemptResult(Long attemptId);
+    void addAttemptResult(Long attemptId, Long attemptNumber);
 
 }
