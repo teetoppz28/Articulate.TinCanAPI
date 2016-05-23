@@ -11,7 +11,7 @@ public class ArticulateTCRequestPayload implements ArticulateTCConstants {
     private String activityId;
     private String agent;
     private String content;
-    private String packageId;
+    private Long contentPackageId;
     private String stateId;
     private String siteId;
     private String userId;
@@ -51,12 +51,12 @@ public class ArticulateTCRequestPayload implements ArticulateTCConstants {
         this.content = getValue(content);
     }
 
-    public String getPackageId() {
-        return packageId;
+    public Long getContentPackageId() {
+        return contentPackageId;
     }
 
-    public void setPackageId(String packageId) {
-        this.packageId = getValue(packageId);
+    public void setContentPackageId(Long contentPackageId) {
+        this.contentPackageId = contentPackageId;
     }
 
     public String getStateId() {
@@ -106,7 +106,7 @@ public class ArticulateTCRequestPayload implements ArticulateTCConstants {
         if (StringUtils.isBlank(this.siteId)) {
             return false;
         }
-        if (StringUtils.isBlank(this.packageId)) {
+        if (this.contentPackageId == null) {
             return false;
         }
 
@@ -137,7 +137,7 @@ public class ArticulateTCRequestPayload implements ArticulateTCConstants {
                 continue;
             }
             if (StringUtils.startsWith(s, STATE_DATA_KEY_PACKAGE_ID)) {
-                setPackageId(s);
+                setContentPackageId(Long.parseLong(getValue(s)));
                 continue;
             }
         }

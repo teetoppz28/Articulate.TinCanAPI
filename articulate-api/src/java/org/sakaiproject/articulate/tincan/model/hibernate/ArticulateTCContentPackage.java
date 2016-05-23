@@ -21,6 +21,8 @@ package org.sakaiproject.articulate.tincan.model.hibernate;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
@@ -52,12 +54,16 @@ public class ArticulateTCContentPackage implements ArticulateTCConstants, Serial
     private String gradebookItemTitle;
     private boolean graded;
     private Double points;
+    private Set<ArticulateTCAttempt> articulateTCAttempts;
+    private Set<ArticulateTCActivityState> articulateTCActivityStates;
 
     public ArticulateTCContentPackage() {
         this.numberOfTries = CONFIGURATION_DEFAULT_NUMBER_OF_TRIES_UNLIMITED;
         this.graded = CONFIGURATION_DEFAULT_IS_GRADED;
         this.points = CONFIGURATION_DEFAULT_POINTS;
         this.recordType = CONFIGURATION_RECORD_SCORE_TYPE_LATEST;
+        this.articulateTCAttempts = new HashSet<ArticulateTCAttempt>();
+        this.articulateTCActivityStates = new HashSet<ArticulateTCActivityState>();
     }
 
     public ArticulateTCContentPackage(ArticulateTCMeta articulateTCMeta) {
@@ -235,6 +241,22 @@ public class ArticulateTCContentPackage implements ArticulateTCConstants, Serial
         this.points = points;
     }
 
+    public Set<ArticulateTCAttempt> getArticulateTCAttempts() {
+        return articulateTCAttempts;
+    }
+
+    public void setArticulateTCAttempts(Set<ArticulateTCAttempt> articulateTCAttempts) {
+        this.articulateTCAttempts = articulateTCAttempts;
+    }
+
+    public Set<ArticulateTCActivityState> getArticulateTCActivityStates() {
+        return articulateTCActivityStates;
+    }
+
+    public void setArticulateTCActivityStates(Set<ArticulateTCActivityState> articulateTCActivityStates) {
+        this.articulateTCActivityStates = articulateTCActivityStates;
+    }
+
     public boolean isRecordBest() {
         return StringUtils.equals(recordType, CONFIGURATION_RECORD_SCORE_TYPE_BEST);
     }
@@ -259,7 +281,8 @@ public class ArticulateTCContentPackage implements ArticulateTCConstants, Serial
     @Override
     public String toString() {
         return "ArticulateTCContentPackage :: " +
-                    "context: " + getContext() +
+                    "id: " + getContentPackageId() +
+                    ", context: " + getContext() +
                     ", title: " + getTitle() +
                     ", resourceId: " + getResourceId() +
                     ", launchUrl: " + getUrl();

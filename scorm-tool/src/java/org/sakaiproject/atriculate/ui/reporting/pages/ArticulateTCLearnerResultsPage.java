@@ -59,7 +59,7 @@ public class ArticulateTCLearnerResultsPage extends ArticulateTCBaseResultsPage 
         List<ArticulateTCAttemptResult> articulateTCAttemptResultsComplete = new ArrayList<ArticulateTCAttemptResult>();
         List<ArticulateTCAttemptResult> articulateTCAttemptResultsIncomplete = new ArrayList<ArticulateTCAttemptResult>();
 
-        final boolean isStudent;
+        final boolean isInstructor = StringUtils.equalsIgnoreCase(pageParams.getString("isInstructor"), "true");
         String contentPackageId = pageParams.getString("contentPackageId");
 
         String userId = pageParams.getString("userId");
@@ -67,15 +67,10 @@ public class ArticulateTCLearnerResultsPage extends ArticulateTCBaseResultsPage 
 
         if (StringUtils.isBlank(fullName) || StringUtils.isBlank(userId)) {
             // no full name or user ID passed in, must be from student page
-            isStudent = true;
-
             User user = userDirectoryService.getCurrentUser();
 
             fullName = user != null ? user.getDisplayName() : "";
             userId = user != null ? user.getId() : "";
-        } else {
-            // is a maintainer
-            isStudent = false;
         }
 
         List<ArticulateTCAttempt> articulateTCAttempts = articulateTCAttemptDao.find(Long.parseLong(contentPackageId), userId);
@@ -167,7 +162,7 @@ public class ArticulateTCLearnerResultsPage extends ArticulateTCBaseResultsPage 
 
             @Override
             public boolean isVisible() {
-                return !isStudent;
+                return isInstructor;
             }
         });
 
@@ -182,7 +177,7 @@ public class ArticulateTCLearnerResultsPage extends ArticulateTCBaseResultsPage 
 
             @Override
             public boolean isVisible() {
-                return isStudent;
+                return true;
             }
         });
     }

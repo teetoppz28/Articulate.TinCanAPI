@@ -15,12 +15,13 @@ public class ArticulateTCActivityState implements Serializable, ArticulateTCCons
 
     private String content;
     private Long id;
-    private String packageId;
+    private Long contentPackageId;
     private String registration;
     private String stateId;
     private String userId;
     private boolean deleted;
     private Date modified;
+    private ArticulateTCContentPackage articulateTCContentPackage;
 
     public ArticulateTCActivityState() {
         this.deleted = CONFIGURATION_DEFAULT_ACTIVITY_STATE_DELETED;
@@ -28,7 +29,7 @@ public class ArticulateTCActivityState implements Serializable, ArticulateTCCons
 
     public ArticulateTCActivityState(ArticulateTCRequestPayload articulateTCRequestPayload) {
         this.content = articulateTCRequestPayload.getContent();
-        this.packageId = articulateTCRequestPayload.getPackageId();
+        this.contentPackageId = articulateTCRequestPayload.getContentPackageId();
         this.registration = articulateTCRequestPayload.getSiteId();
         this.stateId = articulateTCRequestPayload.getStateId();
         this.userId = articulateTCRequestPayload.getUserId();
@@ -51,12 +52,12 @@ public class ArticulateTCActivityState implements Serializable, ArticulateTCCons
         this.id = id;
     }
 
-    public String getPackageId() {
-        return packageId;
+    public Long getContentPackageId() {
+        return contentPackageId;
     }
 
-    public void setPackageId(String packageId) {
-        this.packageId = packageId;
+    public void setContentPackageId(Long contentPackageId) {
+        this.contentPackageId = contentPackageId;
     }
     public String getRegistration() {
         return registration;
@@ -96,6 +97,14 @@ public class ArticulateTCActivityState implements Serializable, ArticulateTCCons
 
     public void setModified(Date modified) {
         this.modified = modified;
+    }
+
+    public ArticulateTCContentPackage getArticulateTCContentPackage() {
+        return articulateTCContentPackage;
+    }
+
+    public void setArticulateTCContentPackage(ArticulateTCContentPackage articulateTCContentPackage) {
+        this.articulateTCContentPackage = articulateTCContentPackage;
     }
 
     /**

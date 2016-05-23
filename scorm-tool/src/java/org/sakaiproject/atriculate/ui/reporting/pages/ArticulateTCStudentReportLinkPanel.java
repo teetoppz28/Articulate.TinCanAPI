@@ -62,11 +62,13 @@ public class ArticulateTCStudentReportLinkPanel<T> extends PropertyColumn<T> {
                     pageParameters.remove("userId");
                     pageParameters.remove("gradebookPointsPossible");
                     pageParameters.remove("gradebookScore");
+                    pageParameters.remove("isInstructor");
 
                     pageParameters.add("fullName", articulateTCMemberAttemptResult.getFullName());
                     pageParameters.add("userId", articulateTCMemberAttemptResult.getUserId());
                     pageParameters.add("gradebookPointsPossible", articulateTCMemberAttemptResult.getGradebookPointsPossible());
                     pageParameters.add("gradebookScore", articulateTCMemberAttemptResult.getGradebookScore());
+                    pageParameters.add("isInstructor", "true");
 
                     setResponsePage(ArticulateTCLearnerResultsPage.class, pageParameters);
                 }

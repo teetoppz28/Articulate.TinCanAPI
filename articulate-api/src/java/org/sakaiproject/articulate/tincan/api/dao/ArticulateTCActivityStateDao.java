@@ -52,14 +52,14 @@ public interface ArticulateTCActivityStateDao {
     ArticulateTCActivityState findOne(ArticulateTCRequestPayload articulateTCRequestPayload);
 
     /**
-     * Finds the row with the given unique key (user ID, site ID, package ID)
+     * Finds the row with the given unique key (user ID, site ID, content package ID)
      * 
      * @param userId
      * @param siteId
-     * @param packageId
+     * @param constantPackageId
      * @return
      */
-    ArticulateTCActivityState findOneByUniqueKey(String userId, String siteId, String packageId);
+    ArticulateTCActivityState findOneByUniqueKey(String userId, String siteId, Long constantPackageId);
 
     /**
      * Softly delete the state row in the db

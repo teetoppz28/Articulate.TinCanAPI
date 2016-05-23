@@ -23,7 +23,7 @@
 <hibernate-mapping default-cascade="all" package="org.sakaiproject.articulate.tincan.model.hibernate" default-lazy="false">
 
     <class name="org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage" table="ARTICULATE_TC_CONTENT_PACKAGE">
-        <id name="contentPackageId" column="PACKAGE_ID" type="long">
+        <id name="contentPackageId" column="ID" type="long">
             <generator class="native">
                 <param name="sequence">ARTICULATE_TC__UID_S</param>
             </generator>
@@ -44,6 +44,18 @@
         <property name="numberOfTries" column="NUMBER_OF_TRIES" />
         <property name="deleted" column="IS_DELETED" />
         <property name="assignmentId" column="ASSIGNMENT_ID" />
+        <set name="articulateTCActivityStates" table="ARTICULATE_TC_ACTIVITY_STATE" inverse="false" fetch="select">
+            <key>
+                <column name="CONTENT_PACKAGE_ID" not-null="true" />
+            </key>
+            <one-to-many class="org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCActivityState" />
+        </set>
+        <set name="articulateTCAttempts" table="ARTICULATE_TC_ATTEMPT" inverse="false" fetch="select">
+            <key>
+                <column name="CONTENT_PACKAGE_ID" not-null="true" />
+            </key>
+            <one-to-many class="org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttempt" />
+        </set>
     </class>
 
 </hibernate-mapping>
