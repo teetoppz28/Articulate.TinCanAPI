@@ -129,7 +129,7 @@ public class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConst
         // get the user ID from the current session
         articulateTCRequestPayload.setUserId(populateCurrentUser());
         // get the site ID from the content package data
-        articulateTCRequestPayload.setSiteId(populateCurrentSite(articulateTCRequestPayload.getPackageId()));
+        articulateTCRequestPayload.setSiteId(populateCurrentSite(articulateTCRequestPayload.getContentPackageId()));
 
         return articulateTCRequestPayload;
     }
@@ -153,14 +153,14 @@ public class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConst
      * Gets the site ID associated with the given package ID
      * Ensures the current user is allowed to access the site
      * 
-     * @param packageId
+     * @param contentPackageId
      * @return
      */
-    private String populateCurrentSite(String packageId) {
-        ArticulateTCContentPackage articulateTCContentPackage = articulateTCContentPackageDao.load(Long.parseLong(packageId));
+    private String populateCurrentSite(Long contentPackageId) {
+        ArticulateTCContentPackage articulateTCContentPackage = articulateTCContentPackageDao.load(contentPackageId);
 
         if (articulateTCContentPackage == null) {
-            throw new IllegalArgumentException("Error finding content package with id: " + packageId);
+            throw new IllegalArgumentException("Error finding content package with id: " + contentPackageId);
         }
 
         String siteId = articulateTCContentPackage.getContext();

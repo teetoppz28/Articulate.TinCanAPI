@@ -162,7 +162,7 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
              */
 
             ArticulateTCRequestPayload articulateTCRequestPayload = articulateTCEntityProviderServiceUtils.getPayloadObject(payload);
-            ArticulateTCContentPackage articulateTCContentPackage = articulateTCContentPackageDao.load(Long.parseLong(articulateTCRequestPayload.getPackageId()));
+            ArticulateTCContentPackage articulateTCContentPackage = articulateTCContentPackageDao.load(articulateTCRequestPayload.getContentPackageId());
 
             developerHelperService.setCurrentUser(DeveloperHelperService.ADMIN_USER_REF);
 

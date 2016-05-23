@@ -23,13 +23,16 @@
 <hibernate-mapping default-cascade="all" package="org.sakaiproject.articulate.tincan.model.hibernate" default-lazy="false">
 
     <class name="org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttemptResult" table="ARTICULATE_TC_ATTEMPT_RESULT">
-        <id name="id" column="ID">
+        <id name="id" column="ID" type="long">
             <generator class="increment"/>
         </id>
-        <properties name="attempt_id_unique" unique="true">
-            <property name="attemptId" column="ATTEMPT_ID" />
+        <properties name="attempt_result_unique" unique="true">
+            <property name="attemptId" column="ATTEMPT_ID" type="long" />
             <property name="attemptNumber" column="ATTEMPT_NUMBER" />
         </properties>
+        <many-to-one name="articulateTCAttempt" class="org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttempt" fetch="select" insert="false" update="false">
+            <column name="ID" not-null="true" />
+        </many-to-one>
         <property name="scaledScore" column="SCALED_SCORE" />
         <property name="dateCompleted" column="DATE_COMPLETED" />
         <property name="modified" column="MODIFIED" />

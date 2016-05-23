@@ -83,10 +83,10 @@ public class ArticulateTCActivityStateDaoImpl extends HibernateDaoSupport implem
 
     @SuppressWarnings("unchecked")
     @Override
-    public ArticulateTCActivityState findOneByUniqueKey(String userId, String siteId, String packageId) {
-        String statement = new StringBuilder(" FROM ").append(ArticulateTCActivityState.class.getName()).append(" WHERE userId = ? AND registration = ? AND packageId = ? ").toString();
+    public ArticulateTCActivityState findOneByUniqueKey(String userId, String siteId, Long contentPackageId) {
+        String statement = new StringBuilder(" FROM ").append(ArticulateTCActivityState.class.getName()).append(" WHERE userId = ? AND registration = ? AND contentPackageId = ? ").toString();
 
-        List<ArticulateTCActivityState> list = getHibernateTemplate().find(statement, new Object[] {userId, siteId, packageId});
+        List<ArticulateTCActivityState> list = getHibernateTemplate().find(statement, new Object[] {userId, siteId, contentPackageId});
 
         // no row exists with the unique key
         if (list.isEmpty()) {
@@ -102,6 +102,6 @@ public class ArticulateTCActivityStateDaoImpl extends HibernateDaoSupport implem
             return null;
         }
 
-        return findOneByUniqueKey(articulateTCRequestPayload.getUserId(), articulateTCRequestPayload.getSiteId(), articulateTCRequestPayload.getPackageId());
+        return findOneByUniqueKey(articulateTCRequestPayload.getUserId(), articulateTCRequestPayload.getSiteId(), articulateTCRequestPayload.getContentPackageId());
     }
 }

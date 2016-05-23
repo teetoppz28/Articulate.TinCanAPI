@@ -23,14 +23,17 @@
 <hibernate-mapping default-cascade="all" package="org.sakaiproject.articulate.tincan.model.hibernate" default-lazy="false">
 
     <class name="org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCActivityState" table="ARTICULATE_TC_ACTIVITY_STATE">
-        <id name="id" column="ID">
+        <id name="id" column="ID" type="long">
             <generator class="increment"/>
         </id>
         <properties name="activity_state_unique" unique="true">
             <property name="userId" column="USER_ID" />
             <property name="registration" column="REGISTRATION" />
-            <property name="packageId" column="CONTENT_PACKAGE_ID" />
+            <property name="contentPackageId" column="CONTENT_PACKAGE_ID" type="long" />
         </properties>
+        <many-to-one name="articulateTCContentPackage" class="org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage" fetch="select" insert="false" update="false">
+            <column name="ID" not-null="true" />
+        </many-to-one>
         <property name="content" column="CONTENT" type="text" />
         <property name="stateId" column="STATE_ID" />
         <property name="deleted" column="DELETED" />

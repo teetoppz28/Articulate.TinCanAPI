@@ -18,6 +18,7 @@ public class ArticulateTCAttemptResult implements ArticulateTCConstants, Seriali
     private Double scaledScore;
     private Date dateCompleted;
     private Date modified;
+    private ArticulateTCAttempt articulateTCAttempt;
 
     public ArticulateTCAttemptResult() {
         this.scaledScore = CONFIGURATION_DEFAULT_SCALED_SCORE;
@@ -69,6 +70,14 @@ public class ArticulateTCAttemptResult implements ArticulateTCConstants, Seriali
 
     public void setModified(Date modified) {
         this.modified = modified;
+    }
+
+    public ArticulateTCAttempt getArticulateTCAttempt() {
+        return articulateTCAttempt;
+    }
+
+    public void setArticulateTCAttempt(ArticulateTCAttempt articulateTCAttempt) {
+        this.articulateTCAttempt = articulateTCAttempt;
     }
 
 }
