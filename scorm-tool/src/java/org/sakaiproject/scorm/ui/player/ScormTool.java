@@ -40,6 +40,7 @@ import org.sakaiproject.component.cover.ServerConfigurationService;
 import org.sakaiproject.scorm.service.api.ScormResourceService;
 import org.sakaiproject.scorm.ui.ContentPackageResourceMountStrategy;
 import org.sakaiproject.scorm.ui.console.pages.PackageListPage;
+import org.sakaiproject.wicket.markup.html.SakaiPortletWebPage;
 import org.sakaiproject.wicket.protocol.http.SakaiWebApplication;
 
 public class ScormTool extends SakaiWebApplication {
@@ -72,7 +73,7 @@ public class ScormTool extends SakaiWebApplication {
     @Override
     public Class getHomePage() {
         // check to see if articulate contant should be allowed
-        boolean allowArticulate = ServerConfigurationService.getBoolean("articulate.tincanapi.package.allowed", true);
+        boolean allowArticulate = SakaiPortletWebPage.isArticulateEnabled();
         Class<?> homePage = allowArticulate ? ArticulateTCPackageListPage.class : PackageListPage.class;
 
         return homePage;

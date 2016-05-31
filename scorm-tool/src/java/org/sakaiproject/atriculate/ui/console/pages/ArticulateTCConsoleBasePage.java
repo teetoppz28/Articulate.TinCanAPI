@@ -41,6 +41,7 @@ import org.sakaiproject.scorm.ui.Icon;
 import org.sakaiproject.scorm.ui.console.components.BreadcrumbPanel;
 import org.sakaiproject.scorm.ui.console.components.SakaiFeedbackPanel;
 import org.sakaiproject.scorm.ui.console.pages.MaydayWebMarkupContainer;
+import org.sakaiproject.scorm.ui.upload.pages.UploadPage;
 import org.sakaiproject.tool.api.ToolManager;
 import org.sakaiproject.wicket.markup.html.SakaiPortletWebPage;
 import org.sakaiproject.wicket.markup.html.link.NavIntraLink;
@@ -90,11 +91,12 @@ public class ArticulateTCConsoleBasePage extends SakaiPortletWebPage implements 
         }
 
         NavIntraLink listLink = new NavIntraLink("listLink", new ResourceModel("link.list"), ArticulateTCPackageListPage.class);
-        NavIntraLink uploadLink = new NavIntraLink("uploadLink", new ResourceModel("link.upload"), ArticulateTCUploadPage.class);
+        NavIntraLink uploadLink = new NavIntraLink("uploadLink", new ResourceModel("link.upload"), UploadPage.class);
         NavIntraLink articulateTCUploadLink = new NavIntraLink("articulate-tc-upload-link", new ResourceModel("link.upload.articulate.tc"), ArticulateTCUploadPage.class);
 
         WebMarkupContainer listContainer = new WebMarkupContainer("listContainer");
-        WebMarkupContainer uploadContainer = new WebMarkupContainer("uploadContainer");WebMarkupContainer articulateTCUploadContainer = new WebMarkupContainer( "articulate-tc-upload-container" );
+        WebMarkupContainer uploadContainer = new WebMarkupContainer("uploadContainer");
+        WebMarkupContainer articulateTCUploadContainer = new WebMarkupContainer( "articulate-tc-upload-container" );
         articulateTCUploadContainer.setVisible(canUpload);
         articulateTCUploadContainer.add(articulateTCUploadLink);
         listContainer.add(listLink);
