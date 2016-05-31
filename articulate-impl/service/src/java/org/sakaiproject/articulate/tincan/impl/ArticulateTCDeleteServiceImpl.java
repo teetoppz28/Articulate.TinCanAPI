@@ -14,6 +14,7 @@ import org.sakaiproject.content.api.ContentCollection;
 import org.sakaiproject.content.api.ContentHostingService;
 import org.sakaiproject.content.api.ContentResourceEdit;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
+import org.sakaiproject.event.api.EventTrackingService;
 import org.sakaiproject.service.gradebook.shared.GradebookService;
 
 /**
@@ -36,6 +37,9 @@ public class ArticulateTCDeleteServiceImpl implements ArticulateTCDeleteService,
     private DeveloperHelperService developerHelperService;
 
     @Setter
+    private EventTrackingService eventTrackingService;
+
+    @Setter
     private GradebookService gradebookService;
 
     @Override
@@ -49,6 +53,8 @@ public class ArticulateTCDeleteServiceImpl implements ArticulateTCDeleteService,
             }
 
             articulateTCContentPackageDao.remove(articulateTCContentPackage);
+
+            eventTrackingService.post(eventTrackingService.newEvent("articulate.tc.remove", "articulate/tc/site/" + articulateTCContentPackage.getContext() + "/user/" + developerHelperService.getCurrentUserId() + "/packageId/" + articulateTCContentPackage.getContentPackageId(), true));
         } catch (Exception e) {
             log.error("Error deleting content package with ID: " + contentPackageId, e);
             return false;

@@ -17,6 +17,7 @@ import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttempt;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttemptResult;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
 import org.sakaiproject.entitybroker.EntityView;
+import org.sakaiproject.event.api.EventTrackingService;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserDirectoryService;
 
@@ -35,6 +36,9 @@ public class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService,
 
     @Setter
     private ArticulateTCContentPackageDao articulateTCContentPackageDao;
+
+    @Setter
+    private EventTrackingService eventTrackingService;
 
     @Setter
     private UserDirectoryService userDirectoryService;
@@ -109,6 +113,8 @@ public class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService,
         articulateTCAttemptDao.save(newAttempt);
 
         addAttemptResult(newAttempt.getId(), newAttempt.getAttemptNumber());
+
+        eventTrackingService.post(eventTrackingService.newEvent("articulate.tc.launch", "articulate/tc/site/" + articulateTCContentPackage.getContext() + "/user/" + userId + "/packageId/" + articulateTCContentPackage.getContentPackageId(), true));
     }
 
     @Override

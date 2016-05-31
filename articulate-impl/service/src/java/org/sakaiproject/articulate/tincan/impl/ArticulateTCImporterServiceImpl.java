@@ -22,6 +22,7 @@ import org.sakaiproject.content.api.ContentResourceEdit;
 import org.sakaiproject.entity.api.Entity;
 import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
+import org.sakaiproject.event.api.EventTrackingService;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -48,6 +49,9 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
 
     @Setter
     private DeveloperHelperService developerHelperService;
+
+    @Setter
+    private EventTrackingService eventTrackingService;
 
     private String packageName;
     private String zipFileId;
@@ -90,6 +94,8 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
 
         // move the temp file directory to the permanent directory (if configured)
         moveContentPackage();
+
+        eventTrackingService.post(eventTrackingService.newEvent("articulate.tc.add", "articulate/tc/site/" + getCurrentContext() + "/user/" + getCurrentUserId() + "/packageName/" + this.packageName, true));
 
         return VALIDATION_SUCCESS;
     }

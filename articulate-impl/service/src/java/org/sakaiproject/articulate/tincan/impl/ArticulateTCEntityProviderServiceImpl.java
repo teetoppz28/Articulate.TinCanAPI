@@ -27,6 +27,7 @@ import org.sakaiproject.articulate.tincan.util.ArticulateTCEntityProviderService
 import org.sakaiproject.articulate.tincan.util.ArticulateTCJsonUtils;
 import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
+import org.sakaiproject.event.api.EventTrackingService;
 import org.sakaiproject.event.api.LearningResourceStoreService;
 import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.service.gradebook.shared.CommentDefinition;
@@ -58,6 +59,9 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
 
     @Setter
     private DeveloperHelperService developerHelperService;
+
+    @Setter
+    private EventTrackingService eventTrackingService;
 
     @Setter
     private SiteService siteService;
@@ -264,6 +268,8 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
             gradeDefinitions.add(gradeDefinition);
 
             gradebookService.saveGradesAndComments(articulateTCRequestPayload.getSiteId(), assignment.getId(), gradeDefinitions);
+
+            eventTrackingService.post(eventTrackingService.newEvent("articulate.tc.grade", "articulate/tc/site/" + articulateTCContentPackage.getContext() + "/instructor/" + articulateTCContentPackage.getCreatedBy() + "/student/" + articulateTCRequestPayload.getUserId() + "/packageId/" + articulateTCContentPackage.getContentPackageId(), true));
         } catch (Exception e) {
             log.error("Error sending grade to gradebook.", e);
         } finally {
