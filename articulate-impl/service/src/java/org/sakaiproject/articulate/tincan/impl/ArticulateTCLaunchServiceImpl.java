@@ -114,7 +114,7 @@ public class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService,
 
         addAttemptResult(newAttempt.getId(), newAttempt.getAttemptNumber());
 
-        eventTrackingService.post(eventTrackingService.newEvent("scorm.articulate.tc.launch.content.package", "user with ID: " + userId + " launched content package with ID: " + articulateTCContentPackage.getContentPackageId() + " in site ID: " + articulateTCContentPackage.getContext(), true));
+        eventTrackingService.post(eventTrackingService.newEvent("articulate.tc.launch", "articulate/tc/site/" + articulateTCContentPackage.getContext() + "/user/" + userId + "/packageId/" + articulateTCContentPackage.getContentPackageId(), true));
     }
 
     @Override

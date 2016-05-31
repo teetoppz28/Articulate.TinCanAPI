@@ -95,7 +95,7 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
         // move the temp file directory to the permanent directory (if configured)
         moveContentPackage();
 
-        eventTrackingService.post(eventTrackingService.newEvent("scorm.articulate.tc.add.content.package", "added content package: " + this.packageName + " to site ID: " + getCurrentContext(), true));
+        eventTrackingService.post(eventTrackingService.newEvent("articulate.tc.add", "articulate/tc/site/" + getCurrentContext() + "/user/" + getCurrentUserId() + "/packageName/" + this.packageName, true));
 
         return VALIDATION_SUCCESS;
     }
