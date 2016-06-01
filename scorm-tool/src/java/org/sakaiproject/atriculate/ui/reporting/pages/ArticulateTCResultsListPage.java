@@ -34,10 +34,10 @@ import org.apache.wicket.model.StringResourceModel;
 import org.sakaiproject.articulate.tincan.model.ArticulateTCMemberAttemptResult;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttempt;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
-import org.sakaiproject.atriculate.ui.console.pages.ArticulateTCPackageListPage;
 import org.sakaiproject.atriculate.ui.reporting.providers.ArticulateTCResultsListProvider;
 import org.sakaiproject.authz.api.Member;
 import org.sakaiproject.exception.IdUnusedException;
+import org.sakaiproject.scorm.ui.console.pages.PackageListPage;
 import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.user.api.User;
@@ -146,7 +146,7 @@ public class ArticulateTCResultsListPage extends ArticulateTCBaseResultsPage {
 
             @Override
             public void onClick() {
-                setResponsePage(ArticulateTCPackageListPage.class, pageParams);
+                setResponsePage(PackageListPage.class, pageParams);
             }
 
             @Override

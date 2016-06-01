@@ -25,8 +25,8 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCAttemptDao;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCAttemptResultDao;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
-import org.sakaiproject.atriculate.ui.console.pages.ArticulateTCConsoleBasePage;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
+import org.sakaiproject.scorm.ui.console.pages.ConsoleBasePage;
 import org.sakaiproject.service.gradebook.shared.GradebookService;
 import org.sakaiproject.site.api.SiteService;
 import org.sakaiproject.user.api.UserDirectoryService;
@@ -34,7 +34,7 @@ import org.sakaiproject.user.api.UserDirectoryService;
 /**
  * @author Robert Long (rlong @ unicon.net)
  */
-public class ArticulateTCBaseResultsPage extends ArticulateTCConsoleBasePage {
+public class ArticulateTCBaseResultsPage extends ConsoleBasePage {
 
     private static final long serialVersionUID = 1L;
 

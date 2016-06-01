@@ -33,9 +33,9 @@ import org.apache.wicket.model.StringResourceModel;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttempt;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttemptResult;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
-import org.sakaiproject.atriculate.ui.console.pages.ArticulateTCPackageListPage;
 import org.sakaiproject.atriculate.ui.reporting.providers.ArticulateTCLearnerResultsProvider;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
+import org.sakaiproject.scorm.ui.console.pages.PackageListPage;
 import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.wicket.markup.html.repeater.data.table.BasicDataTable;
@@ -172,7 +172,7 @@ public class ArticulateTCLearnerResultsPage extends ArticulateTCBaseResultsPage 
 
             @Override
             public void onClick() {
-                setResponsePage(ArticulateTCPackageListPage.class, pageParams);
+                setResponsePage(PackageListPage.class, pageParams);
             }
 
             @Override

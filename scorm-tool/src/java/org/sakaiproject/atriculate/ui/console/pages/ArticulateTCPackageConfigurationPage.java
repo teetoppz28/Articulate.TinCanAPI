@@ -39,10 +39,14 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
+import org.sakaiproject.articulate.tincan.api.ArticulateTCEntityProviderService;
+import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.scorm.service.api.LearningManagementSystem;
+import org.sakaiproject.scorm.ui.console.pages.ConsoleBasePage;
 import org.sakaiproject.scorm.ui.console.pages.DisplayDesignatedPackage;
+import org.sakaiproject.scorm.ui.console.pages.PackageListPage;
 import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.service.gradebook.shared.GradebookService;
 import org.sakaiproject.tool.api.ToolManager;
@@ -53,9 +57,15 @@ import org.sakaiproject.wicket.model.SimpleDateFormatPropertyModel;
 /**
  * @author Robert Long (rlong @ unicon.net)
  */
-public class ArticulateTCPackageConfigurationPage extends ArticulateTCConsoleBasePage implements ArticulateTCConstants {
+public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implements ArticulateTCConstants {
 
     private static final long serialVersionUID = 1L;
+
+    @SpringBean(name="articulateTCContentPackageDao")
+    private ArticulateTCContentPackageDao articulateTCContentPackageDao;
+
+    @SpringBean(name="articulateTCEntityProviderService")
+    private ArticulateTCEntityProviderService articulateTCEntityProviderService;
 
     @SpringBean(name="org.sakaiproject.entitybroker.DeveloperHelperService")
     private DeveloperHelperService developerHelperService;
@@ -126,7 +136,7 @@ public class ArticulateTCPackageConfigurationPage extends ArticulateTCConsoleBas
 
                 articulateTCContentPackageDao.save(articulateTCContentPackage);
 
-                setResponsePage(params.getBoolean("no-toolbar") ? DisplayDesignatedPackage.class : ArticulateTCPackageListPage.class);
+                setResponsePage(params.getBoolean("no-toolbar") ? DisplayDesignatedPackage.class : PackageListPage.class);
             }
         };
 
@@ -288,7 +298,7 @@ public class ArticulateTCPackageConfigurationPage extends ArticulateTCConsoleBas
         gradebookCheckboxSync.setMarkupId("gradebook-input-checkbox-sync");
         gradebookSettingsCheckboxContainer.add(gradebookCheckboxSync);
 
-        form.add(new CancelButton("cancel", (params.getBoolean("no-toolbar")) ? DisplayDesignatedPackage.class : ArticulateTCPackageListPage.class));
+        form.add(new CancelButton("cancel", (params.getBoolean("no-toolbar")) ? DisplayDesignatedPackage.class : PackageListPage.class));
 
         add(form);
     }

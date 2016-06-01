@@ -22,12 +22,12 @@ package org.sakaiproject.atriculate.ui.upload.pages;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.basic.Label;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
-import org.sakaiproject.atriculate.ui.console.pages.ArticulateTCConsoleBasePage;
+import org.sakaiproject.scorm.ui.console.pages.ConsoleBasePage;
 
 /**
  * @author Robert Long (rlong @ unicon.net)
  */
-public class ArticulateTCConfirmPage extends ArticulateTCConsoleBasePage implements ArticulateTCConstants {
+public class ArticulateTCConfirmPage extends ConsoleBasePage implements ArticulateTCConstants {
 
     private static final long serialVersionUID = 1L;
 
