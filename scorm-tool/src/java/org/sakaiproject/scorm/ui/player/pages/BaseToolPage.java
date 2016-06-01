@@ -22,8 +22,9 @@ package org.sakaiproject.scorm.ui.player.pages;
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebPage;
+import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 
-public class BaseToolPage extends WebPage implements IHeaderContributor {
+public class BaseToolPage extends WebPage implements ArticulateTCConstants, IHeaderContributor {
 	private static final long serialVersionUID = 2L;
 
 	protected static final String TOOLBASE_CSS = "/library/skin/tool_base.css";
@@ -34,6 +35,7 @@ public class BaseToolPage extends WebPage implements IHeaderContributor {
 		response.renderCSSReference(TOOLBASE_CSS);
 		response.renderCSSReference(TOOL_CSS);
 		response.renderCSSReference(SCORM_CSS);
+        response.renderCSSReference(HTML_ARTICULATE_TC_CSS);
 	}
 
 }

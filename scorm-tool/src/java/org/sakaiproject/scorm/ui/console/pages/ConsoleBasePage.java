@@ -31,42 +31,43 @@ import org.apache.wicket.markup.html.resources.CompressedResourceReference;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
+import org.sakaiproject.atriculate.ui.upload.pages.ArticulateTCUploadPage;
 import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.scorm.service.api.LearningManagementSystem;
 import org.sakaiproject.scorm.ui.Icon;
 import org.sakaiproject.scorm.ui.console.components.BreadcrumbPanel;
 import org.sakaiproject.scorm.ui.console.components.SakaiFeedbackPanel;
 import org.sakaiproject.scorm.ui.upload.pages.UploadPage;
-import org.sakaiproject.scorm.ui.validation.pages.ValidationPage;
 import org.sakaiproject.tool.api.ToolManager;
 import org.sakaiproject.wicket.markup.html.SakaiPortletWebPage;
 import org.sakaiproject.wicket.markup.html.link.NavIntraLink;
 
 
-public class ConsoleBasePage extends SakaiPortletWebPage implements IHeaderContributor {
+public class ConsoleBasePage extends SakaiPortletWebPage implements ArticulateTCConstants, IHeaderContributor {
 
 	private static final long serialVersionUID = 1L;
 	
-	private static ResourceReference CONSOLE_CSS = new CompressedResourceReference(ConsoleBasePage.class, "res/scorm_console.css");
+	protected static ResourceReference CONSOLE_CSS = new CompressedResourceReference(ConsoleBasePage.class, "res/scorm_console.css");
 	private static ResourceReference LIST_ICON = new ResourceReference(ConsoleBasePage.class, "res/table.png");
 	private static ResourceReference UPLOAD_ICON = new ResourceReference(ConsoleBasePage.class, "res/table_add.png");
-	private static ResourceReference VALIDATE_ICON = new ResourceReference(ConsoleBasePage.class, "res/table_link.png");
+    // private static ResourceReference VALIDATE_ICON = new ResourceReference(ConsoleBasePage.class, "res/table_link.png");
 
     private static final String SAK_PROP_ENABLE_MENU_BUTTON_ICONS = "scorm.menuButton.icons";
-    @SpringBean( name = "org.sakaiproject.component.api.ServerConfigurationService" )
-    ServerConfigurationService serverConfigurationService;
 	
 	// The feedback panel component displays dynamic messages to the user
 	protected FeedbackPanel feedback;
 	private BreadcrumbPanel breadcrumbs;
-	
-	
-	@SpringBean
-	private LearningManagementSystem lms;
-	@SpringBean
-	public ToolManager toolManager;
 
-	
+    @SpringBean
+    private LearningManagementSystem lms;
+
+    @SpringBean(name = "org.sakaiproject.component.api.ServerConfigurationService")
+    private ServerConfigurationService serverConfigurationService;
+
+    @SpringBean(name = "org.sakaiproject.tool.api.ToolManager")
+    protected ToolManager toolManager;
+
 	public ConsoleBasePage() {
 		this(null);
 	}
@@ -84,13 +85,16 @@ public class ConsoleBasePage extends SakaiPortletWebPage implements IHeaderContr
 		
         NavIntraLink listLink = new NavIntraLink("listLink", new ResourceModel("link.list"), PackageListPage.class);
         NavIntraLink uploadLink = new NavIntraLink("uploadLink", new ResourceModel("link.upload"), UploadPage.class);
+        NavIntraLink articulateTCUploadLink = new NavIntraLink("articulate-tc-upload-link", new ResourceModel("link.upload.articulate.tc"), ArticulateTCUploadPage.class);
         //NavIntraLink validateLink = new NavIntraLink("validateLink", new ResourceModel("link.validate"), ValidationPage.class);
         
         WebMarkupContainer listContainer = new WebMarkupContainer( "listContainer" );
         WebMarkupContainer uploadContainer = new WebMarkupContainer( "uploadContainer" );
+        WebMarkupContainer articulateTCUploadContainer = new WebMarkupContainer("articulate-tc-upload-container");
         //WebMarkupContainer validateContainer = new WebMarkupContainer( "validateContainer" );
         listContainer.add( listLink );
         uploadContainer.add( uploadLink );
+        articulateTCUploadContainer.add(articulateTCUploadLink);
         //validateContainer.add( validateLink );
 
         SimpleAttributeModifier className = new SimpleAttributeModifier( "class", "current" );
@@ -103,6 +107,9 @@ public class ConsoleBasePage extends SakaiPortletWebPage implements IHeaderContr
         {
             uploadContainer.add( className );
             uploadLink.add( className );
+        } else if (articulateTCUploadLink.linksTo(getPage())) {
+            articulateTCUploadContainer.add(className);
+            articulateTCUploadContainer.add(className);
         }
         //else if( validateLink.linksTo( getPage() ) )
         //{
@@ -112,6 +119,7 @@ public class ConsoleBasePage extends SakaiPortletWebPage implements IHeaderContr
         
         listLink.setVisible(canUpload || canValidate);
         uploadLink.setVisible(canUpload);
+        articulateTCUploadContainer.setVisible(canUpload);
         
         // SCO-107 - hide the validate link (interface is currently unimplemented)
         //validateLink.setVisible(canValidate);
@@ -119,6 +127,7 @@ public class ConsoleBasePage extends SakaiPortletWebPage implements IHeaderContr
         
         Icon listIcon = new Icon("listIcon", LIST_ICON);
         Icon uploadIcon = new Icon("uploadIcon", UPLOAD_ICON);
+        Icon articulateTCUploadIcon = new Icon("articulate-tc-upload-icon", UPLOAD_ICON);
         //Icon validateIcon = new Icon("validateIcon", VALIDATE_ICON);
         
         // SCO-109 - conditionally show the icons in the menu bar buttons
@@ -127,6 +136,7 @@ public class ConsoleBasePage extends SakaiPortletWebPage implements IHeaderContr
         {
             listIcon.setVisible(canUpload || canValidate);
             uploadIcon.setVisible(canUpload);
+            articulateTCUploadIcon.setVisible(canUpload);
 
             // SCO-107 hide the validate link (interface is currently unimplemented)
             //validateIcon.setVisible(canValidate);
@@ -136,15 +146,18 @@ public class ConsoleBasePage extends SakaiPortletWebPage implements IHeaderContr
         {
             listIcon.setVisibilityAllowed( false );
             uploadIcon.setVisibilityAllowed( false );
+            articulateTCUploadIcon.setVisibilityAllowed(false);
             //validateIcon.setVisibilityAllowed( false );
         }
         
         listContainer.add(listIcon);
         uploadContainer.add(uploadIcon);
+        articulateTCUploadContainer.add(articulateTCUploadIcon);
         //validateContainer.add(validateIcon);
 
         wmc.add( listContainer );
         wmc.add( uploadContainer );
+        wmc.add(articulateTCUploadContainer);
         //wmc.add( validateContainer );
 
         // add the toolbar container

@@ -46,16 +46,17 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.lang.Bytes;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCImporterService;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
-import org.sakaiproject.atriculate.ui.console.pages.ArticulateTCConsoleBasePage;
-import org.sakaiproject.atriculate.ui.console.pages.ArticulateTCPackageListPage;
+import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.event.api.NotificationService;
 import org.sakaiproject.scorm.service.api.ScormResourceService;
+import org.sakaiproject.scorm.ui.console.pages.ConsoleBasePage;
+import org.sakaiproject.scorm.ui.console.pages.PackageListPage;
 import org.sakaiproject.wicket.markup.html.form.CancelButton;
 
 /**
  * @author Robert Long (rlong @ unicon.net)
  */
-public class ArticulateTCUploadPage extends ArticulateTCConsoleBasePage implements ArticulateTCConstants {
+public class ArticulateTCUploadPage extends ConsoleBasePage implements ArticulateTCConstants {
 
     private static final long serialVersionUID = 1L;
     private Log log = LogFactory.getLog(ArticulateTCUploadPage.class);
@@ -65,6 +66,9 @@ public class ArticulateTCUploadPage extends ArticulateTCConsoleBasePage implemen
 
     @SpringBean(name="org.sakaiproject.scorm.service.api.ScormResourceService")
     protected ScormResourceService resourceService;
+
+    @SpringBean(name = "org.sakaiproject.component.api.ServerConfigurationService")
+    private ServerConfigurationService serverConfigurationService;
 
     public ArticulateTCUploadPage(PageParameters params) {
         add(new FileUploadForm("uploadForm"));
@@ -150,7 +154,7 @@ public class ArticulateTCUploadPage extends ArticulateTCConsoleBasePage implemen
             add(priorityLabel);
             add(emailNotificationDropDown);
 
-            final CancelButton btnCancel = new CancelButton("btnCancel", ArticulateTCPackageListPage.class);
+            final CancelButton btnCancel = new CancelButton("btnCancel", PackageListPage.class);
             IndicatingAjaxButton btnSubmit = new IndicatingAjaxButton("btnSubmit", this) {
                 private static final long serialVersionUID = 1L;
 
@@ -187,7 +191,7 @@ public class ArticulateTCUploadPage extends ArticulateTCConsoleBasePage implemen
                             try {
                                 int status = articulateTCImporterService.validateAndProcess(upload.getInputStream(), upload.getClientFileName(), upload.getContentType());
                                 if(status == VALIDATION_SUCCESS) {
-                                    setResponsePage(ArticulateTCPackageListPage.class);
+                                    setResponsePage(PackageListPage.class);
                                 } else {
                                     PageParameters params = new PageParameters();
                                     params.add("filename", upload.getClientFileName());

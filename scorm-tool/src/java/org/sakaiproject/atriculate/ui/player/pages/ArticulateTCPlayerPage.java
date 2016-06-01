@@ -26,12 +26,13 @@ import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCLaunchService;
-import org.sakaiproject.atriculate.ui.console.pages.ArticulateTCPackageListPage;
+import org.sakaiproject.scorm.ui.console.pages.PackageListPage;
+import org.sakaiproject.scorm.ui.player.pages.BaseToolPage;
 
 /**
  * @author Robert Long (rlong @ unicon.net)
  */
-public class ArticulateTCPlayerPage extends ArticulateTCBaseToolPage implements ArticulateTCConstants {
+public class ArticulateTCPlayerPage extends BaseToolPage implements ArticulateTCConstants {
 
     private static final long serialVersionUID = 1L;
 
@@ -70,7 +71,7 @@ public class ArticulateTCPlayerPage extends ArticulateTCBaseToolPage implements 
 
             @Override
             public void onClick() {
-                setResponsePage(ArticulateTCPackageListPage.class, pageParams);
+                setResponsePage(PackageListPage.class, pageParams);
             }
 
             @Override
