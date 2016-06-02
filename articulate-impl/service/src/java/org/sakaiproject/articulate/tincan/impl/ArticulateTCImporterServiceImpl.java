@@ -17,12 +17,16 @@ import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPac
 import org.sakaiproject.articulate.tincan.util.ArticulateTCContentEntityUtils;
 import org.sakaiproject.articulate.tincan.util.ArticulateTCDocumentUtils;
 import org.sakaiproject.content.api.ContentCollectionEdit;
+import org.sakaiproject.content.api.ContentEntity;
 import org.sakaiproject.content.api.ContentHostingService;
+import org.sakaiproject.content.api.ContentResource;
 import org.sakaiproject.content.api.ContentResourceEdit;
 import org.sakaiproject.entity.api.Entity;
 import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.event.api.EventTrackingService;
+import org.springframework.http.MediaType;
+import org.springframework.util.CollectionUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -194,7 +198,7 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
         try {
             contentHostingService.getResource(getPackageCollectionPath(true) + ARCHIVE_TINCAN_XML_FILE);
             contentHostingService.getResource(getPackageCollectionPath(true) + ARCHIVE_META_XML_FILE);
-            contentHostingService.getResource(getPackageCollectionPath(true) + ARCHIVE_DEFAULT_LAUNCH_PAGE);
+            findLaunchPage();
         } catch (Exception e) {
             log.error("Error validating archive.", e);
             return false;
@@ -404,7 +408,59 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
      * Path: /access/content/private/articulate/SITE_ID/MY_CONTENT_PACKAGE-1234567890/story.html
      */
     private String getLaunchUrl(boolean includeTimestamp) {
-        return ARCHIVE_DEFAULT_URL_PATH_PREFIX + getPackageCollectionPath(includeTimestamp) + ARCHIVE_DEFAULT_LAUNCH_PAGE;
+        String launchPage = findLaunchPage();
+
+        // no .html files in directory (this shouldn't happen...)
+        if (StringUtils.isBlank(launchPage)) {
+            throw new IllegalStateException("Error:: no HTML file found for launch page.");
+        }
+
+        return ARCHIVE_DEFAULT_URL_PATH_PREFIX + getPackageCollectionPath(includeTimestamp) + launchPage;
+    }
+
+    /**
+     * Attempts to find a launch page HTML file
+     * Since the user can choose a name other than "story.html"
+     * 
+     * @return the launch page found, or null if none exists
+     */
+    private String findLaunchPage() {
+        List<ContentResource> contentResources = contentHostingService.getAllResources(getPackageCollectionPath(true));
+
+        // no .html files in directory (this shouldn't happen...)
+        if (CollectionUtils.isEmpty(contentResources)) {
+            throw new IllegalStateException("Error:: no HTML file found for launch page.");
+        }
+
+        for (ContentResource contentResource : contentResources) {
+            if (StringUtils.endsWithIgnoreCase(contentResource.getId(), ARCHIVE_DEFAULT_LAUNCH_PAGE)) {
+                return ARCHIVE_DEFAULT_LAUNCH_PAGE;
+            }
+
+            if (StringUtils.endsWith(contentResource.getId(), ARCHIVE_DEFAULT_LAUNCH_PAGE_HTML5_SUFFIX)) {
+                String html5Str = StringUtils.substringAfterLast(contentResource.getId(), ContentEntity.SEPARATOR);
+                String prefixStr = StringUtils.substringBefore(html5Str, "_");
+                return prefixStr + ".html";
+            }
+
+            if (StringUtils.endsWith(contentResource.getId(), ARCHIVE_DEFAULT_LAUNCH_PAGE_UNSUPPORTED_SUFFIX)) {
+                String unsupportedStr = StringUtils.substringAfterLast(contentResource.getId(), ContentEntity.SEPARATOR);
+                String prefixStr = StringUtils.substringBefore(unsupportedStr, "_");
+                return prefixStr + ".html";
+            }
+
+            if (StringUtils.endsWithIgnoreCase(contentResource.getId(), ".html")) {
+                String pathPrefix = StringUtils.substringBeforeLast(contentResource.getId(), ContentEntity.SEPARATOR);
+
+                if (StringUtils.equalsIgnoreCase(pathPrefix, getPackageCollectionPath(true))) {
+                    return StringUtils.substringAfterLast(contentResource.getId(), ContentEntity.SEPARATOR);
+                }
+            }
+        }
+
+        log.error("Error:: no HTML file found for launch page.");
+
+        return null;
     }
 
 }
