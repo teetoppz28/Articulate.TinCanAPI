@@ -68,21 +68,10 @@ public class ScormTool extends SakaiWebApplication {
 		};
 	}
 
-<<<<<<< HEAD
-    @Override
-    public Class getHomePage() {
-        // check to see if articulate contant should be allowed
-        boolean allowArticulate = SakaiPortletWebPage.isArticulateEnabled();
-        Class<?> homePage = allowArticulate ? ArticulateTCPackageListPage.class : PackageListPage.class;
-
-        return homePage;
-    }
-=======
 	@Override
 	public Class getHomePage() {
 		return PackageListPage.class;
 	}
->>>>>>> 10.x
 
 	public Folder getUploadFolder() {
 		Folder folder = new Folder(System.getProperty("java.io.tmpdir"), "scorm-uploads");

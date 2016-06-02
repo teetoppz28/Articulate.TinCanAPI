@@ -55,7 +55,7 @@ public class ArticulateTCJsonUtils {
         }
 
         Gson gson = new Gson();
-        List<Object> rv = new ArrayList<Object>();
+        List<Object> rv = new ArrayList<>();
 
         try {
             JsonArray jsonArray = (JsonArray) getJsonElement(jsonStr);

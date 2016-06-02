@@ -55,7 +55,7 @@ public class ArticulateTCResultsListPage extends ArticulateTCBaseResultsPage {
     public ArticulateTCResultsListPage(final PageParameters pageParams) {
         super(pageParams);
 
-        List<ArticulateTCMemberAttemptResult> articulateTCMemberAttemptResults = new ArrayList<ArticulateTCMemberAttemptResult>();
+        List<ArticulateTCMemberAttemptResult> articulateTCMemberAttemptResults = new ArrayList<>();
         long contentPackageId = pageParams.getLong("contentPackageId");
         ArticulateTCContentPackage articulateTCContentPackage = articulateTCContentPackageDao.get(contentPackageId);
         Long assignmentId = articulateTCContentPackage.getAssignmentId();
@@ -131,7 +131,7 @@ public class ArticulateTCResultsListPage extends ArticulateTCBaseResultsPage {
             articulateTCMemberAttemptResults.add(articulateTCMemberAttemptResult);
         }
 
-        List<IColumn<ArticulateTCMemberAttemptResult>> columns = new ArrayList<IColumn<ArticulateTCMemberAttemptResult>>();
+        List<IColumn<ArticulateTCMemberAttemptResult>> columns = new ArrayList<>();
         columns.add(new ArticulateTCStudentReportLinkPanel<ArticulateTCMemberAttemptResult>(new StringResourceModel("column.header.name", this, null), "fullName", "fullName", pageParams));
         columns.add(new PropertyColumn<ArticulateTCMemberAttemptResult>(new StringResourceModel("column.header.id", this, null), "eid", "eid"));
         columns.add(new PropertyColumn<ArticulateTCMemberAttemptResult>(new StringResourceModel("column.header.attempts", this, null), "attemptNumber", "attemptNumber"));
