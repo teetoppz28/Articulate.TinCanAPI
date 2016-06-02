@@ -264,7 +264,7 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
             gradeDefinition.setStudentUid(articulateTCRequestPayload.getUserId());
             gradeDefinition.setGraderUid(articulateTCContentPackage.getCreatedBy());
 
-            List<GradeDefinition> gradeDefinitions = new ArrayList<GradeDefinition>();
+            List<GradeDefinition> gradeDefinitions = new ArrayList<>();
             gradeDefinitions.add(gradeDefinition);
 
             gradebookService.saveGradesAndComments(articulateTCRequestPayload.getSiteId(), assignment.getId(), gradeDefinitions);

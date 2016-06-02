@@ -56,8 +56,8 @@ public class ArticulateTCLearnerResultsPage extends ArticulateTCBaseResultsPage 
     public ArticulateTCLearnerResultsPage(final PageParameters pageParams) {
         super(pageParams);
 
-        List<ArticulateTCAttemptResult> articulateTCAttemptResultsComplete = new ArrayList<ArticulateTCAttemptResult>();
-        List<ArticulateTCAttemptResult> articulateTCAttemptResultsIncomplete = new ArrayList<ArticulateTCAttemptResult>();
+        List<ArticulateTCAttemptResult> articulateTCAttemptResultsComplete = new ArrayList<>();
+        List<ArticulateTCAttemptResult> articulateTCAttemptResultsIncomplete = new ArrayList<>();
 
         final boolean isInstructor = StringUtils.equalsIgnoreCase(pageParams.getString("isInstructor"), "true");
         String contentPackageId = pageParams.getString("contentPackageId");
@@ -132,7 +132,7 @@ public class ArticulateTCLearnerResultsPage extends ArticulateTCBaseResultsPage 
             }
         }
 
-        List<IColumn<ArticulateTCAttemptResult>> completeColumns = new ArrayList<IColumn<ArticulateTCAttemptResult>>();
+        List<IColumn<ArticulateTCAttemptResult>> completeColumns = new ArrayList<>();
         completeColumns.add(new PropertyColumn<ArticulateTCAttemptResult>(new StringResourceModel("column.header.attempt.number", this, null), "attemptNumber", "attemptNumber"));
         completeColumns.add(new PropertyColumn<ArticulateTCAttemptResult>(new StringResourceModel("column.header.date.completed", this, null), "dateCompleted", "dateCompleted"));
         completeColumns.add(new PropertyColumn<ArticulateTCAttemptResult>(new StringResourceModel("column.header.scaled.score", this, null), "scaledScore", "scaledScore"));
@@ -140,7 +140,7 @@ public class ArticulateTCLearnerResultsPage extends ArticulateTCBaseResultsPage 
         BasicDataTable resultsTableComplete = new BasicDataTable("results-table-complete", completeColumns, new ArticulateTCLearnerResultsProvider(articulateTCAttemptResultsComplete));
         add(resultsTableComplete);
 
-        List<IColumn<ArticulateTCAttemptResult>> incompleteColumns = new ArrayList<IColumn<ArticulateTCAttemptResult>>();
+        List<IColumn<ArticulateTCAttemptResult>> incompleteColumns = new ArrayList<>();
         incompleteColumns.add(new PropertyColumn<ArticulateTCAttemptResult>(new StringResourceModel("column.header.attempt.number", this, null), "attemptNumber", "attemptNumber"));
         incompleteColumns.add(new PropertyColumn<ArticulateTCAttemptResult>(new StringResourceModel("column.header.date.begin", this, null), "modified", "modified"));
         incompleteColumns.add(new PropertyColumn<ArticulateTCAttemptResult>(new StringResourceModel("column.header.scaled.score", this, null), "scaledScore", "scaledScore"));

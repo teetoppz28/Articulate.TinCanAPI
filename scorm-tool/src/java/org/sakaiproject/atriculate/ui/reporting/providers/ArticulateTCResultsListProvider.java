@@ -27,7 +27,7 @@ public class ArticulateTCResultsListProvider extends SortableDataProvider<Articu
     }
 
     public Iterator<? extends ArticulateTCMemberAttemptResult> iterator(int first, int count) {
-        List<ArticulateTCMemberAttemptResult> data = new ArrayList<ArticulateTCMemberAttemptResult>(articulateTCMemberAttemptResults);
+        List<ArticulateTCMemberAttemptResult> data = new ArrayList<>(articulateTCMemberAttemptResults);
 
         Collections.sort(data, new Comparator<ArticulateTCMemberAttemptResult>() {
             public int compare(ArticulateTCMemberAttemptResult o1, ArticulateTCMemberAttemptResult o2) {

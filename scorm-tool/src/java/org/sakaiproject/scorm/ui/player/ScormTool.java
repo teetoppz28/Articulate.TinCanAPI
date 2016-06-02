@@ -38,6 +38,7 @@ import org.apache.wicket.util.file.Folder;
 import org.sakaiproject.scorm.service.api.ScormResourceService;
 import org.sakaiproject.scorm.ui.ContentPackageResourceMountStrategy;
 import org.sakaiproject.scorm.ui.console.pages.PackageListPage;
+import org.sakaiproject.wicket.markup.html.SakaiPortletWebPage;
 import org.sakaiproject.wicket.protocol.http.SakaiWebApplication;
 
 public class ScormTool extends SakaiWebApplication {
