@@ -51,6 +51,8 @@ public interface ArticulateTCConstants extends ScormConstants {
     final static String ARCHIVE_DEFAULT_URL_PATH_PREFIX = "/access/content";
     final static String ARCHIVE_DEFAULT_STORAGE_PATH_PREFIX = "/private/articulate/";
     final static String ARCHIVE_DEFAULT_LAUNCH_PAGE = "story.html";
+    final static String ARCHIVE_DEFAULT_LAUNCH_PAGE_HTML5_SUFFIX = "_html5.html";
+    final static String ARCHIVE_DEFAULT_LAUNCH_PAGE_UNSUPPORTED_SUFFIX = "_unsupported.html";
     final static String ARCHIVE_ZIP_MIMETYPE = "application/zip";
     final static String ARCHIVE_META_XML_FILE = "meta.xml";
     final static String ARCHIVE_TINCAN_XML_FILE = "tincan.xml";
