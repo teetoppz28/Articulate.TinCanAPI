@@ -51,12 +51,4 @@ public class SakaiPortletWebPage extends WebPage implements IHeaderContributor {
 		return new Label(id, new StringResourceModel(id, component, null));
 	}
 
-    /**
-     * Is Articulate content packaging enabled in sakai.properties?
-     * @return
-     */
-    public static boolean isArticulateEnabled() {
-        return ServerConfigurationService.getBoolean("articulate.tincanapi.package.allowed", true);
-    }
-
 }
