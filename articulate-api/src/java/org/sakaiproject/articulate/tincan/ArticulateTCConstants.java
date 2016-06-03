@@ -42,6 +42,7 @@ public interface ArticulateTCConstants extends ScormConstants {
     final static String STATE_DATA_KEY_ACTOR = "actor";
     final static String STATE_DATA_KEY_USER_ID = "userid";
     final static String STATE_DATA_KEY_PACKAGE_ID = "packageid";
+    final static String STATE_DATA_KEY_AUTH = "auth";
 
     final static String DEFAULT_ENCODING = "UTF-8";
 
