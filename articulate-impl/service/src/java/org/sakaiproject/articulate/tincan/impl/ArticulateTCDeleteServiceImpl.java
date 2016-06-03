@@ -54,7 +54,7 @@ public class ArticulateTCDeleteServiceImpl implements ArticulateTCDeleteService,
 
             articulateTCContentPackageDao.remove(articulateTCContentPackage);
 
-            eventTrackingService.post(eventTrackingService.newEvent("articulate.tc.remove", "articulate/tc/site/" + articulateTCContentPackage.getContext() + "/user/" + developerHelperService.getCurrentUserId() + "/packageId/" + articulateTCContentPackage.getContentPackageId(), true));
+            eventTrackingService.post(eventTrackingService.newEvent(SAKAI_EVENT_REMOVE, "articulate/tc/site/" + articulateTCContentPackage.getContext() + "/user/" + developerHelperService.getCurrentUserId() + "/packageId/" + articulateTCContentPackage.getContentPackageId(), true));
         } catch (Exception e) {
             log.error("Error deleting content package with ID: " + contentPackageId, e);
             return false;
