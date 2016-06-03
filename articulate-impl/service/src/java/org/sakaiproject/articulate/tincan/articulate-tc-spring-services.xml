@@ -84,4 +84,22 @@
         <property name="developerHelperService" ref="org.sakaiproject.entitybroker.DeveloperHelperService" />
     </bean>
 
+    <!-- Configuration service -->
+
+    <bean id="articulateTCConfigurationService" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCConfigurationServiceImpl">
+    <property name="articulateTCContentPackageDao" ref="articulateTCContentPackageDao" />
+        <property name="articulateTCEntityProviderService" ref="articulateTCEntityProviderService" />
+        <property name="gradebookService" ref="org.sakaiproject.service.gradebook.GradebookService" />
+    </bean>
+
+    <!-- Results service -->
+
+    <bean id="articulateTCResultsService" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCResultsServiceImpl">
+        <property name="articulateTCAttemptDao" ref="articulateTCAttemptDao" />
+        <property name="articulateTCAttemptResultDao" ref="articulateTCAttemptResultDao" />
+        <property name="articulateTCContentPackageDao" ref="articulateTCContentPackageDao" />
+        <property name="articulateTCEntityProviderService" ref="articulateTCEntityProviderService" />
+        <property name="developerHelperService" ref="org.sakaiproject.entitybroker.DeveloperHelperService" />
+        <property name="gradebookService" ref="org.sakaiproject.service.gradebook.GradebookService" />
+    </bean>
 </beans>

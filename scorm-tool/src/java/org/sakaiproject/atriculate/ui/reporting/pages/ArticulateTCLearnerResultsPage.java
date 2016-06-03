@@ -21,6 +21,7 @@ package org.sakaiproject.atriculate.ui.reporting.pages;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.PageParameters;
@@ -30,17 +31,13 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColu
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.StringResourceModel;
-import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttempt;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.sakaiproject.articulate.tincan.api.ArticulateTCResultsService;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttemptResult;
-import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
 import org.sakaiproject.atriculate.ui.reporting.providers.ArticulateTCLearnerResultsProvider;
-import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.scorm.ui.console.pages.PackageListPage;
-import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.wicket.markup.html.repeater.data.table.BasicDataTable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert Long (rlong @ unicon.net)
@@ -49,15 +46,13 @@ public class ArticulateTCLearnerResultsPage extends ArticulateTCBaseResultsPage 
 
     private static final long serialVersionUID = 1L;
 
-    private Logger log = LoggerFactory.getLogger(ArticulateTCLearnerResultsPage.class);
+    @SpringBean (name = "articulateTCResultsService")
+    private ArticulateTCResultsService articulateTCResultsService;
 
     private static final ResourceReference PAGE_ICON = new ResourceReference(ArticulateTCLearnerResultsPage.class, HTML_RES_REPORTING_PREFIX + "res/report_user.png");
 
     public ArticulateTCLearnerResultsPage(final PageParameters pageParams) {
         super(pageParams);
-
-        List<ArticulateTCAttemptResult> articulateTCAttemptResultsComplete = new ArrayList<>();
-        List<ArticulateTCAttemptResult> articulateTCAttemptResultsIncomplete = new ArrayList<>();
 
         final boolean isInstructor = StringUtils.equalsIgnoreCase(pageParams.getString("isInstructor"), "true");
         String contentPackageId = pageParams.getString("contentPackageId");
@@ -73,64 +68,13 @@ public class ArticulateTCLearnerResultsPage extends ArticulateTCBaseResultsPage 
             userId = user != null ? user.getId() : "";
         }
 
-        List<ArticulateTCAttempt> articulateTCAttempts = articulateTCAttemptDao.find(Long.parseLong(contentPackageId), userId);
+        Map<String, List<ArticulateTCAttemptResult>> results = articulateTCResultsService.calculateAttemptResults(contentPackageId, userId);
+        List<ArticulateTCAttemptResult> articulateTCAttemptResultsComplete = results.get("complete");
+        List<ArticulateTCAttemptResult> articulateTCAttemptResultsIncomplete = results.get("incomplete");
 
-        for (ArticulateTCAttempt articulateTCAttempt : articulateTCAttempts) {
-            List<ArticulateTCAttemptResult> complete = articulateTCAttemptResultDao.findByAttemptId(articulateTCAttempt.getId());
+        String gradebookScore = articulateTCResultsService.calculateGradebookScore(contentPackageId, pageParams.getString("gradebookScore"), userId);
 
-            if (complete != null) {
-                articulateTCAttemptResultsComplete.addAll(complete);
-            }
-
-            List<ArticulateTCAttemptResult> incomplete = articulateTCAttemptResultDao.findByAttemptIdIncomplete(articulateTCAttempt.getId());
-
-            if (incomplete != null) {
-                articulateTCAttemptResultsIncomplete.addAll(incomplete);
-            }
-        }
-
-        String gradebookScore = pageParams.getString("gradebookScore");
-
-        if (StringUtils.isBlank(gradebookScore)) {
-            gradebookScore = "N/A";
-            ArticulateTCContentPackage articulateTCContentPackage = articulateTCContentPackageDao.get(Long.parseLong(contentPackageId));
-
-            if (articulateTCContentPackage != null) {
-                if (articulateTCContentPackage.getAssignmentId() != null) {
-                    try {
-                        developerHelperService.setCurrentUser(DeveloperHelperService.ADMIN_USER_REF);
-                        gradebookScore = gradebookService.getAssignmentScoreString(articulateTCContentPackage.getContext(), articulateTCContentPackage.getAssignmentId(), userId);
-                    } catch (Exception e) {
-                        log.error("Error getting score string for user {} in site {} and asignment {}", userId, articulateTCContentPackage.getContext(), articulateTCContentPackage.getAssignmentId(), e);
-                    } finally {
-                        developerHelperService.restoreCurrentUser();
-                    }
-                }
-            }
-        }
-
-        String gradebookPointsPossible = pageParams.getString("gradebookPointsPossible");
-
-        if (StringUtils.isBlank(gradebookPointsPossible)) {
-            gradebookPointsPossible = "-";
-            ArticulateTCContentPackage articulateTCContentPackage = articulateTCContentPackageDao.get(Long.parseLong(contentPackageId));
-
-            if (articulateTCContentPackage != null) {
-                Long assignmentId = articulateTCContentPackage.getAssignmentId();
-
-                if (assignmentId != null) {
-                    Assignment assignment = gradebookService.getAssignment(articulateTCContentPackage.getContext(), assignmentId);
-
-                    if (assignment != null) {
-                        Double pointsPossible = assignment.getPoints();
- 
-                        if (pointsPossible != null) {
-                            gradebookPointsPossible = Double.toString(pointsPossible);
-                        }
-                    }
-                }
-            }
-        }
+        String gradebookPointsPossible = articulateTCResultsService.calculatePointsPossible(contentPackageId, pageParams.getString("gradebookPointsPossible"));
 
         List<IColumn<ArticulateTCAttemptResult>> completeColumns = new ArrayList<>();
         completeColumns.add(new PropertyColumn<ArticulateTCAttemptResult>(new StringResourceModel("column.header.attempt.number", this, null), "attemptNumber", "attemptNumber"));
