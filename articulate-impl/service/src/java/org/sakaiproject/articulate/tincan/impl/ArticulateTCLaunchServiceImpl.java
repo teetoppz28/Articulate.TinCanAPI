@@ -50,7 +50,7 @@ public class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService,
 
         StringBuilder sb = new StringBuilder("?");
         sb.append(STATE_DATA_KEY_ENDPOINT + "=" + endPoint);
-        sb.append("&auth=");
+        sb.append("&" + STATE_DATA_KEY_AUTH + "=");
         sb.append("&" + STATE_DATA_KEY_ACTOR + "=" + actor);
         sb.append("&" + STATE_DATA_KEY_PACKAGE_ID + "=" + packageId);
 
