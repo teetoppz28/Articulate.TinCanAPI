@@ -269,7 +269,7 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
 
             gradebookService.saveGradesAndComments(articulateTCRequestPayload.getSiteId(), assignment.getId(), gradeDefinitions);
 
-            eventTrackingService.post(eventTrackingService.newEvent("articulate.tc.grade", "articulate/tc/site/" + articulateTCContentPackage.getContext() + "/instructor/" + articulateTCContentPackage.getCreatedBy() + "/student/" + articulateTCRequestPayload.getUserId() + "/packageId/" + articulateTCContentPackage.getContentPackageId(), true));
+            eventTrackingService.post(eventTrackingService.newEvent(SAKAI_EVENT_GRADE, "articulate/tc/site/" + articulateTCContentPackage.getContext() + "/instructor/" + articulateTCContentPackage.getCreatedBy() + "/student/" + articulateTCRequestPayload.getUserId() + "/packageId/" + articulateTCContentPackage.getContentPackageId(), true));
         } catch (Exception e) {
             log.error("Error sending grade to gradebook.", e);
         } finally {

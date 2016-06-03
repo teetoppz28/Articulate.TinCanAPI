@@ -4,6 +4,8 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
+import javax.tools.JavaFileObject.Kind;
+
 import lombok.Setter;
 
 import org.apache.commons.lang.StringUtils;
@@ -25,6 +27,7 @@ import org.sakaiproject.entity.api.Entity;
 import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.event.api.EventTrackingService;
+import org.sakaiproject.exception.IdUnusedException;
 import org.springframework.util.CollectionUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -98,7 +101,7 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
         // move the temp file directory to the permanent directory (if configured)
         moveContentPackage();
 
-        eventTrackingService.post(eventTrackingService.newEvent("articulate.tc.add", "articulate/tc/site/" + getCurrentContext() + "/user/" + getCurrentUserId() + "/packageName/" + this.packageName, true));
+        eventTrackingService.post(eventTrackingService.newEvent(SAKAI_EVENT_ADD, "articulate/tc/site/" + getCurrentContext() + "/user/" + getCurrentUserId() + "/packageName/" + this.packageName, true));
 
         return VALIDATION_SUCCESS;
     }
@@ -424,6 +427,17 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
      * @return the launch page found, or null if none exists
      */
     private String findLaunchPage() {
+        try {
+            contentHostingService.getResource(getPackageCollectionPath(true) + ARCHIVE_DEFAULT_LAUNCH_PAGE);
+
+            return ARCHIVE_DEFAULT_LAUNCH_PAGE;
+        } catch (IdUnusedException iue) {
+            log.info("No default launch page HTML file found");
+        } catch (Exception e) {
+            log.error("Error retrieving launch page HTML file");
+        }
+
+        // get a listing of the files in the directory
         List<ContentResource> contentResources = contentHostingService.getAllResources(getPackageCollectionPath(true));
 
         // no .html files in directory (this shouldn't happen...)
@@ -431,24 +445,21 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
             throw new IllegalStateException("Error:: no HTML file found for launch page.");
         }
 
+        // search the directory for HTML files
         for (ContentResource contentResource : contentResources) {
-            if (StringUtils.endsWithIgnoreCase(contentResource.getId(), ARCHIVE_DEFAULT_LAUNCH_PAGE)) {
-                return ARCHIVE_DEFAULT_LAUNCH_PAGE;
-            }
-
             if (StringUtils.endsWith(contentResource.getId(), ARCHIVE_DEFAULT_LAUNCH_PAGE_HTML5_SUFFIX)) {
                 String html5Str = StringUtils.substringAfterLast(contentResource.getId(), ContentEntity.SEPARATOR);
                 String prefixStr = StringUtils.substringBefore(html5Str, "_");
-                return prefixStr + ".html";
+                return prefixStr + Kind.HTML.extension;
             }
 
             if (StringUtils.endsWith(contentResource.getId(), ARCHIVE_DEFAULT_LAUNCH_PAGE_UNSUPPORTED_SUFFIX)) {
                 String unsupportedStr = StringUtils.substringAfterLast(contentResource.getId(), ContentEntity.SEPARATOR);
                 String prefixStr = StringUtils.substringBefore(unsupportedStr, "_");
-                return prefixStr + ".html";
+                return prefixStr + Kind.HTML.extension;
             }
 
-            if (StringUtils.endsWithIgnoreCase(contentResource.getId(), ".html")) {
+            if (StringUtils.endsWithIgnoreCase(contentResource.getId(), Kind.HTML.extension)) {
                 String pathPrefix = StringUtils.substringBeforeLast(contentResource.getId(), ContentEntity.SEPARATOR);
 
                 if (StringUtils.equalsIgnoreCase(pathPrefix, getPackageCollectionPath(true))) {

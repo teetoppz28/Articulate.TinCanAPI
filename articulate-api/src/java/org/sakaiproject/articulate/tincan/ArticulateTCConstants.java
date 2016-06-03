@@ -93,4 +93,12 @@ public interface ArticulateTCConstants extends ScormConstants {
      */
     final static DecimalFormat GRADE_DECIMAL_FORMAT = new DecimalFormat("#.##");
 
+    /*
+     * Events
+     */
+    final static String SAKAI_EVENT_ADD = "articulate.tc.add";
+    final static String SAKAI_EVENT_REMOVE = "articulate.tc.remove";
+    final static String SAKAI_EVENT_LAUNCH = "articulate.tc.launch";
+    final static String SAKAI_EVENT_GRADE = "articulate.tc.grade";
+
 }

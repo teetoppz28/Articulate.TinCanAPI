@@ -114,7 +114,7 @@ public class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService,
 
         addAttemptResult(newAttempt.getId(), newAttempt.getAttemptNumber());
 
-        eventTrackingService.post(eventTrackingService.newEvent("articulate.tc.launch", "articulate/tc/site/" + articulateTCContentPackage.getContext() + "/user/" + userId + "/packageId/" + articulateTCContentPackage.getContentPackageId(), true));
+        eventTrackingService.post(eventTrackingService.newEvent(SAKAI_EVENT_LAUNCH, "articulate/tc/site/" + articulateTCContentPackage.getContext() + "/user/" + userId + "/packageId/" + articulateTCContentPackage.getContentPackageId(), true));
     }
 
     @Override
