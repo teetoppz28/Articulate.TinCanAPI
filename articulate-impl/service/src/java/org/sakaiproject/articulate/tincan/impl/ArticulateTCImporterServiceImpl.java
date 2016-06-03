@@ -27,7 +27,10 @@ import org.sakaiproject.entity.api.Entity;
 import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.event.api.EventTrackingService;
+<<<<<<< HEAD
 import org.sakaiproject.exception.IdUnusedException;
+=======
+>>>>>>> 10.x
 import org.springframework.util.CollectionUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -456,6 +459,7 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
             if (StringUtils.endsWith(contentResource.getId(), ARCHIVE_DEFAULT_LAUNCH_PAGE_UNSUPPORTED_SUFFIX)) {
                 String unsupportedStr = StringUtils.substringAfterLast(contentResource.getId(), ContentEntity.SEPARATOR);
                 String prefixStr = StringUtils.substringBefore(unsupportedStr, "_");
+
                 return prefixStr + Kind.HTML.extension;
             }
 
