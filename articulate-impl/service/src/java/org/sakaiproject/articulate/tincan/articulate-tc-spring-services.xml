@@ -101,5 +101,7 @@
         <property name="articulateTCEntityProviderService" ref="articulateTCEntityProviderService" />
         <property name="developerHelperService" ref="org.sakaiproject.entitybroker.DeveloperHelperService" />
         <property name="gradebookService" ref="org.sakaiproject.service.gradebook.GradebookService" />
+        <property name="siteService" ref="org.sakaiproject.site.api.SiteService" />
+        <property name="userDirectoryService" ref="org.sakaiproject.user.api.UserDirectoryService" />
     </bean>
 </beans>

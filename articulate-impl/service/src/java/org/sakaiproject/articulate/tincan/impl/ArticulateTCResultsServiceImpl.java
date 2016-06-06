@@ -2,28 +2,39 @@ package org.sakaiproject.articulate.tincan.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import lombok.Setter;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggerFactory;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCEntityProviderService;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCResultsService;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCAttemptDao;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCAttemptResultDao;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
+import org.sakaiproject.articulate.tincan.model.ArticulateTCMemberAttemptResult;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttempt;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttemptResult;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
+import org.sakaiproject.authz.api.Member;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
+import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.service.gradebook.shared.GradebookService;
+import org.sakaiproject.site.api.Site;
+import org.sakaiproject.site.api.SiteService;
+import org.sakaiproject.user.api.User;
+import org.sakaiproject.user.api.UserDirectoryService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ArticulateTCResultsServiceImpl implements ArticulateTCResultsService, ArticulateTCConstants {
+
+    private final Logger log = LoggerFactory.getLogger(ArticulateTCResultsServiceImpl.class);
 
     @Setter
     private ArticulateTCAttemptDao articulateTCAttemptDao;
@@ -42,6 +53,12 @@ public class ArticulateTCResultsServiceImpl implements ArticulateTCResultsServic
 
     @Setter
     private GradebookService gradebookService;
+
+    @Setter
+    private SiteService siteService;
+
+    @Setter
+    private UserDirectoryService userDirectoryService;
 
     @Override
     public String calculatePointsPossible(String contentPackageId, String gradebookPointsPossible) {
@@ -81,7 +98,7 @@ public class ArticulateTCResultsServiceImpl implements ArticulateTCResultsServic
                         developerHelperService.setCurrentUser(DeveloperHelperService.ADMIN_USER_REF);
                         gradebookScore = gradebookService.getAssignmentScoreString(articulateTCContentPackage.getContext(), articulateTCContentPackage.getAssignmentId(), userId);
                     } catch (Exception e) {
-                        // log.error("Error getting score string for user {} in site {} and asignment {}", userId, articulateTCContentPackage.getContext(), articulateTCContentPackage.getAssignmentId(), e);
+                        log.error("Error getting score string for user {} in site {} and asignment {}", userId, articulateTCContentPackage.getContext(), articulateTCContentPackage.getAssignmentId(), e);
                     } finally {
                         developerHelperService.restoreCurrentUser();
                     }
@@ -118,6 +135,93 @@ public class ArticulateTCResultsServiceImpl implements ArticulateTCResultsServic
         results.put("incomplete", articulateTCAttemptResultsIncomplete);
 
         return results;
+    }
+
+    @Override
+    public List<ArticulateTCMemberAttemptResult> calculateLearnerAttemptResults(String siteId, Long contentPackageId, Long assignmentId) {
+        Set<Member> members = calculateLearnerMembers(siteId);
+        String gradebookPointsPossible = calculateAssignmentPoints(siteId, assignmentId);
+        List<ArticulateTCMemberAttemptResult> articulateTCMemberAttemptResults = new ArrayList<>();
+
+        for (Member member : members) {
+            String firstName = "[First name unknown]";
+            String lastName = "[Last name unknown]";
+            String fullName = "[Name unknown]";
+            User user = null;
+
+            try {
+                user = userDirectoryService.getUser(member.getUserId());
+                firstName = user.getFirstName();
+                lastName = user.getLastName();
+                fullName = user.getDisplayName();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            ArticulateTCAttempt articulateTCAttempt = articulateTCAttemptDao.lookupNewest(contentPackageId, member.getUserId());
+
+            String gradebookScore = "-";
+
+            if (assignmentId != null) {
+                gradebookScore = gradebookService.getAssignmentScoreString(siteId, assignmentId, member.getUserId());
+            }
+
+            ArticulateTCMemberAttemptResult articulateTCMemberAttemptResult = new ArticulateTCMemberAttemptResult();
+            articulateTCMemberAttemptResult.setUserId(member.getUserId());
+            articulateTCMemberAttemptResult.setEid(member.getUserEid());
+            articulateTCMemberAttemptResult.setFirstName(firstName);
+            articulateTCMemberAttemptResult.setLastName(lastName);
+            articulateTCMemberAttemptResult.setFullName(fullName);
+            String attemptNumber = articulateTCAttempt != null ? Long.toString(articulateTCAttempt.getAttemptNumber()) : "-";
+            articulateTCMemberAttemptResult.setAttemptNumber(attemptNumber);
+            articulateTCMemberAttemptResult.setGradebookScore(gradebookScore);
+            articulateTCMemberAttemptResult.setGradebookPointsPossible(gradebookPointsPossible);
+
+            articulateTCMemberAttemptResults.add(articulateTCMemberAttemptResult);
+        }
+
+        return articulateTCMemberAttemptResults;
+    }
+
+    private Set<Member> calculateLearnerMembers(String siteId) {
+        Site site = null;
+
+        try {
+            site = siteService.getSite(siteId);
+        } catch (IdUnusedException e) {
+            // site doesn't exist
+            log.error("No site exists with ID: {}", siteId, e);
+        }
+
+        // get learners
+        String maintainRole = site.getMaintainRole();
+        Set<Member> members = site.getMembers();
+        Iterator<Member> iterator = members.iterator();
+
+        while (iterator.hasNext()) {
+            Member member = iterator.next();
+            if (StringUtils.equalsIgnoreCase(member.getRole().getId(), maintainRole)) {
+                // remove maintainers
+                iterator.remove();
+            }
+        }
+
+        return members;
+    }
+
+    private String calculateAssignmentPoints(String siteId, Long assignmentId) {
+        String assignmentPoints = CONFIGURATION_GRADEBOOK_NO_POINTS;
+
+        if (assignmentId != null) {
+            Assignment assignment = gradebookService.getAssignment(siteId, assignmentId);
+
+            if (assignment != null) {
+                Double pointsPossible = assignment.getPoints();
+                assignmentPoints = Double.toString(pointsPossible);
+            }
+        }
+
+        return assignmentPoints;
     }
 
 }

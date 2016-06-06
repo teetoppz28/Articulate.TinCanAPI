@@ -37,6 +37,7 @@ import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttemptRes
 import org.sakaiproject.atriculate.ui.reporting.providers.ArticulateTCLearnerResultsProvider;
 import org.sakaiproject.scorm.ui.console.pages.PackageListPage;
 import org.sakaiproject.user.api.User;
+import org.sakaiproject.user.api.UserDirectoryService;
 import org.sakaiproject.wicket.markup.html.repeater.data.table.BasicDataTable;
 
 /**
@@ -48,6 +49,9 @@ public class ArticulateTCLearnerResultsPage extends ArticulateTCBaseResultsPage 
 
     @SpringBean (name = "articulateTCResultsService")
     private ArticulateTCResultsService articulateTCResultsService;
+
+    @SpringBean(name = "org.sakaiproject.user.api.UserDirectoryService")
+    private UserDirectoryService userDirectoryService;
 
     private static final ResourceReference PAGE_ICON = new ResourceReference(ArticulateTCLearnerResultsPage.class, HTML_RES_REPORTING_PREFIX + "res/report_user.png");
 

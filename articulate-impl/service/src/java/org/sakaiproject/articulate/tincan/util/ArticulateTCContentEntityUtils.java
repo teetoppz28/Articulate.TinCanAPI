@@ -2,21 +2,21 @@ package org.sakaiproject.articulate.tincan.util;
 
 import lombok.Setter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.content.api.ContentCollectionEdit;
 import org.sakaiproject.content.api.ContentHostingService;
 import org.sakaiproject.content.api.ContentResourceEdit;
 import org.sakaiproject.entity.api.Edit;
 import org.sakaiproject.entity.api.ResourcePropertiesEdit;
 import org.sakaiproject.exception.IdUsedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert Long (rlong @ unicon.net)
  */
 public class ArticulateTCContentEntityUtils {
 
-    private Log log = LogFactory.getLog(ArticulateTCContentEntityUtils.class);
+    private final Logger log = LoggerFactory.getLogger(ArticulateTCContentEntityUtils.class);
 
     @Setter
     private ContentHostingService contentHostingService;
@@ -26,7 +26,7 @@ public class ArticulateTCContentEntityUtils {
             return addCollection(collectionPath);
         } catch (IdUsedException iue) {
             // id exists, edit the collection instead
-            log.debug("Collection exists. Getting the EDIT collection object instead for path: " + collectionPath);
+            log.debug("Collection exists. Getting the EDIT collection object instead for path: {}", collectionPath);
             return editCollection(collectionPath);
         } catch (Exception e) {
             log.error("Error getting the add collection object.", e);
@@ -54,7 +54,7 @@ public class ArticulateTCContentEntityUtils {
             return addResource(resourcePath);
         } catch (IdUsedException e) {
             // id exists, edit the resource instead
-            log.debug("Resource exists. Getting the EDIT resource object instead for path: " + resourcePath);
+            log.debug("Resource exists. Getting the EDIT resource object instead for path: {}", resourcePath);
             return editResource(resourcePath);
         } catch (Exception e) {
             log.error("Error getting the add resource object.", e);

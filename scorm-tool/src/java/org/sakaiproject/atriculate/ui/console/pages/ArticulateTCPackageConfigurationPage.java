@@ -99,7 +99,7 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
             }
         };
 
-        List<Integer> tryList = new LinkedList<Integer>();
+        List<Integer> tryList = new LinkedList<>();
 
         tryList.add(-1);
         for (int i = 1; i <= CONFIGURATION_DEFAULT_ATTEMPTS; i++) {

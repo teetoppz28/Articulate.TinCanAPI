@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -21,7 +21,7 @@ import com.google.gson.JsonElement;
  */
 public class ArticulateTCJsonUtils {
 
-    private static Log log = LogFactory.getLog(ArticulateTCJsonUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(ArticulateTCJsonUtils.class);
 
     /**
      * Creates a JSON string from the given object

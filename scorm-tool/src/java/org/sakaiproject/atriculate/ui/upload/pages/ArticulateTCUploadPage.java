@@ -21,8 +21,6 @@ package org.sakaiproject.atriculate.ui.upload.pages;
 
 import java.util.Arrays;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -39,7 +37,6 @@ import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.markup.html.form.upload.FileUploadField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.CompoundPropertyModel;
-import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -52,6 +49,8 @@ import org.sakaiproject.scorm.service.api.ScormResourceService;
 import org.sakaiproject.scorm.ui.console.pages.ConsoleBasePage;
 import org.sakaiproject.scorm.ui.console.pages.PackageListPage;
 import org.sakaiproject.wicket.markup.html.form.CancelButton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert Long (rlong @ unicon.net)
@@ -59,7 +58,7 @@ import org.sakaiproject.wicket.markup.html.form.CancelButton;
 public class ArticulateTCUploadPage extends ConsoleBasePage implements ArticulateTCConstants {
 
     private static final long serialVersionUID = 1L;
-    private Log log = LogFactory.getLog(ArticulateTCUploadPage.class);
+    private final Logger log = LoggerFactory.getLogger(ArticulateTCUploadPage.class);
 
     @SpringBean(name="articulateTCImporterService")
     private ArticulateTCImporterService articulateTCImporterService;
@@ -74,7 +73,7 @@ public class ArticulateTCUploadPage extends ConsoleBasePage implements Articulat
         add(new FileUploadForm("uploadForm"));
     }
 
-    public class FileUploadForm extends Form<Object> {
+    public class FileUploadForm extends Form<ArticulateTCUploadPage> {
         private static final long serialVersionUID = 1L;
         private FileUploadField fileUploadField;
         private boolean fileHidden = false;
@@ -92,8 +91,7 @@ public class ArticulateTCUploadPage extends ConsoleBasePage implements Articulat
         public FileUploadForm(String id) {
             super(id);
 
-            IModel model = new CompoundPropertyModel(this);
-            this.setModel(model);
+            this.setModel(new CompoundPropertyModel<ArticulateTCUploadPage>(this));
 
             // We need to establish the largest file allowed to be uploaded
             setMaxSize(Bytes.megabytes(resourceService.getMaximumUploadFileSize()));
@@ -163,7 +161,7 @@ public class ArticulateTCUploadPage extends ConsoleBasePage implements Articulat
                     FeedbackMessages feedbackMessages = form.getSession().getFeedbackMessages();
 
                     if (!feedbackMessages.isEmpty()) {
-                        log.info("Errors uploading file." + feedbackMessages.toString());
+                        log.info("Errors uploading file: {}", feedbackMessages.toString());
                     }
 
                     target.addComponent(feedbackPanel);
@@ -199,7 +197,7 @@ public class ArticulateTCUploadPage extends ConsoleBasePage implements Articulat
                                     setResponsePage(ArticulateTCConfirmPage.class, params);
                                 }
                             } catch(Exception e) {
-                                ArticulateTCUploadPage.this.warn(getLocalizer().getString("upload.failed", ArticulateTCUploadPage.this, new Model(e)));
+                                ArticulateTCUploadPage.this.warn(getLocalizer().getString("upload.failed", ArticulateTCUploadPage.this, new Model<Exception>(e)));
                                 log.error("Failed to upload file", e);
                             }
                         }

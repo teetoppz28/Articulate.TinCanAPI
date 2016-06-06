@@ -8,10 +8,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import lombok.Setter;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.content.api.ContentHostingService;
 import org.sakaiproject.content.api.ContentResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 /**
@@ -19,7 +19,7 @@ import org.w3c.dom.Document;
  */
 public class ArticulateTCDocumentUtils {
 
-    private Log log = LogFactory.getLog(ArticulateTCDocumentUtils.class);
+    private final Logger log = LoggerFactory.getLogger(ArticulateTCDocumentUtils.class);
 
     @Setter
     private ContentHostingService contentHostingService;
@@ -40,7 +40,7 @@ public class ArticulateTCDocumentUtils {
         try {
             contentResource = contentHostingService.getResource(resourcePath);
         } catch (Exception e) {
-            log.error("Error getting resource as document from path: " + resourcePath, e);
+            log.error("Error getting resource as document from path: {}", resourcePath, e);
         }
 
         DocumentBuilderFactory factory = null;

@@ -3,8 +3,6 @@ package org.sakaiproject.articulate.tincan.impl;
 import lombok.Setter;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCDeleteService;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
@@ -16,13 +14,15 @@ import org.sakaiproject.content.api.ContentResourceEdit;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.event.api.EventTrackingService;
 import org.sakaiproject.service.gradebook.shared.GradebookService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert Long (rlong @ unicon.net)
  */
 public class ArticulateTCDeleteServiceImpl implements ArticulateTCDeleteService, ArticulateTCConstants {
 
-    private Log log = LogFactory.getLog(ArticulateTCDeleteServiceImpl.class);
+    private final Logger log = LoggerFactory.getLogger(ArticulateTCDeleteServiceImpl.class);
 
     @Setter
     private ArticulateTCContentEntityUtils articulateTCContentEntityUtils;
@@ -56,7 +56,7 @@ public class ArticulateTCDeleteServiceImpl implements ArticulateTCDeleteService,
 
             eventTrackingService.post(eventTrackingService.newEvent(SAKAI_EVENT_REMOVE, "articulate/tc/site/" + articulateTCContentPackage.getContext() + "/user/" + developerHelperService.getCurrentUserId() + "/packageId/" + articulateTCContentPackage.getContentPackageId(), true));
         } catch (Exception e) {
-            log.error("Error deleting content package with ID: " + contentPackageId, e);
+            log.error("Error deleting content package with ID: {}", contentPackageId, e);
             return false;
         }
 
@@ -76,7 +76,7 @@ public class ArticulateTCDeleteServiceImpl implements ArticulateTCDeleteService,
 
             if (articulateTCContentPackage == null) {
                 // no package settings data found, skip deletion
-                log.debug("No content package settings found for ID: " + contentPackageId);
+                log.debug("No content package settings found for ID: {}", contentPackageId);
                 return true;
             }
 
@@ -89,7 +89,7 @@ public class ArticulateTCDeleteServiceImpl implements ArticulateTCDeleteService,
 
             gradebookService.removeAssignment(assignmentId);
         } catch (Exception e) {
-            log.error("Error deleting assignment with ID: " + assignmentId, e);
+            log.error("Error deleting assignment with ID: {}", assignmentId, e);
         }
         return true;
     }
@@ -123,7 +123,7 @@ public class ArticulateTCDeleteServiceImpl implements ArticulateTCDeleteService,
             // remove the collection
             contentHostingService.removeCollection(collection.getId());
         } catch (Exception e) {
-            log.error("Error deleting resource files for package ID: " + contentPackageId);
+            log.error("Error deleting resource files for package ID: {}", contentPackageId);
             return false;
         } finally {
             developerHelperService.restoreCurrentUser();
@@ -147,7 +147,7 @@ public class ArticulateTCDeleteServiceImpl implements ArticulateTCDeleteService,
 
         if (articulateTCContentPackage == null) {
             // no content package with the given ID
-            log.debug("No content package found for ID: " + contentPackageId);
+            log.debug("No content package found for ID: {}", contentPackageId);
         }
 
         return articulateTCContentPackage;

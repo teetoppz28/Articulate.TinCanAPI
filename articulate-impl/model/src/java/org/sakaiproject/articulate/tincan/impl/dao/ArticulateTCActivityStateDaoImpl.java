@@ -7,6 +7,8 @@ import org.hibernate.Session;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCActivityStateDao;
 import org.sakaiproject.articulate.tincan.model.ArticulateTCRequestPayload;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCActivityState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.orm.hibernate3.SessionHolder;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -16,6 +18,8 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * @author Robert Long (rlong @ unicon.net)
  */
 public class ArticulateTCActivityStateDaoImpl extends HibernateDaoSupport implements ArticulateTCActivityStateDao {
+
+    private final Logger log = LoggerFactory.getLogger(ArticulateTCActivityStateDaoImpl.class);
 
     @Override
     public void save(ArticulateTCActivityState articulateTCActivityState) {
@@ -31,7 +35,7 @@ public class ArticulateTCActivityStateDaoImpl extends HibernateDaoSupport implem
                 articulateTCActivityState.setModified(new Date());
                 getHibernateTemplate().saveOrUpdate(articulateTCActivityState);
             } catch (Throwable e) {
-                logger.error("Error saving activity state data: ", e);
+                log.error("Error saving activity state data: ", e);
                 session.getTransaction().rollback();
             } finally {
                 if (!session.getTransaction().wasRolledBack()) {

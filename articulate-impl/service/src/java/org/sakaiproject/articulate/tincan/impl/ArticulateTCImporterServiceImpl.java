@@ -9,8 +9,6 @@ import javax.tools.JavaFileObject.Kind;
 import lombok.Setter;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCImporterService;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
@@ -28,6 +26,8 @@ import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.event.api.EventTrackingService;
 import org.sakaiproject.exception.IdUnusedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -39,7 +39,7 @@ import org.w3c.dom.NodeList;
  */
 public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterService, ArticulateTCConstants {
 
-    private Log log = LogFactory.getLog(ArticulateTCImporterServiceImpl.class);
+    private final Logger log = LoggerFactory.getLogger(ArticulateTCImporterServiceImpl.class);
 
     @Setter
     private ArticulateTCContentEntityUtils articulateTCContentEntityUtils;
@@ -76,7 +76,7 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
             return VALIDATION_NOTWELLFORMED;
         }
         if (!StringUtils.equals(ARCHIVE_ZIP_MIMETYPE, contentType)) {
-            log.error("Uploaded file is not of type " + ARCHIVE_ZIP_MIMETYPE);
+            log.error("Uploaded file is not of type {}", ARCHIVE_ZIP_MIMETYPE);
             return VALIDATION_WRONGMIMETYPE;
         }
 
@@ -150,7 +150,7 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
         articulateTCContentPackage = new ArticulateTCContentPackage(processMetaXml(), getLaunchUrl(true));
 
         if (!articulateTCContentPackage.isValid()) {
-            log.error("The Articulate TinCanAPI Content Package is invalid. It has been deleted. \n" + articulateTCContentPackage.toString());
+            log.error("The Articulate TinCanAPI Content Package is invalid. It has been deleted. \n {}", articulateTCContentPackage.toString());
             removeArchiveCollection();
 
             return false;
@@ -318,7 +318,7 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
                 contentHostingService.removeCollection(existingDirectory);
             }
         } catch (Exception e) {
-            log.error("Error removing existing directory: " + existingDirectory, e);
+            log.error("Error removing existing directory: {}", existingDirectory, e);
             return false;
         }
 

@@ -10,20 +10,20 @@ import javax.servlet.http.HttpServletRequest;
 import lombok.Setter;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
 import org.sakaiproject.articulate.tincan.model.ArticulateTCRequestPayload;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert Long (rlong @ unicon.net)
  */
 public class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConstants {
 
-    private static Log log = LogFactory.getLog(ArticulateTCEntityProviderServiceUtils.class);
+    private final Logger log = LoggerFactory.getLogger(ArticulateTCEntityProviderServiceUtils.class);
 
     @Setter
     private ArticulateTCContentPackageDao articulateTCContentPackageDao;
