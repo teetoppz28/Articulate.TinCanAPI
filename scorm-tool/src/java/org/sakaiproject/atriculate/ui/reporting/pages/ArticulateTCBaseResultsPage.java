@@ -38,7 +38,7 @@ public class ArticulateTCBaseResultsPage extends ConsoleBasePage {
 
     private static final long serialVersionUID = 1L;
 
-    @SpringBean(name="articulateTCAttemptDao")
+    /*@SpringBean(name="articulateTCAttemptDao")
     protected ArticulateTCAttemptDao articulateTCAttemptDao;
 
     @SpringBean(name="articulateTCAttemptResultDao")
@@ -57,7 +57,7 @@ public class ArticulateTCBaseResultsPage extends ConsoleBasePage {
     protected SiteService siteService;
 
     @SpringBean(name = "org.sakaiproject.user.api.UserDirectoryService")
-    protected UserDirectoryService userDirectoryService;
+    protected UserDirectoryService userDirectoryService;*/
 
     public ArticulateTCBaseResultsPage(PageParameters pageParams) {
         super(pageParams);

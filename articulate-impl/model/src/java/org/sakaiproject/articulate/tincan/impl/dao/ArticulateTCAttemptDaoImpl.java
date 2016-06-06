@@ -33,6 +33,8 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCAttemptDao;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttempt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.SessionHolder;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -42,6 +44,8 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * @author Robert Long (rlong @ unicon.net)
  */
 public class ArticulateTCAttemptDaoImpl extends HibernateDaoSupport implements ArticulateTCAttemptDao {
+
+    private final Logger log = LoggerFactory.getLogger(ArticulateTCAttemptDaoImpl.class);
 
     public int count(final long contentPackageId, final String learnerId) {
         HibernateCallback<Object> hcb = new HibernateCallback<Object>() {
@@ -135,7 +139,7 @@ public class ArticulateTCAttemptDaoImpl extends HibernateDaoSupport implements A
                 articulateTCAttempt.setLastModifiedDate(new Date());
                 getHibernateTemplate().saveOrUpdate(articulateTCAttempt);
             } catch (Throwable e) {
-                logger.error("Error saving activity state data: ", e);
+                log.error("Error saving activity state data: ", e);
                 session.getTransaction().rollback();
             } finally {
                 if (!session.getTransaction().wasRolledBack()) {

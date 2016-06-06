@@ -88,6 +88,7 @@ public interface ArticulateTCConstants extends ScormConstants {
     final static boolean CONFIGURATION_DEFAULT_ACTIVITY_STATE_DELETED = false;
     final static String CONFIGURATION_RECORD_SCORE_TYPE_BEST = "BEST";
     final static String CONFIGURATION_RECORD_SCORE_TYPE_LATEST = "LATEST";
+    final static String CONFIGURATION_GRADEBOOK_NO_POINTS = "-";
 
     /*
      * Grading

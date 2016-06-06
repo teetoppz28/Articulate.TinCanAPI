@@ -6,8 +6,6 @@ import java.util.Date;
 
 import lombok.Setter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCLaunchService;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCAttemptDao;
@@ -20,13 +18,15 @@ import org.sakaiproject.entitybroker.EntityView;
 import org.sakaiproject.event.api.EventTrackingService;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserDirectoryService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert Long (rlong @ unicon.net)
  */
 public class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService, ArticulateTCConstants {
 
-    private Log log = LogFactory.getLog(ArticulateTCLaunchServiceImpl.class);
+    private final Logger log = LoggerFactory.getLogger(ArticulateTCLaunchServiceImpl.class);
 
     @Setter
     private ArticulateTCAttemptDao articulateTCAttemptDao;

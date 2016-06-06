@@ -6,6 +6,8 @@ import java.util.List;
 import org.hibernate.Session;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCAttemptResultDao;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttemptResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.orm.hibernate3.SessionHolder;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -15,6 +17,8 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * @author Robert Long (rlong @ unicon.net)
  */
 public class ArticulateTCAttemptResultDaoImpl extends HibernateDaoSupport implements ArticulateTCAttemptResultDao {
+
+    private final Logger log = LoggerFactory.getLogger(ArticulateTCAttemptResultDaoImpl.class);
 
     @Override
     public void save(ArticulateTCAttemptResult articulateTCAttemptResult) {
@@ -30,7 +34,7 @@ public class ArticulateTCAttemptResultDaoImpl extends HibernateDaoSupport implem
                 articulateTCAttemptResult.setModified(new Date());
                 getHibernateTemplate().saveOrUpdate(articulateTCAttemptResult);
             } catch (Throwable e) {
-                logger.error("Error saving articulate attempt results data: ", e);
+                log.error("Error saving articulate attempt results data: ", e);
                 session.getTransaction().rollback();
             } finally {
                 if (!session.getTransaction().wasRolledBack()) {

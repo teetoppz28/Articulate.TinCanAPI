@@ -22,8 +22,6 @@ package org.sakaiproject.atriculate.ui.console.pages;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.IAjaxCallDecorator;
@@ -44,6 +42,8 @@ import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPac
 import org.sakaiproject.scorm.ui.console.pages.ConsoleBasePage;
 import org.sakaiproject.scorm.ui.console.pages.PackageListPage;
 import org.sakaiproject.wicket.markup.html.form.CancelButton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert Long (rlong @ unicon.net)
@@ -51,7 +51,7 @@ import org.sakaiproject.wicket.markup.html.form.CancelButton;
 public class ArticulateTCPackageRemovePage extends ConsoleBasePage {
 
     private static final long serialVersionUID = 1L;
-    private static final Log LOG = LogFactory.getLog(ArticulateTCPackageRemovePage.class);
+    private final Logger log = LoggerFactory.getLogger(ArticulateTCPackageRemovePage.class);
 
     @SpringBean(name="articulateTCContentPackageDao")
     private ArticulateTCContentPackageDao articulateTCContentPackageDao;
@@ -115,7 +115,7 @@ public class ArticulateTCPackageRemovePage extends ConsoleBasePage {
                     setResponsePage(PackageListPage.class);
 
                     if (!gbSuccess || !resourceSucess || !cpSuccess) {
-                        LOG.warn("Failed to delete all underlying resources for content package ID: " + contentPackageId);
+                        log.warn("Failed to delete all underlying resources for content package ID: " + contentPackageId);
                         alertLabel.setDefaultModel(new ResourceModel("exception.remove"));
                         alertLabel.setOutputMarkupId(true);
                         target.addComponent(alertLabel);

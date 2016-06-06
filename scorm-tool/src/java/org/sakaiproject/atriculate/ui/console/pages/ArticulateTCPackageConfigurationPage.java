@@ -39,17 +39,13 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
-import org.sakaiproject.articulate.tincan.api.ArticulateTCEntityProviderService;
-import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
+import org.sakaiproject.articulate.tincan.api.ArticulateTCConfigurationService;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
-import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.scorm.service.api.LearningManagementSystem;
 import org.sakaiproject.scorm.ui.console.pages.ConsoleBasePage;
 import org.sakaiproject.scorm.ui.console.pages.DisplayDesignatedPackage;
 import org.sakaiproject.scorm.ui.console.pages.PackageListPage;
 import org.sakaiproject.service.gradebook.shared.Assignment;
-import org.sakaiproject.service.gradebook.shared.GradebookService;
-import org.sakaiproject.tool.api.ToolManager;
 import org.sakaiproject.wicket.markup.html.form.CancelButton;
 import org.sakaiproject.wicket.model.DecoratedPropertyModel;
 import org.sakaiproject.wicket.model.SimpleDateFormatPropertyModel;
@@ -61,23 +57,11 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
 
     private static final long serialVersionUID = 1L;
 
-    @SpringBean(name="articulateTCContentPackageDao")
-    private ArticulateTCContentPackageDao articulateTCContentPackageDao;
-
-    @SpringBean(name="articulateTCEntityProviderService")
-    private ArticulateTCEntityProviderService articulateTCEntityProviderService;
-
-    @SpringBean(name="org.sakaiproject.entitybroker.DeveloperHelperService")
-    private DeveloperHelperService developerHelperService;
-
-    @SpringBean(name="org.sakaiproject.service.gradebook.GradebookService")
-    private GradebookService gradebookService;
+    @SpringBean(name="articulateTCConfigurationService")
+    private ArticulateTCConfigurationService articulateTCConfigurationService;
 
     @SpringBean
     private LearningManagementSystem lms;
-
-    @SpringBean(name="org.sakaiproject.tool.api.ToolManager")
-    private ToolManager toolManager;
 
     private boolean hasGradebookInSite = false;
     private boolean hasGradebookItem = false;
@@ -88,7 +72,7 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
         super(params);
 
         long contentPackageId = params.getLong("contentPackageId");
-        final ArticulateTCContentPackage articulateTCContentPackage = articulateTCContentPackageDao.load(contentPackageId);
+        final ArticulateTCContentPackage articulateTCContentPackage = articulateTCConfigurationService.getContentPackage(contentPackageId);
 
         Form<Object> form = new Form<Object>("configurationForm") {
             private static final long serialVersionUID = 1L;
@@ -97,50 +81,25 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
             protected void onSubmit() {
                 Assignment assignment = null;
                 if (articulateTCContentPackage.getAssignmentId() != null) {
-                    assignment = gradebookService.getAssignment(getContext(), articulateTCContentPackage.getAssignmentId());
+                    assignment = articulateTCConfigurationService.getAssignment(articulateTCContentPackage);
                 }
 
                 boolean hasAssignmentDefined = assignment != null;
                 boolean gradebookChecked = articulateTCContentPackage.isGraded();
-                String fixedTitle = getItemTitle(articulateTCContentPackage, getContext());
-                Double points = articulateTCContentPackage.getPoints();
 
                 if (hasAssignmentDefined && gradebookChecked) {
-                    Double previousPoints = assignment.getPoints();
-                    assignment.setDueDate(articulateTCContentPackage.getDueOn());
-                    assignment.setPoints(points);
-                    gradebookService.updateAssignment(getContext(), assignment.getName(), assignment);
-                    // update the scores for the new points, if changed
-                    if (previousPoints != points) {
-                        articulateTCEntityProviderService.updateScaledScores(getContext(), assignment.getId(), previousPoints);
-                    }
+                    articulateTCConfigurationService.updateGradebookItem(articulateTCContentPackage, assignment);
                 } else if (!hasAssignmentDefined && gradebookChecked) {
-                    assignment = new Assignment();
-                    assignment.setName(fixedTitle);
-                    assignment.setDueDate(articulateTCContentPackage.getDueOn());
-                    assignment.setPoints(points);
-                    assignment.setCounted(true);
-                    gradebookService.addAssignment(getContext(), assignment);
-                    // sync the assignment IDs
-                    assignment = gradebookService.getAssignment(getContext(), assignment.getName());
-                    articulateTCContentPackage.setAssignmentId(assignment.getId());
+                    articulateTCConfigurationService.addGradebookItem(articulateTCContentPackage);
                 } else if (hasAssignmentDefined && !gradebookChecked) {
-                    gradebookService.removeAssignment(assignment.getId());
-                    // reset gradebook item title to package title
-                    articulateTCContentPackage.setGradebookItemTitle(articulateTCContentPackage.getTitle());
-                    // reset gradebook item points to default
-                    articulateTCContentPackage.setPoints(CONFIGURATION_DEFAULT_POINTS);
-                    // reset the assignment ID
-                    articulateTCContentPackage.setAssignmentId(null);
+                    articulateTCConfigurationService.removeGradebookItem(articulateTCContentPackage, assignment);
                 }
-
-                articulateTCContentPackageDao.save(articulateTCContentPackage);
 
                 setResponsePage(params.getBoolean("no-toolbar") ? DisplayDesignatedPackage.class : PackageListPage.class);
             }
         };
 
-        List<Integer> tryList = new LinkedList<Integer>();
+        List<Integer> tryList = new LinkedList<>();
 
         tryList.add(-1);
         for (int i = 1; i <= CONFIGURATION_DEFAULT_ATTEMPTS; i++) {
@@ -164,12 +123,12 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
         form.add(new Label("modifiedBy", new DisplayNamePropertyModel(articulateTCContentPackage, "modifiedBy")));
         form.add(new Label("modifiedOn", new SimpleDateFormatPropertyModel(articulateTCContentPackage, "modifiedOn")));
 
-        hasGradebookInSite = gradebookService.isGradebookDefined(getContext());
+        hasGradebookInSite = articulateTCConfigurationService.isGradebookDefined(articulateTCContentPackage);
 
         // get the current gradebook item, if it exists
         Assignment assignment = null;
         if (hasGradebookInSite && articulateTCContentPackage.getAssignmentId() != null) {
-            assignment = gradebookService.getAssignment(getContext(), articulateTCContentPackage.getAssignmentId());
+            assignment = articulateTCConfigurationService.getAssignment(articulateTCContentPackage);
             hasGradebookItem = assignment != null;
         }
 
@@ -301,34 +260,6 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
         form.add(new CancelButton("cancel", (params.getBoolean("no-toolbar")) ? DisplayDesignatedPackage.class : PackageListPage.class));
 
         add(form);
-    }
-
-    /**
-     * Generates the gradebook item title, not allowing duplicates
-     * 
-     * @param articulateTCContentPackage
-     * @param context
-     * @return
-     */
-    private String getItemTitle(ArticulateTCContentPackage articulateTCContentPackage, String context) {
-        String fixedTitle = articulateTCContentPackage.getGradebookItemTitle();
-
-        int count = 1;
-
-        while (gradebookService.isAssignmentDefined(context, fixedTitle)) {
-            fixedTitle = articulateTCContentPackage.getGradebookItemTitle() + " (" + count++ + ")";
-        }
-
-        return fixedTitle;
-    }
-
-    /**
-     * Get the current site ID
-     * 
-     * @return
-     */
-    protected String getContext() {
-        return developerHelperService.getCurrentLocationId();
     }
 
     public class DisplayNamePropertyModel extends DecoratedPropertyModel implements Serializable {

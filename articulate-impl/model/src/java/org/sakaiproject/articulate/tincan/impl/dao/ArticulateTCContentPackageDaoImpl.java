@@ -27,6 +27,8 @@ import java.util.regex.Pattern;
 import org.hibernate.Session;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.orm.hibernate3.SessionHolder;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -35,6 +37,8 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * @author Robert Long (rlong @ unicon.net)
  */
 public class ArticulateTCContentPackageDaoImpl extends HibernateDaoSupport implements ArticulateTCContentPackageDao {
+
+    private final Logger log = LoggerFactory.getLogger(ArticulateTCContentPackageDaoImpl.class);
 
     public int countContentPackages(String context, String name) {
         int count = 0;
@@ -89,7 +93,7 @@ public class ArticulateTCContentPackageDaoImpl extends HibernateDaoSupport imple
                 articulateTCContentPackage.setModifiedOn(new Date());
                 getHibernateTemplate().saveOrUpdate(articulateTCContentPackage);
             } catch (Throwable e) {
-                logger.error("Error saving activity state data: ", e);
+                log.error("Error saving activity state data: ", e);
                 session.getTransaction().rollback();
             } finally {
                 if (!session.getTransaction().wasRolledBack()) {
