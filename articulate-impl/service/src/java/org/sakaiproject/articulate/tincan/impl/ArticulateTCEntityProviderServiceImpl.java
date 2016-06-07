@@ -95,11 +95,16 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
         }
 
         ArticulateTCRequestPayload articulateTCRequestPayload = articulateTCEntityProviderServiceUtils.getPayloadObject(request);
-        ArticulateTCActivityState articulateTCActivityState = articulateTCActivityStateDao.findOne(articulateTCRequestPayload);
+        ArticulateTCAttempt articulateTCAttempt = articulateTCAttemptDao.lookupNewest(articulateTCRequestPayload.getContentPackageId(), articulateTCRequestPayload.getUserId());
+        ArticulateTCActivityState articulateTCActivityState = null;
+
+        if (articulateTCAttempt != null) {
+            articulateTCActivityState = articulateTCActivityStateDao.findOneByUniqueKey(articulateTCAttempt.getId());
+        }
 
         if (articulateTCActivityState == null) {
             // row does not exist, create a new one
-            articulateTCActivityState = new ArticulateTCActivityState(articulateTCRequestPayload);
+            articulateTCActivityState = new ArticulateTCActivityState(articulateTCRequestPayload, articulateTCAttempt.getId());
         } else {
             // row exists, update mutable fields
             articulateTCActivityState.updateMutableFields(articulateTCRequestPayload);
@@ -115,32 +120,39 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
         }
 
         ArticulateTCRequestPayload articulateTCRequestPayload = articulateTCEntityProviderServiceUtils.getPayloadObject(request);
-        ArticulateTCActivityState articulateTCActivityState = articulateTCActivityStateDao.findOne(articulateTCRequestPayload);
+        ArticulateTCAttempt articulateTCAttempt = articulateTCAttemptDao.lookupNewest(articulateTCRequestPayload.getContentPackageId(), articulateTCRequestPayload.getUserId());
+        ArticulateTCActivityState articulateTCActivityState = null;
 
-        if (articulateTCActivityState != null) {
-            return articulateTCActivityState.getContent();
+        if (articulateTCAttempt == null) {
+            return null;
         }
 
-        return null;
-    }
+        articulateTCActivityState = articulateTCActivityStateDao.findOneByUniqueKey(articulateTCAttempt.getId());
 
-    @Override
-    public void deleteStateData(HttpServletRequest request) {
-        if (request == null) {
-            throw new IllegalArgumentException("Request cannot be null");
-        }
-
-
-        String payload  = articulateTCEntityProviderServiceUtils.getRequestPayload(request);
-        ArticulateTCRequestPayload articulateTCRequestPayload = articulateTCEntityProviderServiceUtils.getPayloadObject(payload);
-        ArticulateTCActivityState articulateTCActivityState = articulateTCActivityStateDao.findOne(articulateTCRequestPayload);
-
-        // no row to delete
         if (articulateTCActivityState == null) {
-            return;
+            // find previous launch attempt state data, if available
+            if (articulateTCAttempt.getAttemptNumber() <= 1) {
+                return null;
+            }
+
+            ArticulateTCAttempt previousArticulateTCAttempt = articulateTCAttemptDao.lookup(articulateTCRequestPayload.getContentPackageId(), articulateTCRequestPayload.getUserId(), articulateTCAttempt.getAttemptNumber() - 1);
+
+            if (previousArticulateTCAttempt == null) {
+                return null;
+            }
+
+            articulateTCActivityState = articulateTCActivityStateDao.findOneByUniqueKey(previousArticulateTCAttempt.getId());
+
+            if (articulateTCActivityState == null) {
+                return null;
+            }
+
+            if (!articulateTCActivityState.isResume()) {
+                return null;
+            }
         }
 
-        articulateTCActivityStateDao.remove(articulateTCActivityState);
+        return articulateTCActivityState.getContent();
     }
 
     @Override
@@ -235,6 +247,16 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
             Double attemptScore = (assignmentPoints != null) ? assignmentPoints * scaled : 0d;
 
             saveAttemptResult(articulateTCContentPackage.getContentPackageId(), articulateTCRequestPayload.getUserId(), scaled);
+
+            /*
+             * Update the activity state ID to "complete"
+             */
+
+            ArticulateTCAttempt articulateTCAttempt = articulateTCAttemptDao.lookupNewest(articulateTCContentPackage.getContentPackageId(), articulateTCRequestPayload.getUserId());
+
+            if (articulateTCAttempt != null) {
+                updateActivityStateId(articulateTCAttempt.getId(), STATE_DATA_KEY_STATE_ID_COMPLETE);
+            }
 
             /*
              * Save grade to gradebook
@@ -358,6 +380,20 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
             return;
         }
 
+    }
+
+    @Override
+    public void updateActivityStateId(long attemptId, String stateId) {
+        ArticulateTCActivityState articulateTCActivityState = articulateTCActivityStateDao.findOneByUniqueKey(attemptId);
+
+        if (articulateTCActivityState == null) {
+            // no activity state exists, return
+            return;
+        }
+
+        articulateTCActivityState.setStateId(stateId);
+
+        articulateTCActivityStateDao.save(articulateTCActivityState);
     }
 
 }

@@ -40,16 +40,6 @@ public interface ArticulateTCEntityProviderService {
     String getActivityStatePayload(HttpServletRequest request);
 
     /**
-     * 1. Retrieve the content payload from the request
-     * 2. Get the data from the payload as a {@link ArticulateTCActivityState} object
-     * 3. Delete the activity state from the database
-     * 
-     * @param request the {@link HttpServletRequest} object
-     * @return the state data as a JSON object string
-     */
-    void deleteStateData(HttpServletRequest request);
-
-    /**
      * Send the statement JSON to the configured LRS
      * 
      * @param statementJson the statement JSON string
@@ -75,6 +65,14 @@ public interface ArticulateTCEntityProviderService {
      * Persist the attempt score
      */
     void saveAttemptResult(long contentPackageId, String userId, Double score);
+
+    /**
+     * Update the state ID for the activity state object
+     * 
+     * @param attemptId
+     * @param stateId
+     */
+    void updateActivityStateId(long attemptId, String stateId);
 
     /**
      * Update the scores using the scaled score, if the points in the configuration has changed

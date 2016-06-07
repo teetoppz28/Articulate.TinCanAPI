@@ -21,7 +21,6 @@ package org.sakaiproject.articulate.tincan.model.hibernate;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Set;
 
 /**
  * @author Robert Long (rlong @ unicon.net)
@@ -38,8 +37,6 @@ public class ArticulateTCAttempt implements Serializable {
     private Long attemptNumber;
     private Date beginDate;
     private Date lastModifiedDate;
-    private ArticulateTCContentPackage articulateTCContentPackage;
-    private Set<ArticulateTCAttemptResult> articulateTCAttemptResults;
 
     public ArticulateTCAttempt() {
     }
@@ -106,22 +103,6 @@ public class ArticulateTCAttempt implements Serializable {
 
     public void setLastModifiedDate(Date lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
-    }
-
-    public ArticulateTCContentPackage getArticulateTCContentPackage() {
-        return articulateTCContentPackage;
-    }
-
-    public void setArticulateTCContentPackage(ArticulateTCContentPackage articulateTCContentPackage) {
-        this.articulateTCContentPackage = articulateTCContentPackage;
-    }
-
-    public Set<ArticulateTCAttemptResult> getArticulateTCAttemptResults() {
-        return articulateTCAttemptResults;
-    }
-
-    public void setArticulateTCAttemptResults(Set<ArticulateTCAttemptResult> articulateTCAttemptResults) {
-        this.articulateTCAttemptResults = articulateTCAttemptResults;
     }
 
 }
