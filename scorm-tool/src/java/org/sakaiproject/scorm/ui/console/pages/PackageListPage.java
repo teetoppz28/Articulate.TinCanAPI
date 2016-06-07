@@ -43,6 +43,7 @@ import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.lang.PropertyResolver;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
+import org.sakaiproject.articulate.tincan.api.ArticulateTCContentPackageService;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
 import org.sakaiproject.atriculate.ui.console.components.TriesColumn;
@@ -77,8 +78,11 @@ public class PackageListPage extends ConsoleBasePage implements ArticulateTCCons
 	private static final ResourceReference PAGE_ICON = new ResourceReference(PackageListPage.class, "res/table.png");
 	private static final ResourceReference DELETE_ICON = new ResourceReference(PackageListPage.class, "res/delete.png");
 
-    @SpringBean(name="articulateTCContentPackageDao")
+    @SpringBean(name = "articulateTCContentPackageDao")
     private ArticulateTCContentPackageDao articulateTCContentPackageDao;
+
+    @SpringBean(name = "articulateTCContentPackageService")
+    private ArticulateTCContentPackageService articulateTCContentPackageService;
 
     @SpringBean(name="org.sakaiproject.scorm.service.api.ScormContentService")
     private ScormContentService contentService;
@@ -134,7 +138,7 @@ public class PackageListPage extends ConsoleBasePage implements ArticulateTCCons
 				}
 
                 if (isArticulate) {
-                    link.setEnabled(isEnabled(bean));
+                    link.setEnabled(articulateTCContentPackageService.isEnabled((ArticulateTCContentPackage) bean));
                 } else {
                     link.setEnabled(isEnabled(bean) && lms.canLaunch((ContentPackage) bean));
                 }
@@ -262,27 +266,30 @@ public class PackageListPage extends ConsoleBasePage implements ArticulateTCCons
 		{
 			String resourceId = "status.unknown";
 			Object target = embeddedModel.getObject();
+            int status = CONTENT_PACKAGE_STATUS_UNKNOWN;
 
-			if (target instanceof ContentPackage) {
-				ContentPackage contentPackage = (ContentPackage)target;
+            if (target instanceof ContentPackage) {
+                ContentPackage contentPackage = (ContentPackage) target;
+                status = contentService.getContentPackageStatus(contentPackage);
+            } else if (target instanceof ArticulateTCContentPackage) {
+                ArticulateTCContentPackage articulateTCContentPackage = (ArticulateTCContentPackage) target;
+                status = articulateTCContentPackageService.getContentPackageStatus(articulateTCContentPackage);
+            }
 
-				int status = contentService.getContentPackageStatus(contentPackage);
-
-				switch (status) {
-				case CONTENT_PACKAGE_STATUS_OPEN:
-					resourceId = "status.open";
-					break;
-				case CONTENT_PACKAGE_STATUS_OVERDUE:
-					resourceId = "status.overdue";
-					break;
-				case CONTENT_PACKAGE_STATUS_CLOSED:
-					resourceId = "status.closed";
-					break;
-				case CONTENT_PACKAGE_STATUS_NOTYETOPEN:
-					resourceId = "status.notyetopen";
-					break;
-				}
-			}
+            switch (status) {
+                case CONTENT_PACKAGE_STATUS_OPEN:
+                    resourceId = "status.open";
+                    break;
+                case CONTENT_PACKAGE_STATUS_OVERDUE:
+                    resourceId = "status.overdue";
+                    break;
+                case CONTENT_PACKAGE_STATUS_CLOSED:
+                    resourceId = "status.closed";
+                    break;
+                case CONTENT_PACKAGE_STATUS_NOTYETOPEN:
+                    resourceId = "status.notyetopen";
+                    break;
+            }
 
 			return new ResourceModel(resourceId);
 		}
