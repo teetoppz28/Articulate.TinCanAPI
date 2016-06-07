@@ -79,6 +79,7 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
 
             @Override
             protected void onSubmit() {
+                articulateTCConfigurationService.updateContentPackage(articulateTCContentPackage);
                 articulateTCConfigurationService.processGradebookItem(articulateTCContentPackage);
 
                 setResponsePage(params.getBoolean("no-toolbar") ? DisplayDesignatedPackage.class : PackageListPage.class);

@@ -104,4 +104,10 @@
         <property name="siteService" ref="org.sakaiproject.site.api.SiteService" />
         <property name="userDirectoryService" ref="org.sakaiproject.user.api.UserDirectoryService" />
     </bean>
+
+    <!-- Content Package Service -->
+
+    <bean id="articulateTCContentPackageService" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCContentPackageServiceImpl">
+    </bean>
+
 </beans>

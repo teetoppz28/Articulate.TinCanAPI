@@ -133,4 +133,13 @@ public class ArticulateTCConfigurationServiceImpl implements ArticulateTCConfigu
         return fixedTitle;
     }
 
+    @Override
+    public void updateContentPackage(ArticulateTCContentPackage articulateTCContentPackage) {
+        if (articulateTCContentPackage == null) {
+            throw new IllegalArgumentException("Articulate content package cannot be null");
+        }
+
+        articulateTCContentPackageDao.save(articulateTCContentPackage);
+    }
+
 }
