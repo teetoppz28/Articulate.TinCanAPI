@@ -43,14 +43,6 @@
         <property name="numberOfTries" column="NUMBER_OF_TRIES" />
         <property name="deleted" column="IS_DELETED" />
         <property name="assignmentId" column="ASSIGNMENT_ID" />
-        <!-- set name="articulateTCActivityStates" table="ARTICULATE_TC_ACTIVITY_STATE">
-            <key column="CONTENT_PACKAGE_ID" not-null="true" />
-            <one-to-many class="org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCActivityState" />
-        </set>
-        <set name="articulateTCAttempts" table="ARTICULATE_TC_ATTEMPT">
-            <key column="CONTENT_PACKAGE_ID" not-null="true" />
-            <one-to-many class="org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttempt" />
-        </set -->
     </class>
 
 </hibernate-mapping>

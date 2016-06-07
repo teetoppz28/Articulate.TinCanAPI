@@ -71,31 +71,31 @@ public class ArticulateTCAttemptDaoImpl extends HibernateDaoSupport implements A
 
     @SuppressWarnings("unchecked")
     public List<ArticulateTCAttempt> find(long contentPackageId) {
-        return (List<ArticulateTCAttempt>) getHibernateTemplate().find("from " + ArticulateTCAttempt.class.getName() + " where contentPackageId=? ", new Object[] { contentPackageId });
+        return (List<ArticulateTCAttempt>) getHibernateTemplate().find(" from " + ArticulateTCAttempt.class.getName() + " where contentPackageId = ? ", new Object[] {contentPackageId});
     }
 
     @SuppressWarnings("unchecked")
     public List<ArticulateTCAttempt> find(long contentPackageId, String learnerId) {
         StringBuilder buffer = new StringBuilder();
-        buffer.append(" from ").append(ArticulateTCAttempt.class.getName()).append(" where contentPackageId = ? and learnerId = ? order by attemptNumber desc");
+        buffer.append(" from ").append(ArticulateTCAttempt.class.getName()).append(" where contentPackageId = ? and learnerId = ? order by attemptNumber desc ");
 
-        return getHibernateTemplate().find(buffer.toString(), new Object[] { contentPackageId, learnerId });
+        return getHibernateTemplate().find(buffer.toString(), new Object[] {contentPackageId, learnerId});
     }
 
     @SuppressWarnings("unchecked")
     public List<ArticulateTCAttempt> find(String courseId, String learnerId) {
         StringBuilder buffer = new StringBuilder();
-        buffer.append(" from ").append(ArticulateTCAttempt.class.getName()).append(" where courseId=? and learnerId=? order by attemptNumber desc");
-        return getHibernateTemplate().find(buffer.toString(), new Object[] { courseId, learnerId });
+        buffer.append(" from ").append(ArticulateTCAttempt.class.getName()).append(" where courseId = ? and learnerId = ? order by attemptNumber desc ");
+        return getHibernateTemplate().find(buffer.toString(), new Object[] {courseId, learnerId});
     }
 
     
     public ArticulateTCAttempt find(String courseId, String learnerId, long attemptNumber) {
         StringBuilder buffer = new StringBuilder();
-        buffer.append("from ").append(ArticulateTCAttempt.class.getName()).append(" where courseId=? and learnerId=? and attemptNumber=? ");
+        buffer.append(" from ").append(ArticulateTCAttempt.class.getName()).append(" where courseId = ? and learnerId = ? and attemptNumber = ? ");
         
         @SuppressWarnings("unchecked")
-        List<ArticulateTCAttempt> r = getHibernateTemplate().find(buffer.toString(), new Object[] { courseId, learnerId, attemptNumber });
+        List<ArticulateTCAttempt> r = getHibernateTemplate().find(buffer.toString(), new Object[] {courseId, learnerId, attemptNumber});
         if (r.size() == 0)
             return null;
 
@@ -110,7 +110,7 @@ public class ArticulateTCAttemptDaoImpl extends HibernateDaoSupport implements A
         HibernateCallback<Object> hcb = new HibernateCallback<Object>() {
             public Object doInHibernate(Session session) throws HibernateException, SQLException {
                 StringBuilder buffer = new StringBuilder();
-                buffer.append(" from ").append(ArticulateTCAttempt.class.getName()).append(" where contentPackageId = ? and learnerId = ? and attemptNumber = ?");
+                buffer.append(" from ").append(ArticulateTCAttempt.class.getName()).append(" where contentPackageId = ? and learnerId = ? and attemptNumber = ? ");
 
                 Query query = session.createQuery(buffer.toString());
                 query.setLong(0, contentPackageId);

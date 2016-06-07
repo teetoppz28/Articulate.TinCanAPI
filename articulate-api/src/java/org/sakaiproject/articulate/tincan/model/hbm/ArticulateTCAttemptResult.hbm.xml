@@ -27,7 +27,7 @@
             <generator class="increment"/>
         </id>
         <properties name="attempt_result_unique" unique="true">
-            <many-to-one name="attemptId" column="ATTEMPT_ID" class="org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttempt" not-null="true" />
+            <property name="attemptId" column="ATTEMPT_ID" />
             <property name="attemptNumber" column="ATTEMPT_NUMBER" />
         </properties>
         <property name="scaledScore" column="SCALED_SCORE" />

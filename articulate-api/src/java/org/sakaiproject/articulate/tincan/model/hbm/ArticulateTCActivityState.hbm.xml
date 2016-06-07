@@ -29,7 +29,7 @@
         <properties name="activity_state_unique" unique="true">
             <property name="userId" column="USER_ID" />
             <property name="registration" column="REGISTRATION" />
-            <many-to-one name="contentPackageId" column="CONTENT_PACKAGE_ID" class="org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage" not-null="true" />
+            <property name="contentPackageId" column="CONTENT_PACKAGE_ID" />
         </properties>
         <property name="content" column="CONTENT" type="text" />
         <property name="stateId" column="STATE_ID" />

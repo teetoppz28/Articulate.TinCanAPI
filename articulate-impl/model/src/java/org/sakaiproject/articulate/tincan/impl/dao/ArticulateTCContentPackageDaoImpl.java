@@ -58,7 +58,7 @@ public class ArticulateTCContentPackageDaoImpl extends HibernateDaoSupport imple
 
     @SuppressWarnings("unchecked")
     public List<ArticulateTCContentPackage> find(String context) {
-        String statement = new StringBuilder("from ").append(ArticulateTCContentPackage.class.getName()).append(" where context = ? and deleted = ? ").toString();
+        String statement = new StringBuilder(" from ").append(ArticulateTCContentPackage.class.getName()).append(" where context = ? and deleted = ? ").toString();
 
         return getHibernateTemplate().find(statement, new Object[] { context, false });
     }
@@ -93,7 +93,7 @@ public class ArticulateTCContentPackageDaoImpl extends HibernateDaoSupport imple
                 articulateTCContentPackage.setModifiedOn(new Date());
                 getHibernateTemplate().saveOrUpdate(articulateTCContentPackage);
             } catch (Throwable e) {
-                log.error("Error saving activity state data: ", e);
+                log.error("Error saving articulate content package data: ", e);
                 session.getTransaction().rollback();
             } finally {
                 if (!session.getTransaction().wasRolledBack()) {
