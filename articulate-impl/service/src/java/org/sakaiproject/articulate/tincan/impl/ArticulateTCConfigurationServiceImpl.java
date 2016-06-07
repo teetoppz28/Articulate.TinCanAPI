@@ -45,6 +45,7 @@ public class ArticulateTCConfigurationServiceImpl implements ArticulateTCConfigu
     @Override
     public boolean addGradebookItem(ArticulateTCContentPackage articulateTCContentPackage) {
         String fixedTitle = getItemTitle(articulateTCContentPackage.getTitle(), articulateTCContentPackage.getContext());
+
         Double points = articulateTCContentPackage.getPoints();
 
         Assignment assignment = new Assignment();
