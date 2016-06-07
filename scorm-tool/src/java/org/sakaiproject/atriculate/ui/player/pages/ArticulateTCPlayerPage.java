@@ -46,10 +46,10 @@ public class ArticulateTCPlayerPage extends BaseToolPage implements ArticulateTC
     public ArticulateTCPlayerPage(final PageParameters pageParams) {
         super();
 
-        final String packageId = pageParams.getString("contentPackageId");
+        final String contentPackageId = pageParams.getString("contentPackageId");
 
         // record the attempt
-        articulateTCLaunchService.addAttempt(packageId);
+        articulateTCLaunchService.addAttempt(contentPackageId);
 
         /**
          * iFrame that holds the Articulate TinCanAPI content player
@@ -59,13 +59,16 @@ public class ArticulateTCPlayerPage extends BaseToolPage implements ArticulateTC
 
             @Override
             protected CharSequence getURL() {
-                return pageParams.getString("url") + articulateTCLaunchService.calculateLaunchParams(packageId);
+                return pageParams.getString("url") + articulateTCLaunchService.calculateLaunchParams(contentPackageId);
             }
         };
 
         add(iframe);
 
-        add(new Link<Void>("link-back-list-page") {
+        /**
+         * Link to return to the package list page
+         */
+        add(new Link<Void>("link-return") {
 
             private static final long serialVersionUID = 1L;
 
@@ -86,6 +89,8 @@ public class ArticulateTCPlayerPage extends BaseToolPage implements ArticulateTC
         super.renderHead(response);
         response.renderCSSReference(HTML_ARTICULATE_TC_CSS);
         response.renderCSSReference(HTML_BOOTSTRAP_CSS);
+        response.renderJavascriptReference(HTML_HEADSCRIPTS);
+        response.renderOnLoadJavascript(HTML_BODY_ONLOAD_ADDTL);
     }
 
 }

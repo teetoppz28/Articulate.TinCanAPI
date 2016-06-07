@@ -103,7 +103,6 @@ public class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService,
         ArticulateTCAttempt latestAttempt = articulateTCAttemptDao.lookupNewest(contentPackageId, userId);
 
         ArticulateTCAttempt newAttempt = new ArticulateTCAttempt();
-        //newAttempt.setArticulateTCContentPackage(articulateTCContentPackage);
         newAttempt.setContentPackageId(contentPackageId);
         newAttempt.setCourseId(siteId);
         newAttempt.setLearnerId(userId);
@@ -121,10 +120,6 @@ public class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService,
     @Override
     public void addAttemptResult(ArticulateTCAttempt articulateTCAttempt) {
         if (articulateTCAttempt == null) {
-            /*
-             * attempt object is null (probably not persisted to the db yet),
-             * we'll create this result object later
-             */
             log.error("Error: the attempt is null.");
             return;
         }
@@ -132,7 +127,6 @@ public class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService,
         ArticulateTCAttemptResult articulateTCAttemptResult = new ArticulateTCAttemptResult();
         articulateTCAttemptResult.setAttemptId(articulateTCAttempt.getId());
         articulateTCAttemptResult.setAttemptNumber(articulateTCAttempt.getAttemptNumber());
-        //articulateTCAttemptResult.setArticulateTCAttempt(articulateTCAttempt);
 
         articulateTCAttemptResultDao.save(articulateTCAttemptResult);
     }
