@@ -60,9 +60,7 @@ public class ArticulateTCSecurityUtils {
         DeveloperHelperService developerHelperService = (DeveloperHelperService) ComponentManager.get(DeveloperHelperService.class);
         AuthzGroupService authzGroupService = (AuthzGroupService) ComponentManager.get(AuthzGroupService.class);
 
-        String userId = developerHelperService.getCurrentUserId();
-        String siteRef = developerHelperService.getCurrentLocationReference();
-        String userRole = authzGroupService.getUserRole(userId, siteRef);
+        String userRole = authzGroupService.getUserRole(developerHelperService.getCurrentUserId(), developerHelperService.getCurrentLocationReference());
         Set<String> maintainerRoles = authzGroupService.getMaintainRoles();
 
         for (String maintainerRole : maintainerRoles) {
