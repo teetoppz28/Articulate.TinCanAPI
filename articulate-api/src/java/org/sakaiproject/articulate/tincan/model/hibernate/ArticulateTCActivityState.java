@@ -23,10 +23,14 @@ public class ArticulateTCActivityState implements Serializable, ArticulateTCCons
     public ArticulateTCActivityState() {
     }
 
-    public ArticulateTCActivityState(ArticulateTCRequestPayload articulateTCRequestPayload, Long attemptId) {
-        this.attemptId = attemptId;
+    public ArticulateTCActivityState(ArticulateTCRequestPayload articulateTCRequestPayload) {
         this.content = articulateTCRequestPayload.getContent();
         this.stateId = articulateTCRequestPayload.getStateId();
+    }
+
+    public ArticulateTCActivityState(ArticulateTCRequestPayload articulateTCRequestPayload, Long attemptId) {
+        this(articulateTCRequestPayload);
+        this.attemptId = attemptId;
     }
 
     public String getContent() {

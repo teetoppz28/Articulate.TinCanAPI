@@ -16,7 +16,7 @@ public interface ArticulateTCActivityStateDao {
 
     /**
      * Get a state row with the given ID
-     * Use this one, prefarrably, over the load() method
+     * Use this one, preferably, over the load() method
      * 
      * @param id
      * @return
@@ -32,7 +32,7 @@ public interface ArticulateTCActivityStateDao {
     ArticulateTCActivityState load(long id);
 
     /**
-     * Finds the row with the given unique key (user ID, site ID, content package ID)
+     * Finds the row with the given unique key (attempt ID)
      * 
      * @param attemptId
      * @return
@@ -40,7 +40,7 @@ public interface ArticulateTCActivityStateDao {
     ArticulateTCActivityState findOneByUniqueKey(Long attemptId);
 
     /**
-     * Finds the row with the given unique key (user ID, site ID, content package ID)
+     * Finds the row with the given unique key (attempt ID)
      * 
      * @param attemptId
      * @param stateId
