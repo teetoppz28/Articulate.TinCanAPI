@@ -1,6 +1,11 @@
 package org.sakaiproject.articulate.tincan.util;
 
+import java.util.Set;
+
+import org.apache.commons.lang.StringUtils;
+import org.sakaiproject.authz.api.AuthzGroupService;
 import org.sakaiproject.component.cover.ComponentManager;
+import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.site.api.SiteService;
 import org.sakaiproject.tool.api.Session;
 import org.sakaiproject.tool.api.SessionManager;
@@ -43,6 +48,30 @@ public class ArticulateTCSecurityUtils {
         SiteService siteService = (SiteService) ComponentManager.get(SiteService.class);
 
         return siteService.isCurrentUserMemberOfSite(siteId);
+    }
+
+    /**
+     * Is the current user defined in the session a maintainer in the current site?
+     * 
+     * @param siteId the site ID to check access
+     * @return true, if the current user is allowed to access
+     */
+    public static boolean isCurrentUserMaintainerInCurrentSite() {
+        DeveloperHelperService developerHelperService = (DeveloperHelperService) ComponentManager.get(DeveloperHelperService.class);
+        AuthzGroupService authzGroupService = (AuthzGroupService) ComponentManager.get(AuthzGroupService.class);
+
+        String userId = developerHelperService.getCurrentUserId();
+        String siteRef = developerHelperService.getCurrentLocationReference();
+        String userRole = authzGroupService.getUserRole(userId, siteRef);
+        Set<String> maintainerRoles = authzGroupService.getMaintainRoles();
+
+        for (String maintainerRole : maintainerRoles) {
+            if (StringUtils.equalsIgnoreCase(userRole, maintainerRole)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

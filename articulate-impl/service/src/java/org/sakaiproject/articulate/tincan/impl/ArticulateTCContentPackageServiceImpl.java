@@ -1,23 +1,13 @@
 package org.sakaiproject.articulate.tincan.impl;
 
 import java.util.Date;
-import java.util.Set;
-
-import lombok.Setter;
 
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCContentPackageService;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
-import org.sakaiproject.authz.api.AuthzGroupService;
-import org.sakaiproject.entitybroker.DeveloperHelperService;
+import org.sakaiproject.articulate.tincan.util.ArticulateTCSecurityUtils;
 
 public class ArticulateTCContentPackageServiceImpl implements ArticulateTCContentPackageService, ArticulateTCConstants {
-
-    @Setter
-    private AuthzGroupService authzGroupService;
-
-    @Setter
-    private DeveloperHelperService developerHelperService;
 
     @Override
     public int getContentPackageStatus(ArticulateTCContentPackage articulateTCContentPackage) {
@@ -43,12 +33,7 @@ public class ArticulateTCContentPackageServiceImpl implements ArticulateTCConten
 
     @Override
     public boolean isEnabled(ArticulateTCContentPackage articulateTCContentPackage) {
-        String userId = developerHelperService.getCurrentUserId();
-        String siteRef = developerHelperService.getCurrentLocationReference();
-        String userRole = authzGroupService.getUserRole(userId, siteRef);
-        Set<String> maintainerRoles = authzGroupService.getMaintainRoles();
-
-        if (maintainerRoles.contains(userRole)) {
+        if (ArticulateTCSecurityUtils.isCurrentUserMaintainerInCurrentSite()) {
             return true;
         }
 

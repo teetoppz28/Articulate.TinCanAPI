@@ -108,8 +108,6 @@
     <!-- Content Package Service -->
 
     <bean id="articulateTCContentPackageService" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCContentPackageServiceImpl">
-        <property name="authzGroupService" ref="org.sakaiproject.authz.api.AuthzGroupService" />
-        <property name="developerHelperService" ref="org.sakaiproject.entitybroker.DeveloperHelperService" />
     </bean>
 
 </beans>
