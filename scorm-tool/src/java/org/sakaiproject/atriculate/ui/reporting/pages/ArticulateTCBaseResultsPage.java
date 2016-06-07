@@ -21,15 +21,7 @@ package org.sakaiproject.atriculate.ui.reporting.pages;
 
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.IHeaderResponse;
-import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCAttemptDao;
-import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCAttemptResultDao;
-import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
-import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.scorm.ui.console.pages.ConsoleBasePage;
-import org.sakaiproject.service.gradebook.shared.GradebookService;
-import org.sakaiproject.site.api.SiteService;
-import org.sakaiproject.user.api.UserDirectoryService;
 
 /**
  * @author Robert Long (rlong @ unicon.net)
@@ -37,27 +29,6 @@ import org.sakaiproject.user.api.UserDirectoryService;
 public class ArticulateTCBaseResultsPage extends ConsoleBasePage {
 
     private static final long serialVersionUID = 1L;
-
-    /*@SpringBean(name="articulateTCAttemptDao")
-    protected ArticulateTCAttemptDao articulateTCAttemptDao;
-
-    @SpringBean(name="articulateTCAttemptResultDao")
-    protected ArticulateTCAttemptResultDao articulateTCAttemptResultDao;
-
-    @SpringBean(name="articulateTCContentPackageDao")
-    protected ArticulateTCContentPackageDao articulateTCContentPackageDao;
-
-    @SpringBean(name="org.sakaiproject.entitybroker.DeveloperHelperService")
-    protected DeveloperHelperService developerHelperService;
-
-    @SpringBean(name="org.sakaiproject.service.gradebook.GradebookService")
-    protected GradebookService gradebookService;
-
-    @SpringBean(name = "org.sakaiproject.site.api.SiteService")
-    protected SiteService siteService;
-
-    @SpringBean(name = "org.sakaiproject.user.api.UserDirectoryService")
-    protected UserDirectoryService userDirectoryService;*/
 
     public ArticulateTCBaseResultsPage(PageParameters pageParams) {
         super(pageParams);

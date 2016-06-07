@@ -100,6 +100,8 @@ public class ArticulateTCContentPackageDaoImpl extends HibernateDaoSupport imple
                     session.flush();
                     session.getTransaction().commit();
                 }
+
+                session.clear();
             }
         } finally {
             if (session != null) {

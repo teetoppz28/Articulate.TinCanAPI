@@ -42,6 +42,8 @@ public class ArticulateTCActivityStateDaoImpl extends HibernateDaoSupport implem
                     session.flush();
                     session.getTransaction().commit();
                 }
+
+                session.clear();
             }
         } finally {
             if (session != null) {

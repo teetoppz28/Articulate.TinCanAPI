@@ -103,6 +103,7 @@ public class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService,
         ArticulateTCAttempt latestAttempt = articulateTCAttemptDao.lookupNewest(contentPackageId, userId);
 
         ArticulateTCAttempt newAttempt = new ArticulateTCAttempt();
+        //newAttempt.setArticulateTCContentPackage(articulateTCContentPackage);
         newAttempt.setContentPackageId(contentPackageId);
         newAttempt.setCourseId(siteId);
         newAttempt.setLearnerId(userId);
@@ -112,25 +113,26 @@ public class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService,
 
         articulateTCAttemptDao.save(newAttempt);
 
-        addAttemptResult(newAttempt.getId(), newAttempt.getAttemptNumber());
+        addAttemptResult(newAttempt);
 
         eventTrackingService.post(eventTrackingService.newEvent(SAKAI_EVENT_LAUNCH, "articulate/tc/site/" + articulateTCContentPackage.getContext() + "/user/" + userId + "/packageId/" + articulateTCContentPackage.getContentPackageId(), true));
     }
 
     @Override
-    public void addAttemptResult(Long attemptId, Long attemptNumber) {
-        if (attemptId == null) {
+    public void addAttemptResult(ArticulateTCAttempt articulateTCAttempt) {
+        if (articulateTCAttempt == null) {
             /*
-             * attempt object ID is null (probably not persisted to the db yet),
+             * attempt object is null (probably not persisted to the db yet),
              * we'll create this result object later
              */
-            log.error("Error: the attempt ID is null.");
+            log.error("Error: the attempt is null.");
             return;
         }
 
         ArticulateTCAttemptResult articulateTCAttemptResult = new ArticulateTCAttemptResult();
-        articulateTCAttemptResult.setAttemptId(attemptId);
-        articulateTCAttemptResult.setAttemptNumber(attemptNumber);
+        articulateTCAttemptResult.setAttemptId(articulateTCAttempt.getId());
+        articulateTCAttemptResult.setAttemptNumber(articulateTCAttempt.getAttemptNumber());
+        //articulateTCAttemptResult.setArticulateTCAttempt(articulateTCAttempt);
 
         articulateTCAttemptResultDao.save(articulateTCAttemptResult);
     }

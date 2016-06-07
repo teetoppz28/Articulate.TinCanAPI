@@ -22,8 +22,6 @@ package org.sakaiproject.scorm.ui.console.pages;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.wicket.Page;
 import org.apache.wicket.PageMap;
 import org.apache.wicket.PageParameters;
@@ -46,10 +44,12 @@ import org.sakaiproject.scorm.ui.reporting.pages.LearnerResultsPage;
 import org.sakaiproject.scorm.ui.reporting.pages.ResultsListPage;
 import org.sakaiproject.tool.api.ToolManager;
 import org.sakaiproject.wicket.markup.html.SakaiPortletWebPage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DisplayDesignatedPackage extends SakaiPortletWebPage implements IHeaderContributor, ScormConstants {
 
-	private static Log log = LogFactory.getLog(DisplayDesignatedPackage.class);
+	private static Logger log = LoggerFactory.getLogger(DisplayDesignatedPackage.class);
 
 	public static final String CFG_PACKAGE_NAME = "scorm.package";
 	public static final String CFG_PACKAGE_NAME_UNDEFINED = "undefined";
@@ -87,7 +87,7 @@ public class DisplayDesignatedPackage extends SakaiPortletWebPage implements IHe
 			resourceId = cfgPlacement.getProperty(CFG_PACKAGE_NAME);
 			// check that the property was set in the tool, otherwise show a configuration error
 			if ((null != resourceId) && (!CFG_PACKAGE_NAME_UNDEFINED.equals(resourceId))) {
-				log.debug("Package name " + resourceId + " was found in configuration.");
+				log.debug("Package name {} was found in configuration.", resourceId);
 				designatedPackage = this.contentService.getContentPackageByResourceId(resourceId);
 			}
 			else {

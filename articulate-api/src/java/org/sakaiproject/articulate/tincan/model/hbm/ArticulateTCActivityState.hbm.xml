@@ -29,11 +29,8 @@
         <properties name="activity_state_unique" unique="true">
             <property name="userId" column="USER_ID" />
             <property name="registration" column="REGISTRATION" />
-            <property name="contentPackageId" column="CONTENT_PACKAGE_ID" type="long" />
+            <many-to-one name="contentPackageId" column="CONTENT_PACKAGE_ID" class="org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage" not-null="true" />
         </properties>
-        <many-to-one name="articulateTCContentPackage" class="org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage" fetch="select" insert="false" update="false">
-            <column name="ID" not-null="true" />
-        </many-to-one>
         <property name="content" column="CONTENT" type="text" />
         <property name="stateId" column="STATE_ID" />
         <property name="deleted" column="DELETED" />

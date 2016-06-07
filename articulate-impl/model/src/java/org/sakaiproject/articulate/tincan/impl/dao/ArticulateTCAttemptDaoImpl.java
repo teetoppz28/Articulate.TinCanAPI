@@ -139,13 +139,15 @@ public class ArticulateTCAttemptDaoImpl extends HibernateDaoSupport implements A
                 articulateTCAttempt.setLastModifiedDate(new Date());
                 getHibernateTemplate().saveOrUpdate(articulateTCAttempt);
             } catch (Throwable e) {
-                log.error("Error saving activity state data: ", e);
+                log.error("Error saving attempt data", e);
                 session.getTransaction().rollback();
             } finally {
                 if (!session.getTransaction().wasRolledBack()) {
                     session.flush();
                     session.getTransaction().commit();
                 }
+
+                session.clear();
             }
         } finally {
             if (session != null) {
