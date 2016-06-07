@@ -27,13 +27,10 @@
             <generator class="increment"/>
         </id>
         <properties name="activity_state_unique" unique="true">
-            <property name="userId" column="USER_ID" />
-            <property name="registration" column="REGISTRATION" />
-            <property name="contentPackageId" column="CONTENT_PACKAGE_ID" />
+            <property name="attemptId" column="ATTEMPT_ID" />
         </properties>
         <property name="content" column="CONTENT" type="text" />
         <property name="stateId" column="STATE_ID" />
-        <property name="deleted" column="DELETED" />
         <property name="modified" column="MODIFIED" />
     </class>
 

@@ -58,7 +58,7 @@ public class ArticulateTCContentPackageDaoImpl extends HibernateDaoSupport imple
 
     @SuppressWarnings("unchecked")
     public List<ArticulateTCContentPackage> find(String context) {
-        String statement = new StringBuilder(" from ").append(ArticulateTCContentPackage.class.getName()).append(" where context = ? and deleted = ? ").toString();
+        String statement = new StringBuilder(" FROM ").append(ArticulateTCContentPackage.class.getName()).append(" WHERE context = ? AND deleted = ? ").toString();
 
         return getHibernateTemplate().find(statement, new Object[] { context, false });
     }

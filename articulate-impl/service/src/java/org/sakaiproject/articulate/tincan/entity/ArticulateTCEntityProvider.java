@@ -98,9 +98,6 @@ public class ArticulateTCEntityProvider extends AbstractEntityProvider implement
             } else if (StringUtils.equalsIgnoreCase(view.getMethod(), "PUT") || StringUtils.equalsIgnoreCase(view.getMethod(), "POST")){
                 // store the activity state
                 articulateTCEntityProviderService.postActivityStatePayload(request);
-            } else if (StringUtils.equalsIgnoreCase(view.getMethod(), "DELETE") || StringUtils.equalsIgnoreCase((String) params.get("queryString"), PATH_QUERY_PARAM_DELETE)) {
-                // delete the activity state
-                articulateTCEntityProviderService.deleteStateData(request);
             }
         }
 

@@ -43,6 +43,8 @@ public interface ArticulateTCConstants extends ScormConstants {
     final static String STATE_DATA_KEY_USER_ID = "userid";
     final static String STATE_DATA_KEY_PACKAGE_ID = "packageid";
     final static String STATE_DATA_KEY_AUTH = "auth";
+    final static String STATE_DATA_KEY_STATE_ID_COMPLETE = "complete";
+    final static String STATE_DATA_KEY_STATE_ID_RESUME = "resume";
 
     final static String DEFAULT_ENCODING = "UTF-8";
 
@@ -85,7 +87,6 @@ public interface ArticulateTCConstants extends ScormConstants {
     final static boolean CONFIGURATION_DEFAULT_IS_GRADED = false;
     final static String CONFIGURATION_DEFAULT_APP_CONTENT_TYPE = "Articulate TinCanAPI";
     final static int CONFIGURATION_DEFAULT_NUMBER_OF_TRIES_UNLIMITED = -1;
-    final static boolean CONFIGURATION_DEFAULT_ACTIVITY_STATE_DELETED = false;
     final static String CONFIGURATION_RECORD_SCORE_TYPE_BEST = "BEST";
     final static String CONFIGURATION_RECORD_SCORE_TYPE_LATEST = "LATEST";
     final static String CONFIGURATION_GRADEBOOK_NO_POINTS = "-";
