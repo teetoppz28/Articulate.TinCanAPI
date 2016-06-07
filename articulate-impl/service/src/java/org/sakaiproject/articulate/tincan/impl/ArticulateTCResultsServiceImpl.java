@@ -131,8 +131,8 @@ public class ArticulateTCResultsServiceImpl implements ArticulateTCResultsServic
             }
         }
 
-        results.put("complete", articulateTCAttemptResultsComplete);
-        results.put("incomplete", articulateTCAttemptResultsIncomplete);
+        results.put(RESULTS_KEY_COMPLETE, articulateTCAttemptResultsComplete);
+        results.put(RESULTS_KEY_INCOMPLETE, articulateTCAttemptResultsIncomplete);
 
         return results;
     }
@@ -222,6 +222,34 @@ public class ArticulateTCResultsServiceImpl implements ArticulateTCResultsServic
         }
 
         return assignmentPoints;
+    }
+
+    @Override
+    public Map<String, String> calculateUserData(String userIdParam, String fullNameParam) {
+        Map<String, String> userData = new HashMap<>(2);
+        userData.put(RESULTS_KEY_USERID, userIdParam);
+        userData.put(RESULTS_KEY_FULLNAME, fullNameParam);
+        User user = null;
+
+        try {
+            user = userDirectoryService.getCurrentUser();
+        } catch (Exception e) {
+            // should never get here, but just in case
+            log.error("No current user exists.");
+            return userData;
+        }
+
+        if (StringUtils.isBlank(userData.get(RESULTS_KEY_FULLNAME))) {
+            // no full name passed in
+            userData.put(RESULTS_KEY_FULLNAME, user != null ? user.getDisplayName() : "");
+        }
+
+        if (StringUtils.isBlank(userData.get(RESULTS_KEY_USERID))) {
+            // no user ID passed in
+            userData.put(RESULTS_KEY_USERID, user != null ? user.getId() : "");
+        }
+
+        return userData;
     }
 
 }

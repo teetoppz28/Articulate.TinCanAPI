@@ -22,8 +22,30 @@ public class ArticulateTCConfigurationServiceImpl implements ArticulateTCConfigu
     private GradebookService gradebookService;
 
     @Override
+    public boolean processGradebookItem(ArticulateTCContentPackage articulateTCContentPackage) {
+        Assignment assignment = null;
+        if (articulateTCContentPackage.getAssignmentId() != null) {
+            assignment = getAssignment(articulateTCContentPackage);
+        }
+
+        boolean hasAssignmentDefined = assignment != null;
+        boolean gradebookChecked = articulateTCContentPackage.isGraded();
+
+        if (hasAssignmentDefined && gradebookChecked) {
+            return updateGradebookItem(articulateTCContentPackage, assignment);
+        } else if (!hasAssignmentDefined && gradebookChecked) {
+            return addGradebookItem(articulateTCContentPackage);
+        } else if (hasAssignmentDefined && !gradebookChecked) {
+            return removeGradebookItem(articulateTCContentPackage, assignment);
+        }
+
+        return true;
+    }
+
+    @Override
     public boolean addGradebookItem(ArticulateTCContentPackage articulateTCContentPackage) {
-        String fixedTitle = getItemTitle(articulateTCContentPackage, articulateTCContentPackage.getContext());
+        String fixedTitle = getItemTitle(articulateTCContentPackage.getTitle(), articulateTCContentPackage.getContext());
+
         Double points = articulateTCContentPackage.getPoints();
 
         Assignment assignment = new Assignment();
@@ -78,25 +100,6 @@ public class ArticulateTCConfigurationServiceImpl implements ArticulateTCConfigu
         return true;
     }
 
-    /**
-     * Generates the gradebook item title, not allowing duplicates
-     * 
-     * @param articulateTCContentPackage
-     * @param context
-     * @return
-     */
-    private String getItemTitle(ArticulateTCContentPackage articulateTCContentPackage, String context) {
-        String fixedTitle = articulateTCContentPackage.getGradebookItemTitle();
-
-        int count = 1;
-
-        while (gradebookService.isAssignmentDefined(context, fixedTitle)) {
-            fixedTitle = articulateTCContentPackage.getGradebookItemTitle() + " (" + count++ + ")";
-        }
-
-        return fixedTitle;
-    }
-
     @Override
     public Assignment getAssignment( ArticulateTCContentPackage articulateTCContentPackage) {
         return gradebookService.getAssignment(articulateTCContentPackage.getContext(), articulateTCContentPackage.getAssignmentId());
@@ -110,6 +113,24 @@ public class ArticulateTCConfigurationServiceImpl implements ArticulateTCConfigu
     @Override
     public ArticulateTCContentPackage getContentPackage(long contentPackageId) {
         return articulateTCContentPackageDao.load(contentPackageId);
+    }
+
+    /**
+     * Generates the gradebook item title, not allowing duplicates
+     * 
+     * @param title
+     * @param context
+     * @return
+     */
+    private String getItemTitle(String title, String context) {
+        String fixedTitle = title;
+        int count = 1;
+
+        while (gradebookService.isAssignmentDefined(context, fixedTitle)) {
+            fixedTitle = title + " (" + count++ + ")";
+        }
+
+        return fixedTitle;
     }
 
 }

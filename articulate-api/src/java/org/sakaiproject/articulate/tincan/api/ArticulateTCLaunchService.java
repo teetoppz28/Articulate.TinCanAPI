@@ -1,5 +1,7 @@
 package org.sakaiproject.articulate.tincan.api;
 
+import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttempt;
+
 /**
  * @author Robert Long (rlong @ unicon.net)
  */
@@ -42,9 +44,8 @@ public interface ArticulateTCLaunchService {
     /**
      * Persists a new attempt result when the content package is launched
      * 
-     * @param attemptId the attempt ID
-     * @param attemptNumber the attempt number
+     * @param articulateTCAttempt the attempt object
      */
-    void addAttemptResult(Long attemptId, Long attemptNumber);
+    void addAttemptResult(ArticulateTCAttempt articulateTCAttempt);
 
 }

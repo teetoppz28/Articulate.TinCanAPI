@@ -28,7 +28,6 @@
                 <param name="sequence">ARTICULATE_TC__UID_S</param>
             </generator>
         </id>
-
         <property name="title" column="TITLE" />
         <property name="resourceId" column="RESOURCE_ID" />
         <property name="context" column="CONTEXT" />
@@ -44,18 +43,6 @@
         <property name="numberOfTries" column="NUMBER_OF_TRIES" />
         <property name="deleted" column="IS_DELETED" />
         <property name="assignmentId" column="ASSIGNMENT_ID" />
-        <set name="articulateTCActivityStates" table="ARTICULATE_TC_ACTIVITY_STATE" inverse="false" fetch="select">
-            <key>
-                <column name="CONTENT_PACKAGE_ID" not-null="true" />
-            </key>
-            <one-to-many class="org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCActivityState" />
-        </set>
-        <set name="articulateTCAttempts" table="ARTICULATE_TC_ATTEMPT" inverse="false" fetch="select">
-            <key>
-                <column name="CONTENT_PACKAGE_ID" not-null="true" />
-            </key>
-            <one-to-many class="org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttempt" />
-        </set>
     </class>
 
 </hibernate-mapping>

@@ -19,8 +19,6 @@
  */
 package org.sakaiproject.scorm.ui.console.pages;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
@@ -32,8 +30,6 @@ import org.sakaiproject.scorm.service.api.ScormContentService;
 import org.sakaiproject.wicket.markup.html.SakaiPortletWebPage;
 
 public class NotConfiguredPage extends SakaiPortletWebPage implements IHeaderContributor, ScormConstants {
-
-	private static Log log = LogFactory.getLog(NotConfiguredPage.class);
 
 	@SpringBean
 	LearningManagementSystem lms;

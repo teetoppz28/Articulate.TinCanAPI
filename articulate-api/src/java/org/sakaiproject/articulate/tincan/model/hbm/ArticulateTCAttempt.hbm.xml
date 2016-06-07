@@ -28,23 +28,13 @@
                 <param name="sequence">ARTICULATE_TC_ATTEMPT_UID_S</param>
             </generator>
         </id>
-
-        <many-to-one name="articulateTCContentPackage" class="org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage" fetch="select" insert="false" update="false">
-            <column name="ID" not-null="true" />
-        </many-to-one>
-        <property name="contentPackageId" column="CONTENT_PACKAGE_ID" type="long" />
+        <property name="contentPackageId" column="CONTENT_PACKAGE_ID" />
         <property name="courseId" column="COURSE_ID" />
         <property name="learnerId" column="LEARNER_ID" />
         <property name="learnerName" column="LEARNER_NAME" />
         <property name="attemptNumber" column="ATTEMPT_NUMBER" />
         <property name="beginDate" column="CREATED_ON" />
         <property name="lastModifiedDate" column="MODIFIED_ON" />
-        <set name="articulateTCAttemptResults" table="ARTICULATE_TC_ATTEMPT_RESULT" inverse="false" lazy="true" fetch="select">
-            <key>
-                <column name="ATTEMPT_ID" not-null="true" />
-            </key>
-            <one-to-many class="org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttemptResult" />
-        </set>
     </class>
 
 </hibernate-mapping>

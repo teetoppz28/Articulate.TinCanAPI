@@ -79,21 +79,7 @@ public class ArticulateTCPackageConfigurationPage extends ConsoleBasePage implem
 
             @Override
             protected void onSubmit() {
-                Assignment assignment = null;
-                if (articulateTCContentPackage.getAssignmentId() != null) {
-                    assignment = articulateTCConfigurationService.getAssignment(articulateTCContentPackage);
-                }
-
-                boolean hasAssignmentDefined = assignment != null;
-                boolean gradebookChecked = articulateTCContentPackage.isGraded();
-
-                if (hasAssignmentDefined && gradebookChecked) {
-                    articulateTCConfigurationService.updateGradebookItem(articulateTCContentPackage, assignment);
-                } else if (!hasAssignmentDefined && gradebookChecked) {
-                    articulateTCConfigurationService.addGradebookItem(articulateTCContentPackage);
-                } else if (hasAssignmentDefined && !gradebookChecked) {
-                    articulateTCConfigurationService.removeGradebookItem(articulateTCContentPackage, assignment);
-                }
+                articulateTCConfigurationService.processGradebookItem(articulateTCContentPackage);
 
                 setResponsePage(params.getBoolean("no-toolbar") ? DisplayDesignatedPackage.class : PackageListPage.class);
             }

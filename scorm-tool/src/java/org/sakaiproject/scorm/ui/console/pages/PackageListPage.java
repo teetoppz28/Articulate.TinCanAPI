@@ -43,9 +43,10 @@ import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.lang.PropertyResolver;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
-import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCAttemptDao;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
+import org.sakaiproject.atriculate.ui.console.components.TriesColumn;
+import org.sakaiproject.atriculate.ui.console.components.TypeColumn;
 import org.sakaiproject.atriculate.ui.console.pages.ArticulateTCPackageConfigurationPage;
 import org.sakaiproject.atriculate.ui.console.pages.ArticulateTCPackageRemovePage;
 import org.sakaiproject.atriculate.ui.player.pages.ArticulateTCPlayerPage;
@@ -76,11 +77,8 @@ public class PackageListPage extends ConsoleBasePage implements ArticulateTCCons
 	private static final ResourceReference PAGE_ICON = new ResourceReference(PackageListPage.class, "res/table.png");
 	private static final ResourceReference DELETE_ICON = new ResourceReference(PackageListPage.class, "res/delete.png");
 
-    @SpringBean(name="articulateTCAttemptDao")
-    protected ArticulateTCAttemptDao articulateTCAttemptDao;
-
     @SpringBean(name="articulateTCContentPackageDao")
-    protected ArticulateTCContentPackageDao articulateTCContentPackageDao;
+    private ArticulateTCContentPackageDao articulateTCContentPackageDao;
 
     @SpringBean(name="org.sakaiproject.scorm.service.api.ScormContentService")
     private ScormContentService contentService;
@@ -289,65 +287,6 @@ public class PackageListPage extends ConsoleBasePage implements ArticulateTCCons
 			return new ResourceModel(resourceId);
 		}
 	}
-
-    public class TriesColumn extends AbstractColumn<ContentPackage> {
-
-        private static final long serialVersionUID = 1L;
-
-        public TriesColumn(IModel<String> displayModel, String sortProperty) {
-            super(displayModel, sortProperty);
-        }
-
-        public void populateItem(Item<ICellPopulator<ContentPackage>> item, String componentId, IModel<ContentPackage> model) {
-            item.add(new Label(componentId, createLabelModel(model)));
-        }
-
-        protected String createLabelModel(IModel<ContentPackage> embeddedModel) {
-            Object target = embeddedModel.getObject();
-
-            if (target instanceof ArticulateTCContentPackage) {
-                ArticulateTCContentPackage contentPackage = (ArticulateTCContentPackage) target;
-
-                String userId = lms.currentLearnerId();
-                int attemptsCount = articulateTCAttemptDao.count(contentPackage.getContentPackageId(), userId);
-                int maxAttempts = contentPackage.getNumberOfTries();
-                String tries = Integer.toString(attemptsCount) + " / ";
-
-                if (maxAttempts == -1) {
-                    return tries + "unlimited";
-                }
-
-                return  tries + Integer.toString(maxAttempts);
-            }
-
-            return "";
-        }
-    }
-
-    public class TypeColumn extends AbstractColumn<ContentPackage> {
-
-        private static final long serialVersionUID = 1L;
-
-        public TypeColumn(IModel<String> displayModel, String sortProperty) {
-            super(displayModel, sortProperty);
-        }
-
-        public void populateItem(Item<ICellPopulator<ContentPackage>> item, String componentId, IModel<ContentPackage> model) {
-            item.add(new Label(componentId, createLabelModel(model)));
-        }
-
-        protected String createLabelModel(IModel<ContentPackage> embeddedModel) {
-            Object contentPackage = embeddedModel.getObject();
-
-            if (contentPackage instanceof ArticulateTCContentPackage) {
-                return CONFIGURATION_DEFAULT_APP_CONTENT_TYPE;
-            } else if (contentPackage instanceof ContentPackage) {
-                return "SCORM 2004 v3";
-            } else {
-                return "unknown";
-            }
-        }
-    }
 
 	@Override
 	protected ResourceReference getPageIconReference() {

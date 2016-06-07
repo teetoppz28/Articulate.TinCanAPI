@@ -6,6 +6,14 @@ import org.sakaiproject.service.gradebook.shared.Assignment;
 public interface ArticulateTCConfigurationService {
 
     /**
+     * Adds, updates, or removes a gradebook item
+     * 
+     * @param articulateTCContentPackage
+     * @return
+     */
+    boolean processGradebookItem(ArticulateTCContentPackage articulateTCContentPackage);
+
+    /**
      * Adds a new gradebook item
      * 
      * @param articulateTCContentPackage

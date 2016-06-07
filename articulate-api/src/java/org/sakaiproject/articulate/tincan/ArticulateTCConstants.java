@@ -91,6 +91,14 @@ public interface ArticulateTCConstants extends ScormConstants {
     final static String CONFIGURATION_GRADEBOOK_NO_POINTS = "-";
 
     /*
+     * Results
+     */
+
+    final static String RESULTS_KEY_USERID = "user-id";
+    final static String RESULTS_KEY_FULLNAME = "full-name";
+    final static String RESULTS_KEY_COMPLETE = "attempts-complete";
+    final static String RESULTS_KEY_INCOMPLETE = "attempts-incomplete";
+    /*
      * Grading
      */
     final static DecimalFormat GRADE_DECIMAL_FORMAT = new DecimalFormat("#.##");

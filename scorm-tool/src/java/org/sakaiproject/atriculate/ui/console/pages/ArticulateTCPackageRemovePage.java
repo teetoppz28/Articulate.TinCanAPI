@@ -75,17 +75,17 @@ public class ArticulateTCPackageRemovePage extends ConsoleBasePage {
             final long contentPackageId = params.getLong("contentPackageId");
             final ArticulateTCContentPackage articulateTCContentPackage = articulateTCContentPackageDao.load(contentPackageId);
 
-            List<ArticulateTCContentPackage> list = new LinkedList<ArticulateTCContentPackage>();
+            List<ArticulateTCContentPackage> list = new LinkedList<>();
             list.add(articulateTCContentPackage);
 
-            List<IColumn<Object>> columns = new LinkedList<IColumn<Object>>();
+            List<IColumn<Object>> columns = new LinkedList<>();
             columns.add(new PropertyColumn<Object>(new Model<String>("Content Package"), "title", "title"));
 
-            DataTable<ArticulateTCContentPackage> removeTable = new DataTable<ArticulateTCContentPackage>("removeTable", columns.toArray(new IColumn[columns.size()]), new ListDataProvider<ArticulateTCContentPackage>(list), 3);
+            DataTable<ArticulateTCContentPackage> removeTable = new DataTable<>("removeTable", columns.toArray(new IColumn[columns.size()]), new ListDataProvider<ArticulateTCContentPackage>(list), 3);
 
             final Label alertLabel = new Label("alert", new ResourceModel("verify.remove"));
             final CancelButton btnCancel = new CancelButton("btnCancel", PackageListPage.class);
-            IndicatingAjaxButton btnSubmit = new IndicatingAjaxButton( "btnSubmit", this ) {
+            IndicatingAjaxButton btnSubmit = new IndicatingAjaxButton("btnSubmit", this) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
