@@ -1,6 +1,7 @@
 package org.sakaiproject.articulate.tincan.impl;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -8,6 +9,7 @@ import javax.tools.JavaFileObject.Kind;
 
 import lombok.Setter;
 
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang.StringUtils;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCImporterService;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
@@ -61,6 +63,9 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
 
     private String packageName;
     private String zipFileId;
+    private String launchPageUrl;
+    private String tincanXmlUrl;
+    private String metaXmlUrl;
     private Document metaXmlDocument;
     private ArticulateTCContentPackage articulateTCContentPackage;
     private String timestamp;
@@ -90,7 +95,7 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
         }
 
         // parse meta.xml for content package data
-        metaXmlDocument = articulateTCDocumentUtils.parseResourceAsDocument(getPackageCollectionPath(true) + ARCHIVE_META_XML_FILE);
+        metaXmlDocument = articulateTCDocumentUtils.parseResourceAsDocument(metaXmlUrl);
 
         // TinCanAPI content package
         boolean contentPackageCreatedSuccessfully = createContentPackage();
@@ -116,6 +121,15 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
 
             // remove the content package zip file after it's extracted
             removeZipFile();
+
+            // find the launnch p[age URL, usually story.html
+            findLaunchPageUrl();
+
+            // find the meta.xml file
+            findMetaXmlUrl();
+
+            // find the tincan.xml file
+            findTincanXmlUrl();
 
             boolean validated = validateArticulateTinCanAPIArchive();
             if (!validated) {
@@ -147,7 +161,7 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
 
     @Override
     public boolean createContentPackage() {
-        articulateTCContentPackage = new ArticulateTCContentPackage(processMetaXml(), getLaunchUrl(true));
+        articulateTCContentPackage = new ArticulateTCContentPackage(processMetaXml(), launchPageUrl);
 
         if (!articulateTCContentPackage.isValid()) {
             log.error("The Articulate TinCanAPI Content Package is invalid. It has been deleted. \n {}", articulateTCContentPackage.toString());
@@ -198,9 +212,9 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
      */
     private boolean validateArticulateTinCanAPIArchive() {
         try {
-            contentHostingService.getResource(getPackageCollectionPath(true) + ARCHIVE_TINCAN_XML_FILE);
-            contentHostingService.getResource(getPackageCollectionPath(true) + ARCHIVE_META_XML_FILE);
-            findLaunchPage();
+            contentHostingService.getResource(metaXmlUrl);
+            contentHostingService.getResource(tincanXmlUrl);
+            contentHostingService.getReference(launchPageUrl);
         } catch (Exception e) {
             log.error("Error validating archive.", e);
             return false;
@@ -407,71 +421,89 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
     }
 
     /**
-     * Path: /access/content/private/articulate/SITE_ID/MY_CONTENT_PACKAGE-1234567890/story.html
-     */
-    private String getLaunchUrl(boolean includeTimestamp) {
-        String launchPage = findLaunchPage();
-
-        // no .html files in directory (this shouldn't happen...)
-        if (StringUtils.isBlank(launchPage)) {
-            throw new IllegalStateException("Error:: no HTML file found for launch page.");
-        }
-
-        return ARCHIVE_DEFAULT_URL_PATH_PREFIX + getPackageCollectionPath(includeTimestamp) + launchPage;
-    }
-
-    /**
-     * Attempts to find a launch page HTML file
+     * Attempts to find a launch page HTML file URL
      * Since the user can choose a name other than "story.html"
-     * 
-     * @return the launch page found, or null if none exists
      */
-    private String findLaunchPage() {
-        try {
-            contentHostingService.getResource(getPackageCollectionPath(true) + ARCHIVE_DEFAULT_LAUNCH_PAGE);
-
-            return ARCHIVE_DEFAULT_LAUNCH_PAGE;
-        } catch (IdUnusedException iue) {
-            log.info("No default launch page HTML file found");
-        } catch (Exception e) {
-            log.error("Error retrieving launch page HTML file");
-        }
-
+    private void findLaunchPageUrl() {
         // get a listing of the files in the directory
-        List<ContentResource> contentResources = contentHostingService.getAllResources(getPackageCollectionPath(true));
+        List<ContentResource> contentResources = getFilesInPackageDirectory();
 
-        // no .html files in directory (this shouldn't happen...)
+        // no files in directory (this shouldn't happen...)
         if (CollectionUtils.isEmpty(contentResources)) {
             throw new IllegalStateException("Error:: no HTML file found for launch page.");
         }
 
         // search the directory for HTML files
         for (ContentResource contentResource : contentResources) {
-            if (StringUtils.endsWith(contentResource.getId(), ARCHIVE_DEFAULT_LAUNCH_PAGE_HTML5_SUFFIX)) {
-                String html5Str = StringUtils.substringAfterLast(contentResource.getId(), ContentEntity.SEPARATOR);
-                String prefixStr = StringUtils.substringBefore(html5Str, "_");
-                return prefixStr + Kind.HTML.extension;
+            if (StringUtils.endsWithIgnoreCase(contentResource.getId(), ARCHIVE_DEFAULT_LAUNCH_PAGE)) {
+                launchPageUrl = ARCHIVE_DEFAULT_URL_PATH_PREFIX + contentResource.getId();
+                return;
             }
 
-            if (StringUtils.endsWith(contentResource.getId(), ARCHIVE_DEFAULT_LAUNCH_PAGE_UNSUPPORTED_SUFFIX)) {
-                String unsupportedStr = StringUtils.substringAfterLast(contentResource.getId(), ContentEntity.SEPARATOR);
-                String prefixStr = StringUtils.substringBefore(unsupportedStr, "_");
-
-                return prefixStr + Kind.HTML.extension;
+            if (StringUtils.endsWithIgnoreCase(contentResource.getId(), ARCHIVE_DEFAULT_LAUNCH_PAGE_HTML5_SUFFIX)) {
+                String path = StringUtils.remove(contentResource.getId(), ARCHIVE_DEFAULT_LAUNCH_PAGE_HTML5_SUFFIX);
+                launchPageUrl = ARCHIVE_DEFAULT_URL_PATH_PREFIX + path;
+                return;
             }
 
-            if (StringUtils.endsWithIgnoreCase(contentResource.getId(), Kind.HTML.extension)) {
-                String pathPrefix = StringUtils.substringBeforeLast(contentResource.getId(), ContentEntity.SEPARATOR);
-
-                if (StringUtils.equalsIgnoreCase(pathPrefix, getPackageCollectionPath(true))) {
-                    return StringUtils.substringAfterLast(contentResource.getId(), ContentEntity.SEPARATOR);
-                }
+            if (StringUtils.endsWithIgnoreCase(contentResource.getId(), ARCHIVE_DEFAULT_LAUNCH_PAGE_UNSUPPORTED_SUFFIX)) {
+                String path = StringUtils.remove(contentResource.getId(), ARCHIVE_DEFAULT_LAUNCH_PAGE_UNSUPPORTED_SUFFIX);
+                launchPageUrl = ARCHIVE_DEFAULT_URL_PATH_PREFIX + path;
+                return;
             }
         }
 
         log.error("Error:: no HTML file found for launch page.");
+    }
 
-        return null;
+    /**
+     * Attempt to find the meta.xml file in the directory
+     */
+    private void findMetaXmlUrl() {
+        List<ContentResource> contentResources = getFilesInPackageDirectory();
+
+        for (ContentResource contentResource : contentResources) {
+            if (StringUtils.endsWithIgnoreCase(contentResource.getId(), ARCHIVE_META_XML_FILE)) {
+                metaXmlUrl = contentResource.getId();
+                return;
+            }
+        }
+
+        log.error("Error:: no meta.xml file found for package.");
+    }
+
+    /**
+     * Attempt to find the tincan.xml file in the directory
+     */
+    private void findTincanXmlUrl() {
+        List<ContentResource> contentResources = getFilesInPackageDirectory();
+
+        for (ContentResource contentResource : contentResources) {
+            if (StringUtils.endsWithIgnoreCase(contentResource.getId(), ARCHIVE_TINCAN_XML_FILE)) {
+                tincanXmlUrl = contentResource.getId();
+                return;
+            }
+        }
+
+        log.error("Error:: no tincan.xml file found for package.");
+    }
+
+    /**
+     * Retrieve a list of all files under the package directory
+     * 
+     * @return a list of the {@link ContentResource} objects
+     */
+    private List<ContentResource> getFilesInPackageDirectory() {
+        // get a listing of the files in the directory
+        List<ContentResource> contentResources = contentHostingService.getAllResources(getPackageCollectionPath(true));
+
+        // no files in directory (this shouldn't happen...)
+        if (CollectionUtils.isEmpty(contentResources)) {
+            log.error("Error:: no files found in package directory.");
+            return new ArrayList<>();
+        }
+
+        return contentResources;
     }
 
 }
