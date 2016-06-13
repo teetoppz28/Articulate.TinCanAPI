@@ -40,7 +40,7 @@ public interface ArticulateTCActivityStateDao {
     ArticulateTCActivityState findOneByUniqueKey(Long attemptId);
 
     /**
-     * Finds the row with the given unique key (attempt ID)
+     * Finds the row with the given unique key (attempt ID) and state ID (resume, completed, etc.)
      * 
      * @param attemptId
      * @param stateId

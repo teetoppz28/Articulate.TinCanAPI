@@ -28,16 +28,51 @@ import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPac
  */
 public interface ArticulateTCContentPackageDao {
 
+    /**
+     * Get the count of all content packages for a site with a specific name
+     * 
+     * @param context
+     * @param name
+     * @return
+     */
     int countContentPackages(String context, String name);
 
+    /**
+     * Get all content packages for a site
+     * 
+     * @param context
+     * @return
+     */
     List<ArticulateTCContentPackage> find(String context);
 
+    /**
+     * Get a specific content package with ID
+     * 
+     * @param id
+     * @return
+     */
     ArticulateTCContentPackage get(long id);
 
+    /**
+     * Get a specific content package with ID (possibly cached)
+     * 
+     * @param id
+     * @return
+     */
     ArticulateTCContentPackage load(long id);
 
+    /**
+     * Softly delete a content package
+     * 
+     * @param articulateTContentPackage
+     */
     void remove(ArticulateTCContentPackage articulateTContentPackage);
 
+    /**
+     * Save or update a content package object
+     * 
+     * @param articulateTContentPackage
+     */
     void save(ArticulateTCContentPackage articulateTContentPackage);
 
 }

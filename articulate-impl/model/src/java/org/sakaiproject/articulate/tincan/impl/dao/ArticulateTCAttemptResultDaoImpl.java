@@ -82,7 +82,7 @@ public class ArticulateTCAttemptResultDaoImpl extends HibernateDaoSupport implem
         String where = " WHERE attemptId = ? ";
 
         if (onlyCompleted) {
-            where += "AND dateCompleted IS NOT NULL ";
+            where += " AND dateCompleted IS NOT NULL ";
         }
 
         String statement = new StringBuilder(" FROM ").append(ArticulateTCAttemptResult.class.getName()).append(where).toString();

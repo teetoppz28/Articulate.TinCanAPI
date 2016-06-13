@@ -1,22 +1,3 @@
-/*
- * #%L
- * SCORM Model Impl
- * %%
- * Copyright (C) 2007 - 2016 Sakai Project
- * %%
- * Licensed under the Educational Community License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *             http://opensource.org/licenses/ecl2
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
 package org.sakaiproject.articulate.tincan.impl.dao;
 
 import java.util.Date;
@@ -40,6 +21,7 @@ public class ArticulateTCContentPackageDaoImpl extends HibernateDaoSupport imple
 
     private final Logger log = LoggerFactory.getLogger(ArticulateTCContentPackageDaoImpl.class);
 
+    @Override
     public int countContentPackages(String context, String name) {
         int count = 0;
         List<ArticulateTCContentPackage> articulateTContentPackages = find(context);
@@ -57,6 +39,7 @@ public class ArticulateTCContentPackageDaoImpl extends HibernateDaoSupport imple
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public List<ArticulateTCContentPackage> find(String context) {
         String statement = new StringBuilder(" FROM ").append(ArticulateTCContentPackage.class.getName()).append(" WHERE context = ? AND deleted = ? ").toString();
 

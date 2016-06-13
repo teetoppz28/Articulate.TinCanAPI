@@ -42,7 +42,7 @@ public interface ArticulateTCAttemptResultDao {
     List<ArticulateTCAttemptResult> findByAttemptId(long attemptId);
 
     /**
-     * Finds the incompleted attempt row(s) with the given attempt ID
+     * Finds the incomplete attempt row(s) with the given attempt ID
      * 
      * @param attemptId the attempt ID
      * @return

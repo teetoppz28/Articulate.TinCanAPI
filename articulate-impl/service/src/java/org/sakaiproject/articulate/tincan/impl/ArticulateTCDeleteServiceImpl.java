@@ -25,9 +25,6 @@ public class ArticulateTCDeleteServiceImpl implements ArticulateTCDeleteService,
     private final Logger log = LoggerFactory.getLogger(ArticulateTCDeleteServiceImpl.class);
 
     @Setter
-    private ArticulateTCContentEntityUtils articulateTCContentEntityUtils;
-
-    @Setter
     private ArticulateTCContentPackageDao articulateTCContentPackageDao;
 
     @Setter
@@ -54,7 +51,13 @@ public class ArticulateTCDeleteServiceImpl implements ArticulateTCDeleteService,
 
             articulateTCContentPackageDao.remove(articulateTCContentPackage);
 
-            eventTrackingService.post(eventTrackingService.newEvent(SAKAI_EVENT_REMOVE, "articulate/tc/site/" + articulateTCContentPackage.getContext() + "/user/" + developerHelperService.getCurrentUserId() + "/packageId/" + articulateTCContentPackage.getContentPackageId(), true));
+            StringBuilder eventRef = new StringBuilder("articulate/tc/site/")
+                .append(articulateTCContentPackage.getContext())
+                .append("/user/")
+                .append(developerHelperService.getCurrentUserId())
+                .append("/packageId/")
+                .append(articulateTCContentPackage.getContentPackageId());
+            eventTrackingService.post(eventTrackingService.newEvent(SAKAI_EVENT_REMOVE, eventRef.toString() , true));
         } catch (Exception e) {
             log.error("Error deleting content package with ID: {}", contentPackageId, e);
             return false;
@@ -91,6 +94,7 @@ public class ArticulateTCDeleteServiceImpl implements ArticulateTCDeleteService,
         } catch (Exception e) {
             log.error("Error deleting assignment with ID: {}", assignmentId, e);
         }
+
         return true;
     }
 
@@ -107,7 +111,7 @@ public class ArticulateTCDeleteServiceImpl implements ArticulateTCDeleteService,
             developerHelperService.setCurrentUser(DeveloperHelperService.ADMIN_USER_REF);
 
             String resourcePath = StringUtils.removeStart(articulateTCContentPackage.getUrl(), ARCHIVE_DEFAULT_URL_PATH_PREFIX);
-            ContentResourceEdit resourceEdit = articulateTCContentEntityUtils.editResource(resourcePath);
+            ContentResourceEdit resourceEdit = ArticulateTCContentEntityUtils.editResource(resourcePath);
 
             if (resourceEdit == null) {
                 return true;

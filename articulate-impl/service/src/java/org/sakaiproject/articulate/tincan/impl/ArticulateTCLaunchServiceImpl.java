@@ -48,11 +48,11 @@ public class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService,
         String actor = calculateActor();
         String endPoint = calculateEndPoint();
 
-        StringBuilder sb = new StringBuilder("?");
-        sb.append(STATE_DATA_KEY_ENDPOINT + "=" + endPoint);
-        sb.append("&" + STATE_DATA_KEY_AUTH + "=");
-        sb.append("&" + STATE_DATA_KEY_ACTOR + "=" + actor);
-        sb.append("&" + STATE_DATA_KEY_PACKAGE_ID + "=" + packageId);
+        StringBuilder sb = new StringBuilder("?")
+            .append(STATE_DATA_KEY_ENDPOINT + "=" + endPoint)
+            .append("&").append(STATE_DATA_KEY_AUTH).append("=")
+            .append("&").append(STATE_DATA_KEY_ACTOR).append("=").append(actor)
+            .append("&").append(STATE_DATA_KEY_PACKAGE_ID).append("=").append(packageId);
 
         return sb.toString();
     }
@@ -64,9 +64,15 @@ public class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService,
             String first = user.getFirstName();
             String last = user.getLastName();
             String email = user.getEmail();
-            String actor = "{\"name\":\"" + first + " " + last + "\",\"mbox\":\"mailto:" + email + "\"}";
+            StringBuilder actor = new StringBuilder("{\"name\":\"")
+                .append(first)
+                .append(" ")
+                .append(last)
+                .append("\",\"mbox\":\"mailto:")
+                .append(email)
+                .append("\"}");
 
-            return URLEncoder.encode(actor, DEFAULT_ENCODING);
+            return URLEncoder.encode(actor.toString(), DEFAULT_ENCODING);
         } catch (UnsupportedEncodingException e) {
             log.error("Error URL encoding actor.", e);
         }
@@ -76,10 +82,13 @@ public class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService,
 
     @Override
     public String calculateEndPoint() {
-        String endpoint = EntityView.DIRECT_PREFIX + EntityView.SEPARATOR + REST_PREFIX + EntityView.SEPARATOR;
+        StringBuilder endpoint = new StringBuilder(EntityView.DIRECT_PREFIX)
+            .append(EntityView.SEPARATOR)
+            .append(REST_PREFIX)
+            .append(EntityView.SEPARATOR);
 
         try {
-            return URLEncoder.encode(endpoint, DEFAULT_ENCODING);
+            return URLEncoder.encode(endpoint.toString(), DEFAULT_ENCODING);
         } catch (UnsupportedEncodingException e) {
             log.error("Error URL encoding endpoint URL.", e);
         }
@@ -114,7 +123,13 @@ public class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService,
 
         addAttemptResult(newAttempt);
 
-        eventTrackingService.post(eventTrackingService.newEvent(SAKAI_EVENT_LAUNCH, "articulate/tc/site/" + articulateTCContentPackage.getContext() + "/user/" + userId + "/packageId/" + articulateTCContentPackage.getContentPackageId(), true));
+        StringBuilder eventRef = new StringBuilder("articulate/tc/site/")
+            .append(articulateTCContentPackage.getContext())
+            .append("/user/")
+            .append(userId)
+            .append("/packageId/")
+            .append(articulateTCContentPackage.getContentPackageId());
+        eventTrackingService.post(eventTrackingService.newEvent(SAKAI_EVENT_LAUNCH, eventRef.toString() , true));
     }
 
     @Override

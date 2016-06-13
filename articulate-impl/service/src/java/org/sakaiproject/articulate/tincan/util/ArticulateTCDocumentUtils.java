@@ -5,9 +5,8 @@ import java.io.ByteArrayInputStream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import lombok.Setter;
-
 import org.apache.commons.lang.StringUtils;
+import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.content.api.ContentHostingService;
 import org.sakaiproject.content.api.ContentResource;
 import org.slf4j.Logger;
@@ -19,10 +18,7 @@ import org.w3c.dom.Document;
  */
 public class ArticulateTCDocumentUtils {
 
-    private final Logger log = LoggerFactory.getLogger(ArticulateTCDocumentUtils.class);
-
-    @Setter
-    private ContentHostingService contentHostingService;
+    private static final Logger log = LoggerFactory.getLogger(ArticulateTCDocumentUtils.class);
 
     /**
      * Creates a document from a given resource path
@@ -30,10 +26,12 @@ public class ArticulateTCDocumentUtils {
      * @param resourcePath the path to the content resource
      * @return the created {@link Document} object
      */
-    public Document parseResourceAsDocument(String resourcePath) {
+    public static Document parseResourceAsDocument(String resourcePath) {
         if (StringUtils.isBlank(resourcePath)) {
             throw new IllegalArgumentException("Resource path cannot be null.");
         }
+
+        ContentHostingService contentHostingService = (ContentHostingService) ComponentManager.get(ContentHostingService.class);
 
         Document document = null;
         ContentResource contentResource = null;

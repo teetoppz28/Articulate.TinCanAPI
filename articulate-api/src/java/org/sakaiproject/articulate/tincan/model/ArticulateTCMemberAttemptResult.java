@@ -2,10 +2,12 @@ package org.sakaiproject.articulate.tincan.model;
 
 import java.io.Serializable;
 
+import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
+
 /**
  * @author Robert Long (rlong @ unicon.net)
  */
-public class ArticulateTCMemberAttemptResult implements Serializable {
+public class ArticulateTCMemberAttemptResult implements Serializable, ArticulateTCConstants {
 
     private static final long serialVersionUID = 1L;
 
@@ -86,7 +88,7 @@ public class ArticulateTCMemberAttemptResult implements Serializable {
     }
 
     public String getGradebookDisplay() {
-        return (gradebookScore == null ? "-" : gradebookScore) + " / " + gradebookPointsPossible;
+        return (gradebookScore == null ? CONFIGURATION_GRADEBOOK_NO_POINTS : gradebookScore) + " / " + gradebookPointsPossible;
     }
 
 }

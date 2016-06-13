@@ -28,22 +28,83 @@ import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttempt;
  */
 public interface ArticulateTCAttemptDao {
 
+    /**
+     * Get the number of attempts by user for the content package
+     * 
+     * @param contentPackageId
+     * @param learnerId
+     * @return
+     */
     int count(long contentPackageId, String learnerId);
 
+    /**
+     * Find attempts by content package
+     * 
+     * @param contentPackageId
+     * @return
+     */
     List<ArticulateTCAttempt> find(long contentPackageId);
 
+    /**
+     * Find attempts by user for a content package
+     * 
+     * @param contentPackageId
+     * @param learnerId
+     * @return
+     */
     List<ArticulateTCAttempt> find(long contentPackageId, String learnerId);
 
+    /**
+     * Find attempts by user for all content packages in a site
+     * 
+     * @param courseId
+     * @param learnerId
+     * @return
+     */
     List<ArticulateTCAttempt> find(String courseId, String learnerId);
 
+    /**
+     * Find a specific attempt by user for a content package in a site
+     * 
+     * @param courseId
+     * @param learnerId
+     * @param attemptNumber
+     * @return
+     */
     ArticulateTCAttempt find(String courseId, String learnerId, long attemptNumber);
 
+    /**
+     * Get an attempt by ID
+     * 
+     * @param id
+     * @return
+     */
     ArticulateTCAttempt load(long id);
 
+    /**
+     * Find a specific attempt by user for a specific content package
+     * 
+     * @param courseId
+     * @param learnerId
+     * @param attemptNumber
+     * @return
+     */
     ArticulateTCAttempt lookup(long contentPackageId, String learnerId, long attemptNumber);
 
+    /**
+     * Find the latest attempt by a user for a content package
+     * 
+     * @param contentPackageId
+     * @param learnerId
+     * @return
+     */
     ArticulateTCAttempt lookupNewest(long contentPackageId, String learnerId);
 
+    /**
+     * Save or update an attempt object
+     * 
+     * @param articulateTCAttempt
+     */
     void save(ArticulateTCAttempt articulateTCAttempt);
 
 }

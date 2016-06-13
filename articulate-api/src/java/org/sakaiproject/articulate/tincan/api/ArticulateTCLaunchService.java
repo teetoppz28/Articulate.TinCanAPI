@@ -9,9 +9,6 @@ public interface ArticulateTCLaunchService {
 
     /**
      * Creates the necessary launch query string
-     * 1. endpoint
-     * 2. auth
-     * 3. actor
      * 
      * @param packageId the ID of the content package row
      * @return the URL encoded query string

@@ -98,7 +98,8 @@ public class ArticulateTCResultsServiceImpl implements ArticulateTCResultsServic
                         developerHelperService.setCurrentUser(DeveloperHelperService.ADMIN_USER_REF);
                         gradebookScore = gradebookService.getAssignmentScoreString(articulateTCContentPackage.getContext(), articulateTCContentPackage.getAssignmentId(), userId);
                     } catch (Exception e) {
-                        log.error("Error getting score string for user {} in site {} and asignment {}", userId, articulateTCContentPackage.getContext(), articulateTCContentPackage.getAssignmentId(), e);
+                        log.error("Error getting score string for user {} in site {} and asignment {}",
+                            userId, articulateTCContentPackage.getContext(), articulateTCContentPackage.getAssignmentId(), e);
                     } finally {
                         developerHelperService.restoreCurrentUser();
                     }
@@ -144,9 +145,9 @@ public class ArticulateTCResultsServiceImpl implements ArticulateTCResultsServic
         List<ArticulateTCMemberAttemptResult> articulateTCMemberAttemptResults = new ArrayList<>();
 
         for (Member member : members) {
-            String firstName = "[First name unknown]";
-            String lastName = "[Last name unknown]";
-            String fullName = "[Name unknown]";
+            String firstName = "";
+            String lastName = "";
+            String fullName = "";
             User user = null;
 
             try {
@@ -155,12 +156,12 @@ public class ArticulateTCResultsServiceImpl implements ArticulateTCResultsServic
                 lastName = user.getLastName();
                 fullName = user.getDisplayName();
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("Error retrieving data for user with ID: {}", member.getUserId(), e);
             }
 
             ArticulateTCAttempt articulateTCAttempt = articulateTCAttemptDao.lookupNewest(contentPackageId, member.getUserId());
 
-            String gradebookScore = "-";
+            String gradebookScore = CONFIGURATION_GRADEBOOK_NO_POINTS;
 
             if (assignmentId != null) {
                 gradebookScore = gradebookService.getAssignmentScoreString(siteId, assignmentId, member.getUserId());
@@ -172,8 +173,7 @@ public class ArticulateTCResultsServiceImpl implements ArticulateTCResultsServic
             articulateTCMemberAttemptResult.setFirstName(firstName);
             articulateTCMemberAttemptResult.setLastName(lastName);
             articulateTCMemberAttemptResult.setFullName(fullName);
-            String attemptNumber = articulateTCAttempt != null ? Long.toString(articulateTCAttempt.getAttemptNumber()) : "-";
-            articulateTCMemberAttemptResult.setAttemptNumber(attemptNumber);
+            articulateTCMemberAttemptResult.setAttemptNumber(articulateTCAttempt != null ? Long.toString(articulateTCAttempt.getAttemptNumber()) : CONFIGURATION_GRADEBOOK_NO_POINTS);
             articulateTCMemberAttemptResult.setGradebookScore(gradebookScore);
             articulateTCMemberAttemptResult.setGradebookPointsPossible(gradebookPointsPossible);
 
@@ -183,6 +183,12 @@ public class ArticulateTCResultsServiceImpl implements ArticulateTCResultsServic
         return articulateTCMemberAttemptResults;
     }
 
+    /**
+     * Get members o a site with non-maintain roles
+     * 
+     * @param siteId
+     * @return
+     */
     private Set<Member> calculateLearnerMembers(String siteId) {
         Site site = null;
 
@@ -200,6 +206,7 @@ public class ArticulateTCResultsServiceImpl implements ArticulateTCResultsServic
 
         while (iterator.hasNext()) {
             Member member = iterator.next();
+
             if (StringUtils.equalsIgnoreCase(member.getRole().getId(), maintainRole)) {
                 // remove maintainers
                 iterator.remove();
@@ -207,21 +214,6 @@ public class ArticulateTCResultsServiceImpl implements ArticulateTCResultsServic
         }
 
         return members;
-    }
-
-    private String calculateAssignmentPoints(String siteId, Long assignmentId) {
-        String assignmentPoints = CONFIGURATION_GRADEBOOK_NO_POINTS;
-
-        if (assignmentId != null) {
-            Assignment assignment = gradebookService.getAssignment(siteId, assignmentId);
-
-            if (assignment != null) {
-                Double pointsPossible = assignment.getPoints();
-                assignmentPoints = Double.toString(pointsPossible);
-            }
-        }
-
-        return assignmentPoints;
     }
 
     @Override
@@ -250,6 +242,28 @@ public class ArticulateTCResultsServiceImpl implements ArticulateTCResultsServic
         }
 
         return userData;
+    }
+
+    /**
+     * Calculates the assignment total points display string
+     * 
+     * @param siteId
+     * @param assignmentId
+     * @return
+     */
+    private String calculateAssignmentPoints(String siteId, Long assignmentId) {
+        String assignmentPoints = CONFIGURATION_GRADEBOOK_NO_POINTS;
+
+        if (assignmentId != null) {
+            Assignment assignment = gradebookService.getAssignment(siteId, assignmentId);
+
+            if (assignment != null) {
+                Double pointsPossible = assignment.getPoints();
+                assignmentPoints = Double.toString(pointsPossible);
+            }
+        }
+
+        return assignmentPoints;
     }
 
 }
