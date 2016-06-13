@@ -7,13 +7,12 @@ import java.net.URLDecoder;
 
 import javax.servlet.http.HttpServletRequest;
 
-import lombok.Setter;
-
 import org.apache.commons.lang.StringUtils;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
 import org.sakaiproject.articulate.tincan.model.ArticulateTCRequestPayload;
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
+import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,13 +22,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConstants {
 
-    private final Logger log = LoggerFactory.getLogger(ArticulateTCEntityProviderServiceUtils.class);
-
-    @Setter
-    private ArticulateTCContentPackageDao articulateTCContentPackageDao;
-
-    @Setter
-    private DeveloperHelperService developerHelperService;
+    private static final Logger log = LoggerFactory.getLogger(ArticulateTCEntityProviderServiceUtils.class);
 
     /**
      * Decodes the URL-encoded string
@@ -37,7 +30,7 @@ public class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConst
      * @param str the string to decode
      * @return
      */
-    public String decodeString(String str) {
+    public static String decodeString(String str) {
         if (StringUtils.isBlank(str)) {
             return str;
         }
@@ -57,7 +50,7 @@ public class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConst
      * @param request
      * @return the payload string
      */
-    public String getRequestPayload(HttpServletRequest request) {
+    public static String getRequestPayload(HttpServletRequest request) {
         if (request == null) {
             throw new IllegalArgumentException("HttpServletRequest cannot be null");
         }
@@ -87,7 +80,7 @@ public class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConst
      * @param str the payload string from the request
      * @return the content data
      */
-    public String getContentDataFromPayload(String str) {
+    public static String getContentDataFromPayload(String str) {
         ArticulateTCRequestPayload articulateTCRequestPayload = getPayloadObject(str);
 
         if (StringUtils.isBlank(articulateTCRequestPayload.getContent())) {
@@ -104,7 +97,7 @@ public class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConst
      * @param request
      * @return
      */
-    public ArticulateTCRequestPayload getPayloadObject(HttpServletRequest request) {
+    public static ArticulateTCRequestPayload getPayloadObject(HttpServletRequest request) {
         if (request == null) {
             throw new IllegalArgumentException("Request object cannot be null");
         }
@@ -118,7 +111,7 @@ public class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConst
      * @param str
      * @return
      */
-    public ArticulateTCRequestPayload getPayloadObject(String str) {
+    public static ArticulateTCRequestPayload getPayloadObject(String str) {
         if (StringUtils.isBlank(str)) {
             throw new IllegalArgumentException("Payload string cannot be blank");
         }
@@ -139,7 +132,8 @@ public class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConst
      * 
      * @return
      */
-    private String populateCurrentUser() {
+    private static String populateCurrentUser() {
+        DeveloperHelperService developerHelperService = (DeveloperHelperService) ComponentManager.get(DeveloperHelperService.class);
         String userId = developerHelperService.getCurrentUserId();
 
         if (StringUtils.isBlank(userId)) {
@@ -156,7 +150,8 @@ public class ArticulateTCEntityProviderServiceUtils implements ArticulateTCConst
      * @param contentPackageId
      * @return
      */
-    private String populateCurrentSite(Long contentPackageId) {
+    private static String populateCurrentSite(Long contentPackageId) {
+        ArticulateTCContentPackageDao articulateTCContentPackageDao = (ArticulateTCContentPackageDao) ComponentManager.get(ArticulateTCContentPackageDao.class);
         ArticulateTCContentPackage articulateTCContentPackage = articulateTCContentPackageDao.load(contentPackageId);
 
         if (articulateTCContentPackage == null) {

@@ -1,22 +1,3 @@
-/*
- * #%L
- * SCORM Model Impl
- * %%
- * Copyright (C) 2007 - 2016 Sakai Project
- * %%
- * Licensed under the Educational Community License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *             http://opensource.org/licenses/ecl2
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
 package org.sakaiproject.articulate.tincan.impl.dao;
 
 import java.sql.SQLException;
@@ -47,6 +28,7 @@ public class ArticulateTCAttemptDaoImpl extends HibernateDaoSupport implements A
 
     private final Logger log = LoggerFactory.getLogger(ArticulateTCAttemptDaoImpl.class);
 
+    @Override
     public int count(final long contentPackageId, final String learnerId) {
         HibernateCallback<Object> hcb = new HibernateCallback<Object>() {
             public Object doInHibernate(Session session) throws HibernateException, SQLException {
@@ -54,6 +36,7 @@ public class ArticulateTCAttemptDaoImpl extends HibernateDaoSupport implements A
                     .add(Restrictions.eq("contentPackageId", contentPackageId))
                     .add(Restrictions.eq("learnerId", learnerId))
                     .setProjection(Projections.count("id"));
+
                 return criteria.uniqueResult();
             }
         };
@@ -61,20 +44,24 @@ public class ArticulateTCAttemptDaoImpl extends HibernateDaoSupport implements A
         Object result = getHibernateTemplate().execute(hcb);
 
         int r = 0;
+
         if (result != null) {
             if (result instanceof Number) {
                 r = ((Number) result).intValue();
             }
         }
+
         return r;
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public List<ArticulateTCAttempt> find(long contentPackageId) {
         return (List<ArticulateTCAttempt>) getHibernateTemplate().find(" FROM " + ArticulateTCAttempt.class.getName() + " WHERE contentPackageId = ? ", new Object[] {contentPackageId});
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public List<ArticulateTCAttempt> find(long contentPackageId, String learnerId) {
         StringBuilder buffer = new StringBuilder();
         buffer.append(" FROM ").append(ArticulateTCAttempt.class.getName()).append(" WHERE contentPackageId = ? AND learnerId = ? ORDER BY attemptNumber DESC ");
@@ -83,29 +70,34 @@ public class ArticulateTCAttemptDaoImpl extends HibernateDaoSupport implements A
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public List<ArticulateTCAttempt> find(String courseId, String learnerId) {
         StringBuilder buffer = new StringBuilder();
         buffer.append(" FROM ").append(ArticulateTCAttempt.class.getName()).append(" WHERE courseId = ? AND learnerId = ? ORDER BY attemptNumber DESC ");
+
         return getHibernateTemplate().find(buffer.toString(), new Object[] {courseId, learnerId});
     }
 
-    
+    @Override
     public ArticulateTCAttempt find(String courseId, String learnerId, long attemptNumber) {
         StringBuilder buffer = new StringBuilder();
         buffer.append(" FROM ").append(ArticulateTCAttempt.class.getName()).append(" WHERE courseId = ? AND learnerId = ? AND attemptNumber = ? ");
         
         @SuppressWarnings("unchecked")
         List<ArticulateTCAttempt> r = getHibernateTemplate().find(buffer.toString(), new Object[] {courseId, learnerId, attemptNumber});
-        if (r.size() == 0)
+        if (r.size() == 0) {
             return null;
+        }
 
         return (ArticulateTCAttempt) r.get(r.size() - 1);
     }
 
+    @Override
     public ArticulateTCAttempt load(long id) {
         return (ArticulateTCAttempt) getHibernateTemplate().load(ArticulateTCAttempt.class, id);
     }
 
+    @Override
     public ArticulateTCAttempt lookup(final long contentPackageId, final String learnerId, final long attemptNumber) {
         HibernateCallback<Object> hcb = new HibernateCallback<Object>() {
             public Object doInHibernate(Session session) throws HibernateException, SQLException {
@@ -126,6 +118,7 @@ public class ArticulateTCAttemptDaoImpl extends HibernateDaoSupport implements A
         return attempt;
     }
 
+    @Override
     public void save(ArticulateTCAttempt articulateTCAttempt) {
         Session session = null;
 
@@ -158,6 +151,7 @@ public class ArticulateTCAttemptDaoImpl extends HibernateDaoSupport implements A
         }
     }
 
+    @Override
     public ArticulateTCAttempt lookupNewest(long contentPackageId, String learnerId) {
         // First figure out the highest attempt number...
         DetachedCriteria sub = DetachedCriteria.forClass(ArticulateTCAttempt.class)
@@ -173,10 +167,11 @@ public class ArticulateTCAttemptDaoImpl extends HibernateDaoSupport implements A
         return uniqueResult(criteria);
     }
 
-    protected ArticulateTCAttempt uniqueResult(final DetachedCriteria criteria) {
+    private ArticulateTCAttempt uniqueResult(final DetachedCriteria criteria) {
         return (ArticulateTCAttempt) getHibernateTemplate().execute(new HibernateCallback<Object>() {
             public Object doInHibernate(Session session) throws HibernateException, SQLException {
                 Criteria s = criteria.getExecutableCriteria(session);
+
                 return s.uniqueResult();
             }
         });

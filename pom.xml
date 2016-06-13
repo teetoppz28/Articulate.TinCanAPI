@@ -11,7 +11,6 @@
 
     <name>Sakai SCORM Project</name>
     <artifactId>sakai-scorm-base</artifactId>
-    <version>10-SNAPSHOT</version>
     <packaging>pom</packaging>
     <organization>
         <name>Sakai Project</name>
@@ -121,7 +120,6 @@
             </plugin>
             <plugin>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.3.2</version>
                 <configuration>
                     <tagNameFormat>${project.version}</tagNameFormat>
                     <autoVersionSubmodules>true</autoVersionSubmodules>

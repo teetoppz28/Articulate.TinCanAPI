@@ -24,6 +24,7 @@ public class ArticulateTCConfigurationServiceImpl implements ArticulateTCConfigu
     @Override
     public boolean processGradebookItem(ArticulateTCContentPackage articulateTCContentPackage) {
         Assignment assignment = null;
+
         if (articulateTCContentPackage.getAssignmentId() != null) {
             assignment = getAssignment(articulateTCContentPackage);
         }
@@ -45,7 +46,6 @@ public class ArticulateTCConfigurationServiceImpl implements ArticulateTCConfigu
     @Override
     public boolean addGradebookItem(ArticulateTCContentPackage articulateTCContentPackage) {
         String fixedTitle = getItemTitle(articulateTCContentPackage.getTitle(), articulateTCContentPackage.getContext());
-
         Double points = articulateTCContentPackage.getPoints();
 
         Assignment assignment = new Assignment();
@@ -115,6 +115,15 @@ public class ArticulateTCConfigurationServiceImpl implements ArticulateTCConfigu
         return articulateTCContentPackageDao.load(contentPackageId);
     }
 
+    @Override
+    public void updateContentPackage(ArticulateTCContentPackage articulateTCContentPackage) {
+        if (articulateTCContentPackage == null) {
+            throw new IllegalArgumentException("Articulate content package cannot be null");
+        }
+
+        articulateTCContentPackageDao.save(articulateTCContentPackage);
+    }
+
     /**
      * Generates the gradebook item title, not allowing duplicates
      * 
@@ -131,15 +140,6 @@ public class ArticulateTCConfigurationServiceImpl implements ArticulateTCConfigu
         }
 
         return fixedTitle;
-    }
-
-    @Override
-    public void updateContentPackage(ArticulateTCContentPackage articulateTCContentPackage) {
-        if (articulateTCContentPackage == null) {
-            throw new IllegalArgumentException("Articulate content package cannot be null");
-        }
-
-        articulateTCContentPackageDao.save(articulateTCContentPackage);
     }
 
 }

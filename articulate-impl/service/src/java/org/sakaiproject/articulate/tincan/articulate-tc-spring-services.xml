@@ -25,26 +25,15 @@
     <!--  Package Importer -->
 
     <bean id="articulateTCImporterService" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCImporterServiceImpl">
-        <property name="articulateTCContentEntityUtils" ref="articulateTCContentEntityUtils" />
         <property name="articulateTCContentPackageDao" ref="articulateTCContentPackageDao" />
-        <property name="articulateTCDocumentUtils" ref="articulateTCDocumentUtils" />
         <property name="contentHostingService" ref="org.sakaiproject.content.api.ContentHostingService" />
         <property name="developerHelperService" ref="org.sakaiproject.entitybroker.DeveloperHelperService" />
         <property name="eventTrackingService" ref="org.sakaiproject.event.api.EventTrackingService" />
     </bean>
 
-    <bean id="articulateTCContentEntityUtils" class="org.sakaiproject.articulate.tincan.util.ArticulateTCContentEntityUtils">
-        <property name="contentHostingService" ref="org.sakaiproject.content.api.ContentHostingService" />
-    </bean>
-
-    <bean id="articulateTCDocumentUtils" class="org.sakaiproject.articulate.tincan.util.ArticulateTCDocumentUtils">
-        <property name="contentHostingService" ref="org.sakaiproject.content.api.ContentHostingService" />
-    </bean>
-
     <!-- Package deletion -->
 
     <bean id="articulateTCDeleteService" class="org.sakaiproject.articulate.tincan.impl.ArticulateTCDeleteServiceImpl">
-        <property name="articulateTCContentEntityUtils" ref="articulateTCContentEntityUtils" />
         <property name="articulateTCContentPackageDao" ref="articulateTCContentPackageDao" />
         <property name="contentHostingService" ref="org.sakaiproject.content.api.ContentHostingService" />
         <property name="developerHelperService" ref="org.sakaiproject.entitybroker.DeveloperHelperService" />
@@ -73,15 +62,9 @@
         <property name="articulateTCAttemptDao" ref="articulateTCAttemptDao" />
         <property name="articulateTCAttemptResultDao" ref="articulateTCAttemptResultDao" />
         <property name="articulateTCContentPackageDao" ref="articulateTCContentPackageDao" />
-        <property name="articulateTCEntityProviderServiceUtils" ref="articulateTCEntityProviderServiceUtils" />
         <property name="developerHelperService" ref="org.sakaiproject.entitybroker.DeveloperHelperService" />
         <property name="eventTrackingService" ref="org.sakaiproject.event.api.EventTrackingService" />
         <property name="siteService" ref="org.sakaiproject.site.api.SiteService" />
-    </bean>
-
-    <bean id="articulateTCEntityProviderServiceUtils" class="org.sakaiproject.articulate.tincan.util.ArticulateTCEntityProviderServiceUtils">
-        <property name="articulateTCContentPackageDao" ref="articulateTCContentPackageDao" />
-        <property name="developerHelperService" ref="org.sakaiproject.entitybroker.DeveloperHelperService" />
     </bean>
 
     <!-- Configuration service -->

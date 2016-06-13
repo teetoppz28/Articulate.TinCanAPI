@@ -55,9 +55,6 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
     private ArticulateTCContentPackageDao articulateTCContentPackageDao;
 
     @Setter
-    private ArticulateTCEntityProviderServiceUtils articulateTCEntityProviderServiceUtils;
-
-    @Setter
     private DeveloperHelperService developerHelperService;
 
     @Setter
@@ -80,8 +77,8 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
             throw new IllegalArgumentException("Request cannot be null");
         }
 
-        String payload = articulateTCEntityProviderServiceUtils.getRequestPayload(request);
-        String statementJson = articulateTCEntityProviderServiceUtils.getContentDataFromPayload(payload);
+        String payload = ArticulateTCEntityProviderServiceUtils.getRequestPayload(request);
+        String statementJson = ArticulateTCEntityProviderServiceUtils.getContentDataFromPayload(payload);
 
         sendStatementToLRS(statementJson);
 
@@ -94,7 +91,7 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
             throw new IllegalArgumentException("Request cannot be null");
         }
 
-        ArticulateTCRequestPayload articulateTCRequestPayload = articulateTCEntityProviderServiceUtils.getPayloadObject(request);
+        ArticulateTCRequestPayload articulateTCRequestPayload = ArticulateTCEntityProviderServiceUtils.getPayloadObject(request);
         ArticulateTCAttempt articulateTCAttempt = articulateTCAttemptDao.lookupNewest(articulateTCRequestPayload.getContentPackageId(), articulateTCRequestPayload.getUserId());
         ArticulateTCActivityState articulateTCActivityState = null;
 
@@ -119,7 +116,7 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
             throw new IllegalArgumentException("Request cannot be null");
         }
 
-        ArticulateTCRequestPayload articulateTCRequestPayload = articulateTCEntityProviderServiceUtils.getPayloadObject(request);
+        ArticulateTCRequestPayload articulateTCRequestPayload = ArticulateTCEntityProviderServiceUtils.getPayloadObject(request);
         ArticulateTCAttempt articulateTCAttempt = articulateTCAttemptDao.lookupNewest(articulateTCRequestPayload.getContentPackageId(), articulateTCRequestPayload.getUserId());
         ArticulateTCActivityState articulateTCActivityState = null;
 
@@ -177,7 +174,7 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
              * Get the attempt and package objects
              */
 
-            ArticulateTCRequestPayload articulateTCRequestPayload = articulateTCEntityProviderServiceUtils.getPayloadObject(payload);
+            ArticulateTCRequestPayload articulateTCRequestPayload = ArticulateTCEntityProviderServiceUtils.getPayloadObject(payload);
             ArticulateTCContentPackage articulateTCContentPackage = articulateTCContentPackageDao.load(articulateTCRequestPayload.getContentPackageId());
 
             developerHelperService.setCurrentUser(DeveloperHelperService.ADMIN_USER_REF);
@@ -271,9 +268,10 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
 
             if (StringUtils.isNotBlank(previousScoreStr)) {
                 Double previousScore = Double.parseDouble(previousScoreStr);
+
                 if (articulateTCContentPackage.isRecordBest()) {
                     // only record the best attempt score
-                    if (attemptScore < previousScore) {
+                    if (attemptScore <= previousScore) {
                         // configured to only record best score and score is not better than previous, skip saving to gradebook
                         return;
                     }
@@ -304,7 +302,7 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
         ArticulateTCContentPackage articulateTCContentPackage = articulateTCContentPackageDao.get(contentPackageId);
         long maxAttempts = articulateTCContentPackage.getNumberOfTries();
 
-        if (maxAttempts == -1) {
+        if (articulateTCContentPackage.isUnlimitedAttempts()) {
             // unlimited attempts allowed
             return true;
         }
@@ -339,6 +337,7 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
         articulateTCAttemptResult.setAttemptNumber(newestAttempt.getAttemptNumber());
         articulateTCAttemptResult.setScaledScore(scaledScore);
         articulateTCAttemptResult.setDateCompleted(new Date());
+
         articulateTCAttemptResultDao.save(articulateTCAttemptResult);
     }
 
@@ -376,7 +375,7 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
             }
         } catch (Exception e) {
             // an error occurred, so abort saving assignment scores
-            log.error("Error occurred saving grades.", e);
+            log.error("Error occurred saving grades for assignment ID: {} in gradebook: {}", assignmentId, gradebookUid, e);
             return;
         }
 

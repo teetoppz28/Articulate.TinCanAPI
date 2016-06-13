@@ -5,11 +5,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.tools.JavaFileObject.Kind;
-
 import lombok.Setter;
 
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang.StringUtils;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCImporterService;
 import org.sakaiproject.articulate.tincan.api.dao.ArticulateTCContentPackageDao;
@@ -19,7 +16,6 @@ import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPac
 import org.sakaiproject.articulate.tincan.util.ArticulateTCContentEntityUtils;
 import org.sakaiproject.articulate.tincan.util.ArticulateTCDocumentUtils;
 import org.sakaiproject.content.api.ContentCollectionEdit;
-import org.sakaiproject.content.api.ContentEntity;
 import org.sakaiproject.content.api.ContentHostingService;
 import org.sakaiproject.content.api.ContentResource;
 import org.sakaiproject.content.api.ContentResourceEdit;
@@ -27,7 +23,6 @@ import org.sakaiproject.entity.api.Entity;
 import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.event.api.EventTrackingService;
-import org.sakaiproject.exception.IdUnusedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
@@ -44,13 +39,7 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
     private final Logger log = LoggerFactory.getLogger(ArticulateTCImporterServiceImpl.class);
 
     @Setter
-    private ArticulateTCContentEntityUtils articulateTCContentEntityUtils;
-
-    @Setter
     private ArticulateTCContentPackageDao articulateTCContentPackageDao;
-
-    @Setter
-    private ArticulateTCDocumentUtils articulateTCDocumentUtils;
 
     @Setter
     private ContentHostingService contentHostingService;
@@ -76,10 +65,12 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
             log.error("InputStream cannot be null.");
             return VALIDATION_NOFILE;
         }
+
         if (StringUtils.isBlank(packageName)) {
             log.error("Package name cannot be empty.");
             return VALIDATION_NOTWELLFORMED;
         }
+
         if (!StringUtils.equals(ARCHIVE_ZIP_MIMETYPE, contentType)) {
             log.error("Uploaded file is not of type {}", ARCHIVE_ZIP_MIMETYPE);
             return VALIDATION_WRONGMIMETYPE;
@@ -95,7 +86,7 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
         }
 
         // parse meta.xml for content package data
-        metaXmlDocument = articulateTCDocumentUtils.parseResourceAsDocument(metaXmlUrl);
+        metaXmlDocument = ArticulateTCDocumentUtils.parseResourceAsDocument(metaXmlUrl);
 
         // TinCanAPI content package
         boolean contentPackageCreatedSuccessfully = createContentPackage();
@@ -103,10 +94,16 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
             return VALIDATION_CONVERTFAILED;
         }
 
-        // move the temp file directory to the permanent directory (if configured)
+        // move the temp file directory to the permanent directory
         moveContentPackage();
 
-        eventTrackingService.post(eventTrackingService.newEvent(SAKAI_EVENT_ADD, "articulate/tc/site/" + getCurrentContext() + "/user/" + getCurrentUserId() + "/packageName/" + this.packageName, true));
+        StringBuilder eventRef = new StringBuilder("articulate/tc/site/")
+            .append(getCurrentContext())
+            .append("/user/")
+            .append(getCurrentUserId())
+            .append("/packageName/")
+            .append(this.packageName);
+        eventTrackingService.post(eventTrackingService.newEvent(SAKAI_EVENT_ADD, eventRef.toString() , true));
 
         return VALIDATION_SUCCESS;
     }
@@ -114,6 +111,7 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
     @Override
     public boolean processPackage(InputStream inputStream, String packageName, String contentType) {
         try {
+            // store the zip file
             storeZipFile(inputStream);
 
             // extract the files to the current directory
@@ -152,7 +150,7 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
                 return false;
             }
         } catch (Exception e) {
-            log.error("An error occurred extracting the TinCanAPI zip file into resources.", e);
+            log.error("An error occurred extracting the TinCanAPI zip file {} into resources.", packageName, e);
             return false;
         }
 
@@ -212,9 +210,9 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
      */
     private boolean validateArticulateTinCanAPIArchive() {
         try {
+            contentHostingService.getReference(launchPageUrl);
             contentHostingService.getResource(metaXmlUrl);
             contentHostingService.getResource(tincanXmlUrl);
-            contentHostingService.getReference(launchPageUrl);
         } catch (Exception e) {
             log.error("Error validating archive.", e);
             return false;
@@ -230,7 +228,7 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
      * @return true, if the root articulate directory is valid
      */
     private boolean processRootDirectory() {
-            ContentCollectionEdit articulateCollectionEdit = articulateTCContentEntityUtils.addOrEditCollection(ARCHIVE_DEFAULT_STORAGE_PATH_PREFIX);
+            ContentCollectionEdit articulateCollectionEdit = ArticulateTCContentEntityUtils.addOrEditCollection(ARCHIVE_DEFAULT_STORAGE_PATH_PREFIX);
 
             return processDirectory(articulateCollectionEdit, true);
     }
@@ -242,7 +240,7 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
      * @return true, if the site directory is valid
      */
     private boolean processSiteDirectory() {
-        ContentCollectionEdit siteCollectionEdit = articulateTCContentEntityUtils.addOrEditCollection(getSiteCollectionRootPath());
+        ContentCollectionEdit siteCollectionEdit = ArticulateTCContentEntityUtils.addOrEditCollection(getSiteCollectionRootPath());
 
         return processDirectory(siteCollectionEdit, false);
     }
@@ -283,7 +281,7 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
      */
     private boolean storeZipFile(InputStream inputStream) {
         try {
-            ContentResourceEdit zipFile = articulateTCContentEntityUtils.addOrEditResource(getPackageArchiveFilePath(true));
+            ContentResourceEdit zipFile = ArticulateTCContentEntityUtils.addOrEditResource(getPackageArchiveFilePath(true));
             zipFile.setContent(inputStream);
             zipFile.setContentType(ARCHIVE_ZIP_MIMETYPE);
             contentHostingService.commitResource(zipFile);
@@ -328,6 +326,7 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
 
         try {
             List<String> packageCollectionRootChildren = contentHostingService.getCollection(getSiteCollectionRootPath()).getMembers();
+
             if (packageCollectionRootChildren.contains(existingDirectory)) {
                 contentHostingService.removeCollection(existingDirectory);
             }
@@ -336,13 +335,13 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
             return false;
         }
 
-        ContentCollectionEdit newCollectionEdit = articulateTCContentEntityUtils.addOrEditCollection(getPackageCollectionPath(true));
+        ContentCollectionEdit newCollectionEdit = ArticulateTCContentEntityUtils.addOrEditCollection(getPackageCollectionPath(true));
 
         if (newCollectionEdit == null) {
             return false;
         }
 
-        newCollectionEdit = (ContentCollectionEdit) articulateTCContentEntityUtils.addProperties(
+        newCollectionEdit = (ContentCollectionEdit) ArticulateTCContentEntityUtils.addProperties(
             newCollectionEdit,
             new String[] {ResourceProperties.PROP_DISPLAY_NAME},
             new String[] {getDuplicateTitle()}
@@ -378,6 +377,8 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
 
     /**
      * Path: MY_CONTENT_PACKAGE (optional timestamp suffix: "-1234567890")
+     * 
+     * @param includeTimestamp should the timestamp be included in the name?
      */
     private String getPackageCollectionId(boolean includeTimestamp) {
         String suffix = includeTimestamp ? timestamp : "";
@@ -407,14 +408,18 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
     }
 
     /**
-     * Path: /private/articulate/SITE_ID/MY_CONTENT_PACKAGE-1234567890/
+     * Path: /private/articulate/SITE_ID/MY_CONTENT_PACKAGE{-1234567890}/
+     * 
+     * @param includeTimestamp should the timestamp be included in the name?
      */
     private String getPackageCollectionPath(boolean includeTimestamp) {
         return getSiteCollectionRootPath() + getPackageCollectionId(includeTimestamp) + Entity.SEPARATOR;
     }
 
     /**
-     * Path: /private/articulate/SITE_ID/MY_CONTENT_PACKAGE-1234567890.zip
+     * Path: /private/articulate/SITE_ID/MY_CONTENT_PACKAGE{-1234567890}.zip
+     * 
+     * @param includeTimestamp should the timestamp be included in the name?
      */
     private String getPackageArchiveFilePath(boolean includeTimestamp) {
         return getSiteCollectionRootPath() + getPackageCollectionId(includeTimestamp) + ".zip";

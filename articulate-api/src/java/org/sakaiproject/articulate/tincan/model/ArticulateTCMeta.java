@@ -55,6 +55,11 @@ public class ArticulateTCMeta implements ArticulateTCConstants {
         this.title = title;
     }
 
+    /**
+     * Are all required fields non-blank?
+     * 
+     * @return
+     */
     public boolean isValid() {
         if (StringUtils.isBlank(this.courseId)) {
             return false;

@@ -40,6 +40,7 @@ public class ArticulateTCContentPackageDaoImpl extends HibernateDaoSupport imple
 
     private final Logger log = LoggerFactory.getLogger(ArticulateTCContentPackageDaoImpl.class);
 
+    @Override
     public int countContentPackages(String context, String name) {
         int count = 0;
         List<ArticulateTCContentPackage> articulateTContentPackages = find(context);
@@ -57,6 +58,7 @@ public class ArticulateTCContentPackageDaoImpl extends HibernateDaoSupport imple
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public List<ArticulateTCContentPackage> find(String context) {
         String statement = new StringBuilder(" FROM ").append(ArticulateTCContentPackage.class.getName()).append(" WHERE context = ? AND deleted = ? ").toString();
 
