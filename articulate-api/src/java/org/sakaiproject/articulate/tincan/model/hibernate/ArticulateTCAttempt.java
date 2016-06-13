@@ -14,7 +14,6 @@ public class ArticulateTCAttempt implements Serializable {
     private Long contentPackageId;
     private String courseId;
     private String learnerId;
-    private String learnerName;
     private Long attemptNumber;
     private Date beginDate;
     private Date lastModifiedDate;
@@ -52,14 +51,6 @@ public class ArticulateTCAttempt implements Serializable {
 
     public void setLearnerId(String learnerId) {
         this.learnerId = learnerId;
-    }
-
-    public String getLearnerName() {
-        return learnerName;
-    }
-
-    public void setLearnerName(String learnerName) {
-        this.learnerName = learnerName;
     }
 
     public Long getAttemptNumber() {

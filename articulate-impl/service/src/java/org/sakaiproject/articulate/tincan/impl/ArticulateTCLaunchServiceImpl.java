@@ -108,14 +108,12 @@ public class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService,
         String siteId = articulateTCContentPackage.getContext();
         User user = userDirectoryService.getCurrentUser();
         String userId = user.getId();
-        String displayName = user.getDisplayName();
         ArticulateTCAttempt latestAttempt = articulateTCAttemptDao.lookupNewest(contentPackageId, userId);
 
         ArticulateTCAttempt newAttempt = new ArticulateTCAttempt();
         newAttempt.setContentPackageId(contentPackageId);
         newAttempt.setCourseId(siteId);
         newAttempt.setLearnerId(userId);
-        newAttempt.setLearnerName(displayName);
         newAttempt.setBeginDate(new Date());
         newAttempt.setAttemptNumber(latestAttempt == null ? 1 : latestAttempt.getAttemptNumber() + 1);
 
