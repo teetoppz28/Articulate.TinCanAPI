@@ -65,6 +65,7 @@ public interface ArticulateTCConfigurationService {
 
     /**
      * Persists the content package configuration to the database
+     * 
      * @param articulateTCContentPackage
      */
     void updateContentPackage(ArticulateTCContentPackage articulateTCContentPackage);
