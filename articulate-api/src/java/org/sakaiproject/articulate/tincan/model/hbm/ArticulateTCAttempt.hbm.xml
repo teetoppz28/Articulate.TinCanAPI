@@ -13,7 +13,6 @@
         <property name="contentPackageId" column="CONTENT_PACKAGE_ID" />
         <property name="courseId" column="COURSE_ID" />
         <property name="learnerId" column="LEARNER_ID" />
-        <property name="learnerName" column="LEARNER_NAME" />
         <property name="attemptNumber" column="ATTEMPT_NUMBER" />
         <property name="beginDate" column="CREATED_ON" />
         <property name="lastModifiedDate" column="MODIFIED_ON" />
