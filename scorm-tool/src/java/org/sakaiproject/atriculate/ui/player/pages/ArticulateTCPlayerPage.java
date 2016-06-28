@@ -40,7 +40,8 @@ public class ArticulateTCPlayerPage extends BaseToolPage implements ArticulateTC
 
             @Override
             protected CharSequence getURL() {
-                return pageParams.getString("url") + articulateTCLaunchService.calculateLaunchParams(contentPackageId);
+                String params = articulateTCLaunchService.calculateLaunchParams(contentPackageId);
+                return pageParams.getString("url") + params;
             }
         };
 
