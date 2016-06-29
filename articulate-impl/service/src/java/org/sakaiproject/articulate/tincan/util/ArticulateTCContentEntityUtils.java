@@ -89,7 +89,7 @@ public class ArticulateTCContentEntityUtils {
     }
 
     /**
-     * Attempt to add resourc
+     * Attempt to add resource
      * 
      * @param resourcePath
      * @return
@@ -128,6 +128,7 @@ public class ArticulateTCContentEntityUtils {
      */
     public static Edit addProperties(Edit editEntity, String[] keys, String[] values) {
         ResourcePropertiesEdit props = editEntity.getPropertiesEdit();
+
         for (int i = 0; i < keys.length; i++) {
             props.addProperty(keys[i], values[i]);
         }

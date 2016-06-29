@@ -53,7 +53,6 @@ public class ArticulateTCSecurityUtils {
     /**
      * Is the current user defined in the session a maintainer in the current site?
      * 
-     * @param siteId the site ID to check access
      * @return true, if the current user is allowed to access
      */
     public static boolean isCurrentUserMaintainerInCurrentSite() {

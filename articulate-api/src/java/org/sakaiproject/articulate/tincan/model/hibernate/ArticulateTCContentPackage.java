@@ -259,11 +259,11 @@ public class ArticulateTCContentPackage implements ArticulateTCConstants, Serial
     @Override
     public String toString() {
         return "ArticulateTCContentPackage :: " +
-                    "id: " + getContentPackageId() +
-                    ", context: " + getContext() +
-                    ", title: " + getTitle() +
-                    ", resourceId: " + getResourceId() +
-                    ", launchUrl: " + getUrl();
+            "id: " + getContentPackageId() +
+            ", context: " + getContext() +
+            ", title: " + getTitle() +
+            ", resourceId: " + getResourceId() +
+            ", launchUrl: " + getUrl();
     }
 
 }

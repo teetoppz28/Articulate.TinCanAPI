@@ -49,10 +49,10 @@ public class ArticulateTCLaunchServiceImpl implements ArticulateTCLaunchService,
         String endPoint = calculateEndPoint();
 
         StringBuilder sb = new StringBuilder("?")
-            .append(STATE_DATA_KEY_ENDPOINT + "=" + endPoint)
-            .append("&").append(STATE_DATA_KEY_AUTH).append("=")
-            .append("&").append(STATE_DATA_KEY_ACTOR).append("=").append(actor)
-            .append("&").append(STATE_DATA_KEY_PACKAGE_ID).append("=").append(packageId);
+            .append(DataKeys.endpoint.toString()).append("=").append(endPoint)
+            .append("&").append(DataKeys.auth.toString()).append("=")
+            .append("&").append(DataKeys.actor.toString()).append("=").append(actor)
+            .append("&").append(DataKeys.packageid.toString()).append("=").append(packageId);
 
         return sb.toString();
     }

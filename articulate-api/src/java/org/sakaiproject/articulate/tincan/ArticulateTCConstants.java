@@ -12,7 +12,7 @@ public interface ArticulateTCConstants extends ScormConstants {
     /**
      * Entity provider prefix
      */
-    final static String REST_PREFIX = "tincanapi-lrs";
+    final static String REST_PREFIX = "articulate";
 
     /*
      * RESTful API entity configuration
@@ -24,27 +24,12 @@ public interface ArticulateTCConstants extends ScormConstants {
     final static String PATH_QUERY_PARAM_DELETE = "method=delete";
 
     /*
-     * Activity statement data keys
-     */
-    final static String STATEMENT_DATA_KEY_CONTENT = "content";
-
-    /*
      * Activity state data keys
      */
     final static String STATE_DATA_ID_SEPARATOR = "::";
-    final static String STATE_DATA_KEY_ID = "id";
-    final static String STATE_DATA_KEY_ACTIVITY_ID = "activityId";
-    final static String STATE_DATA_KEY_CONTENT = "content";
-    final static String STATE_DATA_KEY_AGENT = "agent";
-    final static String STATE_DATA_KEY_STATE_ID = "stateId";
-    final static String STATE_DATA_KEY_SITE_ID = "siteid";
-    final static String STATE_DATA_KEY_ENDPOINT = "endpoint";
-    final static String STATE_DATA_KEY_ACTOR = "actor";
-    final static String STATE_DATA_KEY_USER_ID = "userid";
-    final static String STATE_DATA_KEY_PACKAGE_ID = "packageid";
-    final static String STATE_DATA_KEY_AUTH = "auth";
-    final static String STATE_DATA_KEY_STATE_ID_COMPLETE = "complete";
-    final static String STATE_DATA_KEY_STATE_ID_RESUME = "resume";
+    static enum DataKeys {
+        id, activityId, content, agent, stateId, siteid, endpoint, actor, userid, packageid, auth, complete, resume
+    }
 
     final static String DEFAULT_ENCODING = "UTF-8";
 
@@ -57,10 +42,13 @@ public interface ArticulateTCConstants extends ScormConstants {
     final static String ARCHIVE_DEFAULT_LAUNCH_PAGE_HTML5_SUFFIX = "_html5";
     final static String ARCHIVE_DEFAULT_LAUNCH_PAGE_UNSUPPORTED_SUFFIX = "_unsupported";
     final static String ARCHIVE_ZIP_MIMETYPE = "application/zip";
+    final static String ARCHIVE_ZIP_EXTENSION = ".zip";
     final static String ARCHIVE_META_XML_FILE = "meta.xml";
     final static String ARCHIVE_TINCAN_XML_FILE = "tincan.xml";
-    final static String ARCHIVE_META_ATTR_ID = "id";
-    final static String ARCHIVE_META_ATTR_TITLE = "title";
+    final static String ARCHIVE_FILE_SUFFIX_SEPARATOR = "-";
+    static enum XmlKeys {
+        project, id, title
+    }
 
     /*
      * HTML page
@@ -90,6 +78,7 @@ public interface ArticulateTCConstants extends ScormConstants {
     final static String CONFIGURATION_RECORD_SCORE_TYPE_BEST = "BEST";
     final static String CONFIGURATION_RECORD_SCORE_TYPE_LATEST = "LATEST";
     final static String CONFIGURATION_GRADEBOOK_NO_POINTS = "-";
+    final static String CONFIGURATION_GRADEBOOK_NOT_AVAILABLE = "N/A";
 
     /*
      * Results
@@ -104,6 +93,9 @@ public interface ArticulateTCConstants extends ScormConstants {
      * Grading
      */
     final static DecimalFormat GRADE_DECIMAL_FORMAT = new DecimalFormat("#.##");
+    static enum GradingKeys {
+        result, completion, score, scaled, grade
+    }
 
     /*
      * Events
@@ -112,5 +104,14 @@ public interface ArticulateTCConstants extends ScormConstants {
     final static String SAKAI_EVENT_REMOVE = "articulate.tc.remove";
     final static String SAKAI_EVENT_LAUNCH = "articulate.tc.launch";
     final static String SAKAI_EVENT_GRADE = "articulate.tc.grade";
+
+    /*
+     * LRS 
+     */
+    final static String LRS_DEFAULT_ACTOR_TYPE = "Agent";
+    final static String SAKAI_PROPERTY_ACTOR_IDENTIFIER = "lrs.tincanapi.inverse.functional.identifier";
+    static enum LRSKeys {
+        actor, mbox, mbox_sha1sum, openid, account, objectType, name, homePage
+    }
 
 }

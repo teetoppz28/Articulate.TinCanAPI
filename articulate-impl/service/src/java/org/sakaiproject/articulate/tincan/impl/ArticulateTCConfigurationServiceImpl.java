@@ -136,7 +136,11 @@ public class ArticulateTCConfigurationServiceImpl implements ArticulateTCConfigu
         int count = 1;
 
         while (gradebookService.isAssignmentDefined(context, fixedTitle)) {
-            fixedTitle = title + " (" + count++ + ")";
+            fixedTitle = new StringBuilder(title)
+                .append(" (")
+                .append(count++)
+                .append(")")
+                .toString();
         }
 
         return fixedTitle;
