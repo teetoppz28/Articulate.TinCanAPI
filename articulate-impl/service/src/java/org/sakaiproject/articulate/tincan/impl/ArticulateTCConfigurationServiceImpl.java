@@ -101,12 +101,12 @@ public class ArticulateTCConfigurationServiceImpl implements ArticulateTCConfigu
     }
 
     @Override
-    public Assignment getAssignment( ArticulateTCContentPackage articulateTCContentPackage) {
+    public Assignment getAssignment(ArticulateTCContentPackage articulateTCContentPackage) {
         return gradebookService.getAssignment(articulateTCContentPackage.getContext(), articulateTCContentPackage.getAssignmentId());
     }
 
     @Override
-    public boolean isGradebookDefined( ArticulateTCContentPackage articulateTCContentPackage) {
+    public boolean isGradebookDefined(ArticulateTCContentPackage articulateTCContentPackage) {
         return gradebookService.isGradebookDefined(articulateTCContentPackage.getContext());
     }
 
