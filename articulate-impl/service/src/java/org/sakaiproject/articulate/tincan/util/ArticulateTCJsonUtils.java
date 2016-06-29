@@ -76,7 +76,8 @@ public class ArticulateTCJsonUtils {
      * @param jsonStr the JSON to parse
      * @return a Map of the POJO created
      */
-    public static Map<?, ?> parseFromJsonObject(String jsonStr) {
+    @SuppressWarnings("unchecked")
+    public static Map<String, Object> parseFromJsonObject(String jsonStr) {
         if (StringUtils.isBlank(jsonStr)) {
             throw new IllegalArgumentException("JSON string cannot be blank.");
         }
@@ -84,7 +85,7 @@ public class ArticulateTCJsonUtils {
         Gson gson = new Gson();
 
         try {
-            return gson.fromJson(getJsonElement(jsonStr), HashMap.class);
+            return (Map<String, Object>) gson.fromJson(getJsonElement(jsonStr), HashMap.class);
         } catch (Exception e) {
             log.error("Error getting JSON Object.", e);
         }

@@ -2,6 +2,7 @@ package org.sakaiproject.articulate.tincan.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import lombok.Setter;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.api.ArticulateTCEntityProviderService;
@@ -23,6 +25,7 @@ import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCAttemptRes
 import org.sakaiproject.articulate.tincan.model.hibernate.ArticulateTCContentPackage;
 import org.sakaiproject.articulate.tincan.util.ArticulateTCEntityProviderServiceUtils;
 import org.sakaiproject.articulate.tincan.util.ArticulateTCJsonUtils;
+import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.event.api.EventTrackingService;
@@ -32,6 +35,8 @@ import org.sakaiproject.service.gradebook.shared.CommentDefinition;
 import org.sakaiproject.service.gradebook.shared.GradeDefinition;
 import org.sakaiproject.service.gradebook.shared.GradebookService;
 import org.sakaiproject.site.api.SiteService;
+import org.sakaiproject.user.api.User;
+import org.sakaiproject.user.api.UserDirectoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +66,13 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
     private EventTrackingService eventTrackingService;
 
     @Setter
+    private ServerConfigurationService serverConfigurationService;
+
+    @Setter
     private SiteService siteService;
+
+    @Setter
+    private UserDirectoryService userDirectoryService;
 
     private GradebookService gradebookService;
     private LearningResourceStoreService learningResourceStoreService;
@@ -159,6 +170,32 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
         }
 
         try {
+            User user = userDirectoryService.getCurrentUser();
+            Map<String, Object> statementMap = ArticulateTCJsonUtils.parseFromJsonObject(statementJson);
+            String identifierKey = serverConfigurationService.getString("lrs.tincanapi.inverse.functional.identifier", "account");
+
+            Map<String, Object> actorMap = new HashMap<String, Object>();
+            actorMap.put("name", user.getDisplayName());
+            actorMap.put("objectType", "Agent");
+
+            if (StringUtils.equalsIgnoreCase(identifierKey, "mbox")) {
+                actorMap.put("mbox", "mailto:" + user.getEmail());
+            } else if (StringUtils.equalsIgnoreCase(identifierKey, "mbox_sha1sum")) {
+                actorMap.put("mbox_sha1sum", DigestUtils.sha1Hex("mailto:" + user.getEmail()));
+            } else if (StringUtils.equalsIgnoreCase(identifierKey, "openid")) {
+                // NOT IMPLEMENTED
+                actorMap.put("openid", "NOT_IMPLEMENTED");
+            } else {
+                // default identifier is account object
+                Map<String, String> accountMap = new HashMap<String, String>(2);
+                accountMap.put("name", user.getEid());
+                accountMap.put("homePage", serverConfigurationService.getServerUrl());
+                actorMap.put("account", accountMap);
+            }
+
+            statementMap.put("actor", actorMap);
+            statementJson = ArticulateTCJsonUtils.parseToJson(statementMap);
+
             LearningResourceStoreService.LRS_Statement statement = new LearningResourceStoreService.LRS_Statement(statementJson);
             learningResourceStoreService.registerStatement(statement, null);
         } catch (Exception e) {
