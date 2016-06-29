@@ -74,11 +74,11 @@ public class ArticulateTCActivityState implements Serializable, ArticulateTCCons
     }
 
     public boolean isResume() {
-        return StringUtils.equalsIgnoreCase(this.stateId, STATE_DATA_KEY_STATE_ID_RESUME);
+        return StringUtils.equalsIgnoreCase(this.stateId, DataKeys.resume.toString());
     }
 
     public boolean isComplete() {
-        return StringUtils.equalsIgnoreCase(this.stateId, STATE_DATA_KEY_STATE_ID_COMPLETE);
+        return StringUtils.equalsIgnoreCase(this.stateId, DataKeys.complete.toString());
     }
 
     /**

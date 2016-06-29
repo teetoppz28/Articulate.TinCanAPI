@@ -120,23 +120,23 @@ public class ArticulateTCRequestPayload implements ArticulateTCConstants {
      */
     public void populateFields(String[] parameters) {
         for (String s : parameters) {
-            if (StringUtils.startsWith(s, STATE_DATA_KEY_ACTIVITY_ID)) {
+            if (StringUtils.startsWith(s, DataKeys.activityId.toString())) {
                 setActivityId(s);
                 continue;
             }
-            if (StringUtils.startsWith(s, STATE_DATA_KEY_AGENT)) {
+            if (StringUtils.startsWith(s, DataKeys.agent.toString())) {
                 setAgent(s);
                 continue;
             }
-            if (StringUtils.startsWith(s, STATE_DATA_KEY_CONTENT)) {
+            if (StringUtils.startsWith(s, DataKeys.content.toString())) {
                 setContent(s);
                 continue;
             }
-            if (StringUtils.startsWith(s, STATE_DATA_KEY_STATE_ID)) {
+            if (StringUtils.startsWith(s, DataKeys.stateId.toString())) {
                 setStateId(s);
                 continue;
             }
-            if (StringUtils.startsWith(s, STATE_DATA_KEY_PACKAGE_ID)) {
+            if (StringUtils.startsWith(s, DataKeys.packageid.toString())) {
                 setContentPackageId(Long.parseLong(getValue(s)));
                 continue;
             }

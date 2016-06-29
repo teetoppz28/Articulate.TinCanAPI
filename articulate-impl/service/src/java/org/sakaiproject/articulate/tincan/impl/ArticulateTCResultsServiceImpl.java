@@ -63,7 +63,7 @@ public class ArticulateTCResultsServiceImpl implements ArticulateTCResultsServic
     @Override
     public String calculatePointsPossible(String contentPackageId, String gradebookPointsPossible) {
         if (StringUtils.isBlank(gradebookPointsPossible)) {
-            gradebookPointsPossible = "-";
+            gradebookPointsPossible = CONFIGURATION_GRADEBOOK_NO_POINTS;
             ArticulateTCContentPackage articulateTCContentPackage = articulateTCContentPackageDao.get(Long.parseLong(contentPackageId));
 
             if (articulateTCContentPackage != null) {
@@ -89,14 +89,15 @@ public class ArticulateTCResultsServiceImpl implements ArticulateTCResultsServic
     @Override
     public String calculateGradebookScore(String contentPackageId, String gradebookScore, String userId) {
         if (StringUtils.isBlank(gradebookScore)) {
-            gradebookScore = "N/A";
+            gradebookScore = CONFIGURATION_GRADEBOOK_NOT_AVAILABLE;
             ArticulateTCContentPackage articulateTCContentPackage = articulateTCContentPackageDao.get(Long.parseLong(contentPackageId));
 
             if (articulateTCContentPackage != null) {
                 if (articulateTCContentPackage.getAssignmentId() != null) {
                     try {
                         developerHelperService.setCurrentUser(DeveloperHelperService.ADMIN_USER_REF);
-                        gradebookScore = gradebookService.getAssignmentScoreString(articulateTCContentPackage.getContext(), articulateTCContentPackage.getAssignmentId(), userId);
+                        gradebookScore = gradebookService.getAssignmentScoreString(articulateTCContentPackage.getContext(),
+                            articulateTCContentPackage.getAssignmentId(), userId);
                     } catch (Exception e) {
                         log.error("Error getting score string for user {} in site {} and asignment {}",
                             userId, articulateTCContentPackage.getContext(), articulateTCContentPackage.getAssignmentId(), e);

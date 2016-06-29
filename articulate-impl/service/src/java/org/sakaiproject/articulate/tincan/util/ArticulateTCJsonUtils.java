@@ -104,7 +104,7 @@ public class ArticulateTCJsonUtils {
         JsonElement jsonElement = gson.fromJson(jsonStr, JsonElement.class);
 
          if (jsonElement.isJsonObject()) {
-            return jsonElement.getAsJsonObject();
+             return jsonElement.getAsJsonObject();
          } else if (jsonElement.isJsonArray()) {
              return jsonElement.getAsJsonArray();
          }

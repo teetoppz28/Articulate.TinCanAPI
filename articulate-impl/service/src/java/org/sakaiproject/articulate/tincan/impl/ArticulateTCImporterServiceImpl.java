@@ -182,15 +182,15 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
         ArticulateTCMeta tinCanAPIMeta = null;
 
         try {
-            NodeList projectList = metaXmlDocument.getElementsByTagName("project");
+            NodeList projectList = metaXmlDocument.getElementsByTagName(XmlKeys.project.toString());
             Node project = projectList.item(0);
             Element element = (Element) project;
 
             tinCanAPIMeta = new ArticulateTCMeta(
                 getCurrentContext(),
                 getCurrentUserId(),
-                element.getAttribute(ArticulateTCConstants.ARCHIVE_META_ATTR_ID),
-                element.getAttribute(ArticulateTCConstants.ARCHIVE_META_ATTR_TITLE)
+                element.getAttribute(XmlKeys.id.toString()),
+                element.getAttribute(XmlKeys.title.toString())
             );
         } catch (Exception e) {
             log.error("Error occurred processing the meta XML document.", e);
@@ -361,7 +361,10 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
         int count = articulateTCContentPackageDao.countContentPackages(getCurrentContext(), title);
 
         if (count > 1) {
-            title += " (" + count + ")";
+            title += new StringBuilder(" (")
+                .append(count)
+                .append(")")
+                .toString();
         }
 
         return title;
@@ -372,7 +375,7 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
      * e.g "-1234567890"
      */
     private void setTimestamp() {
-        this.timestamp = "-" + Long.toString((new Date()).getTime());
+        this.timestamp = ARCHIVE_FILE_SUFFIX_SEPARATOR + Long.toString((new Date()).getTime());
     }
 
     /**
@@ -404,7 +407,10 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
      * Path: /private/articulate/SITE_ID/
      */
     private String getSiteCollectionRootPath() {
-        return ARCHIVE_DEFAULT_STORAGE_PATH_PREFIX + getCurrentContext() + Entity.SEPARATOR;
+        return new StringBuilder(ARCHIVE_DEFAULT_STORAGE_PATH_PREFIX)
+            .append(getCurrentContext())
+            .append(Entity.SEPARATOR)
+            .toString();
     }
 
     /**
@@ -413,7 +419,10 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
      * @param includeTimestamp should the timestamp be included in the name?
      */
     private String getPackageCollectionPath(boolean includeTimestamp) {
-        return getSiteCollectionRootPath() + getPackageCollectionId(includeTimestamp) + Entity.SEPARATOR;
+        return new StringBuilder(getSiteCollectionRootPath())
+            .append(getPackageCollectionId(includeTimestamp))
+            .append(Entity.SEPARATOR)
+            .toString();
     }
 
     /**
@@ -422,7 +431,10 @@ public class ArticulateTCImporterServiceImpl implements ArticulateTCImporterServ
      * @param includeTimestamp should the timestamp be included in the name?
      */
     private String getPackageArchiveFilePath(boolean includeTimestamp) {
-        return getSiteCollectionRootPath() + getPackageCollectionId(includeTimestamp) + ".zip";
+        return new StringBuilder(getSiteCollectionRootPath())
+            .append(getPackageCollectionId(includeTimestamp))
+            .append(ARCHIVE_ZIP_EXTENSION)
+            .toString();
     }
 
     /**

@@ -172,28 +172,28 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
         try {
             User user = userDirectoryService.getCurrentUser();
             Map<String, Object> statementMap = ArticulateTCJsonUtils.parseFromJsonObject(statementJson);
-            String identifierKey = serverConfigurationService.getString("lrs.tincanapi.inverse.functional.identifier", "account");
+            String identifierKey = serverConfigurationService.getString(SAKAI_PROPERTY_ACTOR_IDENTIFIER, LRSKeys.account.toString());
 
             Map<String, Object> actorMap = new HashMap<String, Object>();
-            actorMap.put("name", user.getDisplayName());
-            actorMap.put("objectType", "Agent");
+            actorMap.put(LRSKeys.name.toString(), user.getDisplayName());
+            actorMap.put(LRSKeys.objectType.toString(), LRS_DEFAULT_ACTOR_TYPE);
 
-            if (StringUtils.equalsIgnoreCase(identifierKey, "mbox")) {
-                actorMap.put("mbox", "mailto:" + user.getEmail());
-            } else if (StringUtils.equalsIgnoreCase(identifierKey, "mbox_sha1sum")) {
-                actorMap.put("mbox_sha1sum", DigestUtils.sha1Hex("mailto:" + user.getEmail()));
-            } else if (StringUtils.equalsIgnoreCase(identifierKey, "openid")) {
+            if (StringUtils.equalsIgnoreCase(identifierKey, LRSKeys.mbox.toString())) {
+                actorMap.put(LRSKeys.mbox.toString(), "mailto:" + user.getEmail());
+            } else if (StringUtils.equalsIgnoreCase(identifierKey, LRSKeys.mbox_sha1sum.toString())) {
+                actorMap.put(LRSKeys.mbox_sha1sum.toString(), DigestUtils.sha1Hex("mailto:" + user.getEmail()));
+            } else if (StringUtils.equalsIgnoreCase(identifierKey, LRSKeys.openid.toString())) {
                 // NOT IMPLEMENTED
-                actorMap.put("openid", "NOT_IMPLEMENTED");
+                actorMap.put(LRSKeys.openid.toString(), "NOT_IMPLEMENTED");
             } else {
                 // default identifier is account object
                 Map<String, String> accountMap = new HashMap<String, String>(2);
-                accountMap.put("name", user.getEid());
-                accountMap.put("homePage", serverConfigurationService.getServerUrl());
-                actorMap.put("account", accountMap);
+                accountMap.put(LRSKeys.name.toString(), user.getEid());
+                accountMap.put(LRSKeys.homePage.toString(), serverConfigurationService.getServerUrl());
+                actorMap.put(LRSKeys.account.toString(), accountMap);
             }
 
-            statementMap.put("actor", actorMap);
+            statementMap.put(LRSKeys.actor.toString(), actorMap);
             statementJson = ArticulateTCJsonUtils.parseToJson(statementMap);
 
             LearningResourceStoreService.LRS_Statement statement = new LearningResourceStoreService.LRS_Statement(statementJson);
@@ -248,28 +248,28 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
                 return;
             }
 
-            Map<String, Object> result = (Map<String, Object>) statement.get("result");
+            Map<String, Object> result = (Map<String, Object>) statement.get(GradingKeys.result.toString());
             if (result == null) {
                 // no result in content
                 return;
             }
 
-            Boolean completion = (Boolean) result.get("completion");
+            Boolean completion = (Boolean) result.get(GradingKeys.completion.toString());
             if (completion == null || !completion) {
                 // activity is not completed
                 return;
             }
 
-            Map<String, Object> score = (Map<String, Object>) result.get("score");
+            Map<String, Object> score = (Map<String, Object>) result.get(GradingKeys.score.toString());
             if (score == null) {
                 // no score sent
                 return;
             }
 
-            Double scaled = (Double) score.get("scaled");
+            Double scaled = (Double) score.get(GradingKeys.scaled.toString());
             if (scaled == null) {
                 // no scale sent, default to 0 (zero)
-                scaled = 0d;
+                scaled = CONFIGURATION_DEFAULT_SCALED_SCORE;
             }
 
             Double assignmentPoints = assignment.getPoints();
@@ -278,7 +278,7 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
              * Save the Attempt result
              */
 
-            Double attemptScore = (assignmentPoints != null) ? assignmentPoints * scaled : 0d;
+            Double attemptScore = (assignmentPoints != null) ? assignmentPoints * scaled : CONFIGURATION_DEFAULT_SCALED_SCORE;
 
             saveAttemptResult(articulateTCContentPackage.getContentPackageId(), articulateTCRequestPayload.getUserId(), scaled);
 
@@ -289,7 +289,7 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
             ArticulateTCAttempt articulateTCAttempt = articulateTCAttemptDao.lookupNewest(articulateTCContentPackage.getContentPackageId(), articulateTCRequestPayload.getUserId());
 
             if (articulateTCAttempt != null) {
-                updateActivityStateId(articulateTCAttempt.getId(), STATE_DATA_KEY_STATE_ID_COMPLETE);
+                updateActivityStateId(articulateTCAttempt.getId(), DataKeys.complete.toString());
             }
 
             /*
@@ -326,7 +326,15 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
 
             gradebookService.saveGradesAndComments(articulateTCRequestPayload.getSiteId(), assignment.getId(), gradeDefinitions);
 
-            eventTrackingService.post(eventTrackingService.newEvent(SAKAI_EVENT_GRADE, "articulate/tc/site/" + articulateTCContentPackage.getContext() + "/instructor/" + articulateTCContentPackage.getCreatedBy() + "/student/" + articulateTCRequestPayload.getUserId() + "/packageId/" + articulateTCContentPackage.getContentPackageId(), true));
+            StringBuilder eventRef = new StringBuilder("articulate/tc/site/")
+                .append(articulateTCContentPackage.getContext())
+                .append("/instructor/")
+                .append(articulateTCContentPackage.getCreatedBy())
+                .append("/student/")
+                .append(articulateTCRequestPayload.getUserId())
+                .append("/packageId/")
+                .append(articulateTCContentPackage.getContentPackageId());
+            eventTrackingService.post(eventTrackingService.newEvent(SAKAI_EVENT_GRADE, eventRef.toString(), true));
         } catch (Exception e) {
             log.error("Error sending grade to gradebook.", e);
         } finally {
@@ -392,7 +400,7 @@ public class ArticulateTCEntityProviderServiceImpl implements ArticulateTCEntity
             Map<String, String> studentsToGrade = gradebookService.getViewableStudentsForItemForCurrentUser(gradebookUid, assignmentId);
 
             for (Map.Entry<String, String> student : studentsToGrade.entrySet()) {
-                if (StringUtils.equalsIgnoreCase(student.getValue(), "grade")) {
+                if (StringUtils.equalsIgnoreCase(student.getValue(), GradingKeys.grade.toString())) {
                     String previousScoreStr = gradebookService.getAssignmentScoreString(siteId, assignment.getId(), student.getKey());
 
                     if (StringUtils.isBlank(previousScoreStr)) {
