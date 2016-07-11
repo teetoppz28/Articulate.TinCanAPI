@@ -5,6 +5,9 @@ import java.util.Date;
 
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * @author Robert Long (rlong @ unicon.net)
  */
@@ -12,63 +15,15 @@ public class ArticulateTCAttemptResult implements ArticulateTCConstants, Seriali
 
     private static final long serialVersionUID = 1L;
 
-    private Long id;
-    private Long attemptId;
-    private Long attemptNumber;
-    private Double scaledScore;
-    private Date dateCompleted;
-    private Date modified;
+    @Setter @Getter private Long id;
+    @Setter @Getter private Long attemptId;
+    @Setter @Getter private Long attemptNumber;
+    @Setter @Getter private Double scaledScore;
+    @Setter @Getter private Date dateCompleted;
+    @Setter @Getter private Date modified;
 
     public ArticulateTCAttemptResult() {
         this.scaledScore = CONFIGURATION_DEFAULT_SCALED_SCORE;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getAttemptId() {
-        return attemptId;
-    }
-
-    public void setAttemptId(Long attemptId) {
-        this.attemptId = attemptId;
-    }
-
-    public Long getAttemptNumber() {
-        return attemptNumber;
-    }
-
-    public void setAttemptNumber(Long attemptNumber) {
-        this.attemptNumber = attemptNumber;
-    }
-
-    public Double getScaledScore() {
-        return scaledScore;
-    }
-
-    public void setScaledScore(Double scaledScore) {
-        this.scaledScore = scaledScore;
-    }
-
-    public Date getDateCompleted() {
-        return dateCompleted;
-    }
-
-    public void setDateCompleted(Date dateCompleted) {
-        this.dateCompleted = dateCompleted;
-    }
-
-    public Date getModified() {
-        return modified;
-    }
-
-    public void setModified(Date modified) {
-        this.modified = modified;
     }
 
 }

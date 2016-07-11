@@ -3,18 +3,21 @@ package org.sakaiproject.articulate.tincan.model;
 import org.apache.commons.lang.StringUtils;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * @author Robert Long (rlong @ unicon.net)
  */
 public class ArticulateTCRequestPayload implements ArticulateTCConstants {
 
-    private String activityId;
-    private String agent;
-    private String content;
-    private Long contentPackageId;
-    private String stateId;
-    private String siteId;
-    private String userId;
+    @Setter @Getter private String activityId;
+    @Setter @Getter private String agent;
+    @Setter @Getter private String content;
+    @Setter @Getter private Long contentPackageId;
+    @Setter @Getter private String stateId;
+    @Setter @Getter private String siteId;
+    @Setter @Getter private String userId;
 
     public ArticulateTCRequestPayload() {
     }
@@ -25,62 +28,6 @@ public class ArticulateTCRequestPayload implements ArticulateTCConstants {
 
     public ArticulateTCRequestPayload(String[] parameters) {
         populateFields(parameters);
-    }
-
-    public String getActivityId() {
-        return activityId;
-    }
-
-    public void setActivityId(String activityId) {
-        this.activityId = getValue(activityId);
-    }
-
-    public String getAgent() {
-        return agent;
-    }
-
-    public void setAgent(String agent) {
-        this.agent = getValue(agent);
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = getValue(content);
-    }
-
-    public Long getContentPackageId() {
-        return contentPackageId;
-    }
-
-    public void setContentPackageId(Long contentPackageId) {
-        this.contentPackageId = contentPackageId;
-    }
-
-    public String getStateId() {
-        return stateId;
-    }
-
-    public void setStateId(String stateId) {
-        this.stateId = getValue(stateId);
-    }
-
-    public String getSiteId() {
-        return siteId;
-    }
-
-    public void setSiteId(String siteId) {
-        this.siteId = siteId;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
     }
 
     /**

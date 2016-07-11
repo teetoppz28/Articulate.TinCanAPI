@@ -7,6 +7,9 @@ import org.apache.commons.lang.StringUtils;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.model.ArticulateTCMeta;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * @author Robert Long (rlong @ unicon.net)
  */
@@ -14,25 +17,25 @@ public class ArticulateTCContentPackage implements ArticulateTCConstants, Serial
 
     private static final long serialVersionUID = 1L;
 
-    private Long contentPackageId;
-    private String title;
-    private String resourceId;
-    private String context;
-    private String url;
-    private String recordType;
-    private Date releaseOn;
-    private Date dueOn;
-    private Date acceptUntil;
-    private Date createdOn;
-    private String createdBy;
-    private Date modifiedOn;
-    private String modifiedBy;
-    private int numberOfTries;
-    private boolean isDeleted;
-    private Long assignmentId;
-    private String gradebookItemTitle;
-    private boolean graded;
-    private Double points;
+    @Setter @Getter private Long contentPackageId;
+    @Setter @Getter private String title;
+    @Setter @Getter private String resourceId;
+    @Setter @Getter private String context;
+    @Setter @Getter private String url;
+    @Setter @Getter private String recordType;
+    @Setter @Getter private Date releaseOn;
+    @Setter @Getter private Date dueOn;
+    @Setter @Getter private Date acceptUntil;
+    @Setter @Getter private Date createdOn;
+    @Setter @Getter private String createdBy;
+    @Setter @Getter private Date modifiedOn;
+    @Setter @Getter private String modifiedBy;
+    @Setter @Getter private int numberOfTries;
+    @Setter @Getter private boolean isDeleted;
+    @Setter @Getter private Long assignmentId;
+    @Setter @Getter private String gradebookItemTitle;
+    @Setter @Getter private boolean graded;
+    @Setter @Getter private Double points;
 
     public ArticulateTCContentPackage() {
         this.numberOfTries = CONFIGURATION_DEFAULT_NUMBER_OF_TRIES_UNLIMITED;
@@ -45,175 +48,21 @@ public class ArticulateTCContentPackage implements ArticulateTCConstants, Serial
         this();
 
         if (articulateTCMeta != null) {
-            setContext(articulateTCMeta.getCourseId());
-            setTitle(articulateTCMeta.getTitle());
-            setResourceId(articulateTCMeta.getId());
-            setDeleted(false);
-            setReleaseOn(new Date());
-            setCreatedOn(new Date());
-            setCreatedBy(articulateTCMeta.getCreatedBy());
-            setModifiedOn(new Date());
-            setModifiedBy(articulateTCMeta.getCreatedBy());
+            this.context = articulateTCMeta.getCourseId();
+            this.title = articulateTCMeta.getTitle();
+            this.resourceId = articulateTCMeta.getId();
+            this.isDeleted = false;
+            this.releaseOn = new Date();
+            this.createdOn = new Date();
+            this.createdBy = articulateTCMeta.getCreatedBy();
+            this.modifiedOn = new Date();
+            this.modifiedBy = articulateTCMeta.getCreatedBy();
         }
     }
 
     public ArticulateTCContentPackage(ArticulateTCMeta articulateTCMeta, String launchUrl) {
         this(articulateTCMeta);
-        setUrl(launchUrl);
-    }
-
-    public Long getContentPackageId() {
-        return contentPackageId;
-    }
-
-    public void setContentPackageId(Long contentPackageId) {
-        this.contentPackageId = contentPackageId;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getResourceId() {
-        return resourceId;
-    }
-
-    public void setResourceId(String resourceId) {
-        this.resourceId = resourceId;
-    }
-
-    public String getContext() {
-        return context;
-    }
-
-    public void setContext(String context) {
-        this.context = context;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getRecordType() {
-        return recordType;
-    }
-
-    public void setRecordType(String recordType) {
-        this.recordType = recordType;
-    }
-
-    public Date getReleaseOn() {
-        return releaseOn;
-    }
-
-    public void setReleaseOn(Date releaseOn) {
-        this.releaseOn = releaseOn;
-    }
-
-    public Date getDueOn() {
-        return dueOn;
-    }
-
-    public void setDueOn(Date dueOn) {
-        this.dueOn = dueOn;
-    }
-
-    public Date getAcceptUntil() {
-        return acceptUntil;
-    }
-
-    public void setAcceptUntil(Date acceptUntil) {
-        this.acceptUntil = acceptUntil;
-    }
-
-    public Date getCreatedOn() {
-        return createdOn;
-    }
-
-    public void setCreatedOn(Date createdOn) {
-        this.createdOn = createdOn;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public Date getModifiedOn() {
-        return modifiedOn;
-    }
-
-    public void setModifiedOn(Date modifiedOn) {
-        this.modifiedOn = modifiedOn;
-    }
-
-    public String getModifiedBy() {
-        return modifiedBy;
-    }
-
-    public void setModifiedBy(String modifiedBy) {
-        this.modifiedBy = modifiedBy;
-    }
-
-    public int getNumberOfTries() {
-        return numberOfTries;
-    }
-
-    public void setNumberOfTries(int numberOfTries) {
-        this.numberOfTries = numberOfTries;
-    }
-
-    public boolean isDeleted() {
-        return isDeleted;
-    }
-
-    public void setDeleted(boolean isDeleted) {
-        this.isDeleted = isDeleted;
-    }
-
-    public Long getAssignmentId() {
-        return assignmentId;
-    }
-
-    public void setAssignmentId(Long assignmentId) {
-        this.assignmentId = assignmentId;
-
-        this.graded = assignmentId != null;
-    }
-
-    public boolean isGraded() {
-        return graded;
-    }
-
-    public void setGraded(boolean graded) {
-        this.graded = graded;
-    }
-
-    public String getGradebookItemTitle() {
-        return gradebookItemTitle;
-    }
-
-    public void setGradebookItemTitle(String gradebookItemTitle) {
-        this.gradebookItemTitle = gradebookItemTitle;
-    }
-
-    public Double getPoints() {
-        return points;
-    }
-
-    public void setPoints(Double points) {
-        this.points = points;
+        this.url = launchUrl;
     }
 
     /**
@@ -226,7 +75,7 @@ public class ArticulateTCContentPackage implements ArticulateTCConstants, Serial
     }
 
     /**
-     * Can the user have unlimted attempts?
+     * Can the user have unlimited attempts?
      * 
      * @return
      */

@@ -4,6 +4,9 @@ import java.io.Serializable;
 
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * @author Robert Long (rlong @ unicon.net)
  */
@@ -11,80 +14,16 @@ public class ArticulateTCMemberAttemptResult implements Serializable, Articulate
 
     private static final long serialVersionUID = 1L;
 
-    private String userId;
-    private String eid;
-    private String firstName;
-    private String lastName;
-    private String fullName;
-    private String attemptNumber;
-    private String gradebookPointsPossible;
-    private String gradebookScore;
+    @Setter @Getter private String userId;
+    @Setter @Getter private String eid;
+    @Setter @Getter private String firstName;
+    @Setter @Getter private String lastName;
+    @Setter @Getter private String fullName;
+    @Setter @Getter private String attemptNumber;
+    @Setter @Getter private String gradebookPointsPossible;
+    @Setter @Getter private String gradebookScore;
 
     public ArticulateTCMemberAttemptResult() {
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getEid() {
-        return eid;
-    }
-
-    public void setEid(String eid) {
-        this.eid = eid;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getAttemptNumber() {
-        return attemptNumber;
-    }
-
-    public void setAttemptNumber(String attemptNumber) {
-        this.attemptNumber = attemptNumber;
-    }
-
-    public String getGradebookScore() {
-        return gradebookScore;
-    }
-
-    public void setGradebookScore(String gradebookScore) {
-        this.gradebookScore = gradebookScore;
-    }
-
-    public String getGradebookPointsPossible() {
-        return gradebookPointsPossible;
-    }
-
-    public void setGradebookPointsPossible(String gradebookPointsPossible) {
-        this.gradebookPointsPossible = gradebookPointsPossible;
     }
 
     public String getGradebookDisplay() {

@@ -7,6 +7,9 @@ import org.apache.commons.lang.StringUtils;
 import org.sakaiproject.articulate.tincan.ArticulateTCConstants;
 import org.sakaiproject.articulate.tincan.model.ArticulateTCRequestPayload;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * @author Robert Long (rlong @ unicon.net)
  */
@@ -14,11 +17,11 @@ public class ArticulateTCActivityState implements Serializable, ArticulateTCCons
 
     private static final long serialVersionUID = 1L;
 
-    private String content;
-    private Long id;
-    private Long attemptId;
-    private String stateId;
-    private Date modified;
+    @Setter @Getter private String content;
+    @Setter @Getter private Long id;
+    @Setter @Getter private Long attemptId;
+    @Setter @Getter private String stateId;
+    @Setter @Getter private Date modified;
 
     public ArticulateTCActivityState() {
     }
@@ -31,46 +34,6 @@ public class ArticulateTCActivityState implements Serializable, ArticulateTCCons
     public ArticulateTCActivityState(ArticulateTCRequestPayload articulateTCRequestPayload, Long attemptId) {
         this(articulateTCRequestPayload);
         this.attemptId = attemptId;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getAttemptId() {
-        return attemptId;
-    }
-
-    public void setAttemptId(Long attemptId) {
-        this.attemptId = attemptId;
-    }
-
-    public String getStateId() {
-        return stateId;
-    }
-
-    public void setStateId(String stateId) {
-        this.stateId = stateId;
-    }
-
-    public Date getModified() {
-        return modified;
-    }
-
-    public void setModified(Date modified) {
-        this.modified = modified;
     }
 
     public boolean isResume() {
