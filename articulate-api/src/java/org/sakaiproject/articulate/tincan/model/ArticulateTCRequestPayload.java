@@ -11,11 +11,11 @@ import lombok.Setter;
  */
 public class ArticulateTCRequestPayload implements ArticulateTCConstants {
 
-    @Setter @Getter private String activityId;
-    @Setter @Getter private String agent;
-    @Setter @Getter private String content;
+    @Getter private String activityId;
+    @Getter private String agent;
+    @Getter private String content;
     @Setter @Getter private Long contentPackageId;
-    @Setter @Getter private String stateId;
+    @Getter private String stateId;
     @Setter @Getter private String siteId;
     @Setter @Getter private String userId;
 
@@ -28,6 +28,26 @@ public class ArticulateTCRequestPayload implements ArticulateTCConstants {
 
     public ArticulateTCRequestPayload(String[] parameters) {
         populateFields(parameters);
+    }
+
+    /*
+     * Custom setters, due to JSON string data
+     */
+
+    public void setActivityId(String activityId) {
+        this.activityId = getValue(activityId);
+    }
+
+    public void setAgent(String agent) {
+        this.agent = getValue(agent);
+    }
+
+    public void setContent(String content) {
+        this.content = getValue(content);
+    }
+
+    public void setStateId(String stateId) {
+        this.stateId = getValue(stateId);
     }
 
     /**
